@@ -12,7 +12,7 @@ class VoterAdmin(admin.ModelAdmin):
     fieldsets = ()
 
 
-# admin.site.register(Voter, VoterAdmin)
+admin.site.register(Voter, VoterAdmin)
 admin.site.register(Category)
 admin.site.register(Nominee)
-# admin.site.register(Vote)
+admin.site.register(Vote)

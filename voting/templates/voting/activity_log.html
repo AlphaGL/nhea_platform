@@ -1,0 +1,158 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Activity Log{% endblock %}
+{% block header %}Activity Log{% endblock %}
+{% block body %}
+<style>
+.al-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.filter-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);padding:1.5rem;margin-bottom:1.5rem;}
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;align-items:end;}
+.filter-group label{font-size:0.8rem;font-weight:700;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:0.4rem;}
+.filter-group input,.filter-group select{width:100%;padding:0.65rem 0.9rem;border:2px solid var(--nhea-border);border-radius:8px;background:#fafafa;font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;transition:all 0.3s;}
+.filter-group input:focus,.filter-group select:focus{border-color:var(--nhea-green);background:#fff;}
+.btn-filter{padding:0.7rem 1.5rem;background:var(--gradient-hero);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.3s;}
+.btn-filter:hover{transform:translateY(-1px);}
+
+/* Action badges */
+.badge-action{display:inline-block;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.73rem;font-weight:700;white-space:nowrap;}
+.badge-LOGIN{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;}
+.badge-LOGOUT{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;}
+.badge-LOGIN_FAILED{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+.badge-VOTE_CAST{background:#fdf4ff;color:#9333ea;border:1px solid #d8b4fe;}
+.badge-VOTES_RESET{background:#fff1f2;color:#e11d48;border:1px solid #fda4af;}
+.badge-ADMIN_CREATED,.badge-VOTER_CREATED{background:#fffbeb;color:#d97706;border:1px solid #fde68a;}
+.badge-VOTER_DELETED{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+.badge-CATEGORY_CREATED,.badge-NOMINEE_CREATED{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;}
+.badge-CATEGORY_DELETED,.badge-NOMINEE_DELETED{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+.badge-PASSWORD_CHANGE,.badge-PASSWORD_RESET{background:#eff6ff;color:#2563eb;border:1px solid #93c5fd;}
+.badge-PHONE_VERIFIED,.badge-EMAIL_VERIFIED{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;}
+.badge-ACCESS_CODE_USED{background:#fffbeb;color:#d97706;border:1px solid #fde68a;}
+
+/* Log table */
+.log-table-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);overflow:hidden;}
+.log-table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+.log-table th{background:#f8fdf9;padding:0.8rem 1rem;text-align:left;font-size:0.77rem;font-weight:700;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--nhea-border);}
+.log-table td{padding:0.8rem 1rem;border-bottom:1px solid #f0f7f4;vertical-align:top;}
+.log-table tr:last-child td{border-bottom:none;}
+.log-table tr:hover td{background:#fafef9;}
+.log-desc{color:var(--nhea-text);max-width:280px;line-height:1.4;}
+.log-meta{font-size:0.77rem;color:var(--nhea-muted);}
+.ip-badge{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:0.1rem 0.4rem;font-family:monospace;font-size:0.78rem;color:#475569;}
+.geo-text{font-size:0.78rem;color:var(--nhea-muted);}
+.empty-log{text-align:center;padding:3.5rem 2rem;color:var(--nhea-muted);}
+.log-count{font-size:0.82rem;color:var(--nhea-muted);padding:0.75rem 1rem;border-bottom:1px solid var(--nhea-border);background:#f8fdf9;}
+</style>
+
+<section class="al-section">
+<div class="container">
+
+    <div style="margin-bottom:1.5rem;" data-aos="fade-up">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin:0 0 0.25rem;">Activity & Audit Log</h5>
+        <p style="color:var(--nhea-muted);font-size:0.88rem;margin:0;">Track every important action on the platform in real-time.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card" data-aos="fade-up">
+        <form method="get">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Action Type</label>
+                    <select name="action">
+                        <option value="">All Actions</option>
+                        {% for val, label in action_choices %}
+                        <option value="{{ val }}" {% if action_filter == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Actor (Name / ID)</label>
+                    <input type="text" name="actor" value="{{ actor_filter }}" placeholder="Search user…">
+                </div>
+                <div class="filter-group">
+                    <label>From Date</label>
+                    <input type="date" name="date_from" value="{{ date_from }}">
+                </div>
+                <div class="filter-group">
+                    <label>To Date</label>
+                    <input type="date" name="date_to" value="{{ date_to }}">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn-filter"><i class="fas fa-filter me-1"></i>Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="log-table-card" data-aos="fade-up">
+        <div class="log-count">Showing {{ logs|length }} entr{{ logs|length|pluralize:"y,ies" }} (most recent first)</div>
+        {% if logs %}
+        <div style="overflow-x:auto;">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Action</th>
+                        <th>Actor</th>
+                        <th>Description</th>
+                        <th>IP / Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>
+                            <div style="white-space:nowrap;font-weight:600;color:var(--nhea-text);">{{ log.timestamp|date:"d M Y" }}</div>
+                            <div class="log-meta">{{ log.timestamp|time:"H:i:s" }}</div>
+                        </td>
+                        <td>
+                            <span class="badge-action badge-{{ log.action }}">{{ log.get_action_display }}</span>
+                        </td>
+                        <td>
+                            {% if log.actor %}
+                            <div style="font-weight:600;color:var(--nhea-text);">{{ log.actor.full_name }}</div>
+                            <div class="log-meta">{{ log.actor.voter_id }}</div>
+                            {% else %}
+                            <span class="log-meta">Anonymous</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="log-desc">{{ log.description|default:"—" }}</div>
+                            {% if log.target_repr %}
+                            <div class="log-meta">Target: {{ log.target_repr }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.ip_address %}
+                            <span class="ip-badge">{{ log.ip_address }}</span>
+                            {% endif %}
+                            {% if log.country or log.city %}
+                            <div class="geo-text mt-1">
+                                {% if log.city %}{{ log.city }}, {% endif %}
+                                {% if log.country %}{{ log.country }}{% endif %}
+                            </div>
+                            {% endif %}
+                            {% if not log.ip_address and not log.country %}<span class="log-meta">—</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-log">
+            <i class="fas fa-clipboard-list" style="font-size:3rem;opacity:0.3;display:block;margin-bottom:1rem;"></i>
+            <p>No activity logs found matching your filters.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'list_voters' %}" style="color:var(--nhea-green);font-weight:600;font-size:0.9rem;text-decoration:none;">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+</div>
+</section>
+{% endblock %}

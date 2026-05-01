@@ -9,7 +9,6 @@
         min-height: calc(100vh - 220px);
         padding: 3rem 0 5rem;
     }
-
     .dash-hero {
         background: var(--gradient-hero);
         border-radius: 20px;
@@ -20,93 +19,31 @@
         overflow: hidden;
         box-shadow: 0 12px 40px rgba(10,79,60,0.2);
     }
-
     .dash-hero::before {
         content: '';
         position: absolute;
         inset: 0;
         background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a84c' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/svg%3E") repeat;
     }
-
-    .dash-hero-title {
-        font-size: 2.5rem;
-        color: #fff;
-        position: relative; z-index: 2;
-        margin-bottom: 0.5rem;
-    }
-
-    .dash-hero-sub {
-        color: rgba(255,255,255,0.7);
-        position: relative; z-index: 2;
-        font-size: 0.95rem;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2.5rem;
-    }
-
+    .dash-hero-title { font-size: 2.5rem; color: #fff; position: relative; z-index: 2; margin-bottom: 0.5rem; }
+    .dash-hero-sub { color: rgba(255,255,255,0.7); position: relative; z-index: 2; font-size: 0.95rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
     .stat-card {
         background: #fff;
         border-radius: 16px;
         padding: 1.75rem;
         border: 1px solid var(--nhea-border);
         box-shadow: 0 4px 20px rgba(10,79,60,0.06);
-        position: relative;
-        overflow: hidden;
+        position: relative; overflow: hidden;
         transition: all 0.35s ease;
     }
-
-    .stat-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 50px rgba(10,79,60,0.12);
-    }
-
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 4px;
-        background: var(--gradient-gold);
-    }
-
-    .stat-icon-box {
-        width: 52px; height: 52px;
-        border-radius: 12px;
-        display: flex; align-items: center; justify-content: center;
-        margin-bottom: 1.25rem;
-        font-size: 1.3rem;
-        color: #fff;
-        background: var(--gradient-hero);
-    }
-
-    .stat-value {
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 2.8rem;
-        font-weight: 700;
-        color: var(--nhea-text);
-        line-height: 1;
-        margin-bottom: 0.35rem;
-    }
-
-    .stat-label {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--nhea-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-    }
-
-    /* Quick links */
-    .quick-links-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2.5rem;
-    }
-
+    .stat-card:hover { transform: translateY(-6px); box-shadow: 0 16px 50px rgba(10,79,60,0.12); }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-gold); }
+    .stat-icon-box { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; font-size: 1.3rem; color: #fff; background: var(--gradient-hero); }
+    .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 700; color: var(--nhea-text); line-height: 1; margin-bottom: 0.35rem; }
+    .stat-label { font-size: 0.8rem; font-weight: 600; color: var(--nhea-muted); text-transform: uppercase; letter-spacing: 0.8px; }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--nhea-text); margin-bottom: 1rem; }
+    .quick-links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
     .quick-link-card {
         background: #fff;
         border-radius: 14px;
@@ -119,60 +56,25 @@
         transition: all 0.3s;
         box-shadow: 0 2px 10px rgba(10,79,60,0.05);
     }
-
-    .quick-link-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(10,79,60,0.12);
-        border-color: var(--nhea-green);
-        text-decoration: none;
-    }
-
-    .quick-link-icon {
-        width: 44px; height: 44px;
-        border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.1rem;
-        color: #fff;
-        flex-shrink: 0;
-    }
-
-    .quick-link-label {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--nhea-text);
-        line-height: 1.3;
-    }
-
-    .quick-link-sub {
-        font-size: 0.78rem;
-        color: var(--nhea-muted);
-    }
-
-    /* Actions card */
-    .actions-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 2rem;
-        border: 1px solid var(--nhea-border);
-        box-shadow: 0 4px 20px rgba(10,79,60,0.06);
-        text-align: center;
-    }
-
-    .actions-card-title {
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 1.8rem;
-        color: var(--nhea-text);
-        margin-bottom: 0.5rem;
-    }
-
-    .actions-card-subtitle {
-        color: var(--nhea-muted);
-        font-size: 0.9rem;
-        margin-bottom: 2rem;
-        max-width: 450px;
-        margin-left: auto;
-        margin-right: auto;
-    }
+    .quick-link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(10,79,60,0.12); border-color: var(--nhea-green); text-decoration: none; }
+    .quick-link-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #fff; flex-shrink: 0; }
+    .quick-link-label { font-weight: 600; font-size: 0.9rem; color: var(--nhea-text); line-height: 1.3; }
+    .quick-link-sub { font-size: 0.78rem; color: var(--nhea-muted); }
+    /* Superadmin-only section */
+    .superadmin-section { border: 2px solid rgba(201,168,76,0.4); border-radius: 16px; padding: 1.5rem; margin-bottom: 2.5rem; background: rgba(201,168,76,0.04); }
+    .superadmin-label { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: #92400e; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem; }
+    /* Recent activity */
+    .activity-card { background: #fff; border-radius: 16px; border: 1px solid var(--nhea-border); box-shadow: 0 4px 20px rgba(10,79,60,0.06); overflow: hidden; margin-bottom: 2.5rem; }
+    .activity-header { background: #f8fdf9; padding: 1rem 1.5rem; border-bottom: 1px solid var(--nhea-border); display: flex; justify-content: space-between; align-items: center; }
+    .activity-header h6 { margin: 0; font-weight: 700; color: var(--nhea-text); }
+    .log-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 1.5rem; border-bottom: 1px solid #f0f7f4; }
+    .log-row:last-child { border-bottom: none; }
+    .log-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--nhea-green); flex-shrink: 0; margin-top: 0.35rem; }
+    .log-text { font-size: 0.87rem; color: var(--nhea-text); line-height: 1.4; }
+    .log-meta-sm { font-size: 0.77rem; color: var(--nhea-muted); }
+    .actions-card { background: #fff; border-radius: 16px; padding: 2rem; border: 1px solid var(--nhea-border); box-shadow: 0 4px 20px rgba(10,79,60,0.06); text-align: center; }
+    .actions-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--nhea-text); margin-bottom: 0.5rem; }
+    .actions-card-subtitle { color: var(--nhea-muted); font-size: 0.9rem; margin-bottom: 2rem; max-width: 450px; margin-left: auto; margin-right: auto; }
 </style>
 
 <section class="dashboard-section">
@@ -219,10 +121,38 @@
                 <div class="stat-value">{{ total_nominees }}</div>
                 <div class="stat-label">Total Nominees</div>
             </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="250">
+                <div class="stat-icon-box" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-user-shield"></i></div>
+                <div class="stat-value">{{ total_admins }}</div>
+                <div class="stat-label">Admin Accounts</div>
+            </div>
         </div>
 
+        <!-- Superadmin-only section -->
+        {% if request.user.is_superuser %}
+        <div class="superadmin-section" data-aos="fade-up">
+            <div class="superadmin-label"><i class="fas fa-crown"></i>Superadmin Controls</div>
+            <div class="quick-links-grid" style="margin-bottom:0;">
+                <a href="{% url 'manage_admins' %}" class="quick-link-card">
+                    <div class="quick-link-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-user-shield"></i></div>
+                    <div>
+                        <div class="quick-link-label">Manage Admins</div>
+                        <div class="quick-link-sub">Create & remove admin accounts</div>
+                    </div>
+                </a>
+                <a href="{% url 'create_admin' %}" class="quick-link-card">
+                    <div class="quick-link-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><i class="fas fa-user-plus"></i></div>
+                    <div>
+                        <div class="quick-link-label">Create New Admin</div>
+                        <div class="quick-link-sub">Assign admin privileges</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Quick Links -->
-        <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin-bottom:1rem;" data-aos="fade-up">Quick Actions</h5>
+        <h5 class="section-title" data-aos="fade-up">Quick Actions</h5>
         <div class="quick-links-grid">
             <a href="{% url 'list_voters' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="50">
                 <div class="quick-link-icon" style="background:var(--gradient-hero);"><i class="fas fa-users"></i></div>
@@ -232,7 +162,7 @@
                 </div>
             </a>
             <a href="{% url 'list_nominees' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#c9a84c,#e8c96a); color:#0a2a1e;"><i class="fas fa-user-tie"></i></div>
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#0a2a1e;"><i class="fas fa-user-tie"></i></div>
                 <div>
                     <div class="quick-link-label">Manage Nominees</div>
                     <div class="quick-link-sub">Add or remove nominees</div>
@@ -252,14 +182,28 @@
                     <div class="quick-link-sub">Real-time vote tallies</div>
                 </div>
             </a>
-            <a href="{% url 'register_voter' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="250">
+            <a href="{% url 'voting_analytics' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="250">
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#dc2626,#f87171);"><i class="fas fa-globe-africa"></i></div>
+                <div>
+                    <div class="quick-link-label">Vote Analytics</div>
+                    <div class="quick-link-sub">Charts, maps & location data</div>
+                </div>
+            </a>
+            <a href="{% url 'activity_log' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-clipboard-list"></i></div>
+                <div>
+                    <div class="quick-link-label">Activity Log</div>
+                    <div class="quick-link-sub">Full platform audit trail</div>
+                </div>
+            </a>
+            <a href="{% url 'self_register' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="350">
                 <div class="quick-link-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-user-plus"></i></div>
                 <div>
                     <div class="quick-link-label">Register Voter</div>
                     <div class="quick-link-sub">Add a new delegate</div>
                 </div>
             </a>
-            <a href="{% url 'add_nominee' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="300">
+            <a href="{% url 'add_nominee' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="400">
                 <div class="quick-link-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><i class="fas fa-plus-circle"></i></div>
                 <div>
                     <div class="quick-link-label">Add Nominee</div>
@@ -267,6 +211,30 @@
                 </div>
             </a>
         </div>
+
+        <!-- Recent Activity -->
+        {% if recent_logs %}
+        <h5 class="section-title" data-aos="fade-up">Recent Activity</h5>
+        <div class="activity-card" data-aos="fade-up">
+            <div class="activity-header">
+                <h6><i class="fas fa-history me-2" style="color:var(--nhea-green);"></i>Latest Platform Actions</h6>
+                <a href="{% url 'activity_log' %}" style="font-size:0.83rem;color:var(--nhea-green);font-weight:600;text-decoration:none;">View Full Log →</a>
+            </div>
+            {% for log in recent_logs %}
+            <div class="log-row">
+                <div class="log-dot"></div>
+                <div style="flex:1;">
+                    <div class="log-text">{{ log.description|default:log.get_action_display }}</div>
+                    <div class="log-meta-sm">
+                        {% if log.actor %}{{ log.actor.full_name }} · {% endif %}
+                        {{ log.timestamp|date:"d M Y H:i" }}
+                        {% if log.country %} · {{ log.city }}, {{ log.country }}{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <!-- Reset Action -->
         <div class="actions-card" data-aos="fade-up">

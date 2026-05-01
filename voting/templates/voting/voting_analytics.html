@@ -1,0 +1,251 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Voting Analytics{% endblock %}
+{% block header %}Voting Analytics{% endblock %}
+{% block body %}
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- Leaflet for heatmap -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+
+<style>
+.va-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.va-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem;margin-bottom:2rem;}
+.va-stat{background:#fff;border-radius:14px;padding:1.5rem;border:1px solid var(--nhea-border);box-shadow:0 4px 16px rgba(10,79,60,0.06);text-align:center;position:relative;overflow:hidden;}
+.va-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--gradient-gold);}
+.va-stat-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:var(--nhea-green);line-height:1;}
+.va-stat-label{font-size:0.78rem;font-weight:600;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:0.35rem;}
+.chart-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);padding:1.75rem;margin-bottom:1.5rem;}
+.chart-card-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--nhea-text);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid var(--nhea-border);padding-bottom:0.75rem;}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+@media(max-width:768px){.chart-grid{grid-template-columns:1fr;}}
+#voteMap{height:380px;border-radius:12px;border:2px solid var(--nhea-border);}
+.country-bar-row{margin-bottom:0.85rem;}
+.country-bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;}
+.country-name{font-size:0.88rem;font-weight:600;color:var(--nhea-text);display:flex;align-items:center;gap:0.5rem;}
+.country-count{font-size:0.85rem;font-weight:700;color:var(--nhea-green);}
+.country-bar-bg{height:8px;background:#f0f7f4;border-radius:4px;overflow:hidden;}
+.country-bar-fill{height:100%;background:var(--gradient-hero);border-radius:4px;transition:width 1s ease;}
+.region-table{width:100%;border-collapse:collapse;font-size:0.88rem;}
+.region-table th{background:#f8fdf9;padding:0.65rem 0.9rem;text-align:left;font-size:0.77rem;font-weight:700;color:var(--nhea-muted);text-transform:uppercase;border-bottom:1px solid var(--nhea-border);}
+.region-table td{padding:0.65rem 0.9rem;border-bottom:1px solid #f0f7f4;}
+.region-table tr:last-child td{border-bottom:none;}
+.empty-data{text-align:center;padding:2.5rem;color:var(--nhea-muted);font-size:0.9rem;}
+</style>
+
+<section class="va-section">
+<div class="container">
+
+    <div style="margin-bottom:1.5rem;" data-aos="fade-up">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin:0 0 0.25rem;">
+            <i class="fas fa-chart-pie me-2" style="color:var(--nhea-green);"></i>Voting Analytics
+        </h5>
+        <p style="color:var(--nhea-muted);font-size:0.88rem;margin:0;">Real-time insights into voting patterns, locations, and category performance.</p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="va-stats" data-aos="fade-up">
+        <div class="va-stat">
+            <div class="va-stat-num">{{ total_votes }}</div>
+            <div class="va-stat-label">Total Votes</div>
+        </div>
+        <div class="va-stat">
+            <div class="va-stat-num">{{ total_voters }}</div>
+            <div class="va-stat-label">Unique Voters</div>
+        </div>
+        <div class="va-stat">
+            <div class="va-stat-num">{{ total_countries }}</div>
+            <div class="va-stat-label">Countries</div>
+        </div>
+        <div class="va-stat">
+            <div class="va-stat-num">{{ by_category|length }}</div>
+            <div class="va-stat-label">Categories Voted</div>
+        </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="chart-grid">
+
+        <!-- Votes by Category (bar) -->
+        <div class="chart-card" data-aos="fade-up">
+            <div class="chart-card-title">
+                <i class="fas fa-trophy" style="color:var(--nhea-gold);"></i>Votes by Category
+            </div>
+            {% if by_category %}
+            <canvas id="categoryChart" height="260"></canvas>
+            {% else %}
+            <div class="empty-data"><i class="fas fa-chart-bar" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>No votes cast yet.</div>
+            {% endif %}
+        </div>
+
+        <!-- Votes by Country (bar) -->
+        <div class="chart-card" data-aos="fade-up">
+            <div class="chart-card-title">
+                <i class="fas fa-globe-africa" style="color:#0369a1;"></i>Votes by Country
+            </div>
+            {% if by_country %}
+            {% with max_count=by_country.0.count %}
+            {% for item in by_country|slice:":10" %}
+            <div class="country-bar-row">
+                <div class="country-bar-head">
+                    <span class="country-name"><i class="fas fa-map-marker-alt" style="color:var(--nhea-muted);font-size:0.75rem;"></i>{{ item.country }}</span>
+                    <span class="country-count">{{ item.count }}</span>
+                </div>
+                <div class="country-bar-bg">
+                    <div class="country-bar-fill" style="width:{% widthratio item.count max_count 100 %}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endwith %}
+            {% else %}
+            <div class="empty-data"><i class="fas fa-globe" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>No location data available yet.</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Vote Activity Chart (last 24h) -->
+    <div class="chart-card" data-aos="fade-up">
+        <div class="chart-card-title">
+            <i class="fas fa-chart-line" style="color:#7c3aed;"></i>Voting Activity (Last 24 Hours)
+        </div>
+        {% if by_hour %}
+        <canvas id="hourChart" height="100"></canvas>
+        {% else %}
+        <div class="empty-data"><i class="fas fa-chart-area" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>No activity data for the last 24 hours.</div>
+        {% endif %}
+    </div>
+
+    <!-- Map + Top Regions -->
+    <div class="chart-grid">
+
+        <!-- Heatmap -->
+        <div class="chart-card" data-aos="fade-up">
+            <div class="chart-card-title">
+                <i class="fas fa-map-marked-alt" style="color:#dc2626;"></i>Geographic Vote Heatmap
+            </div>
+            <div id="voteMap"></div>
+            {% if not geo_points %}
+            <p style="text-align:center;color:var(--nhea-muted);font-size:0.85rem;margin-top:0.75rem;">
+                <i class="fas fa-info-circle me-1"></i>Heatmap data will appear once votes with location data are cast.
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Top Regions -->
+        <div class="chart-card" data-aos="fade-up">
+            <div class="chart-card-title">
+                <i class="fas fa-map" style="color:#065f46;"></i>Top Voting Regions
+            </div>
+            {% if by_region %}
+            <table class="region-table">
+                <thead>
+                    <tr><th>#</th><th>Region</th><th>Country</th><th>Votes</th></tr>
+                </thead>
+                <tbody>
+                    {% for item in by_region %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.region }}</td>
+                        <td>{{ item.country }}</td>
+                        <td><strong style="color:var(--nhea-green);">{{ item.count }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-data"><i class="fas fa-map" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>No regional data available yet.</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="{% url 'list_voters' %}" style="color:var(--nhea-green);font-weight:600;font-size:0.9rem;text-decoration:none;">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+</div>
+</section>
+
+<script>
+// ── Category bar chart ─────────────────────────────────────────────────────
+{% if by_category %}
+const catCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(catCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for c in by_category %}"{{ c.category__name|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Votes',
+            data: [{% for c in by_category %}{{ c.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            backgroundColor: 'rgba(10,79,60,0.75)',
+            borderColor: '#0a4f3c',
+            borderWidth: 1.5,
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { ticks: { maxRotation: 35, font: { size: 11 } } }
+        }
+    }
+});
+{% endif %}
+
+// ── Hourly activity line chart ─────────────────────────────────────────────
+{% if by_hour %}
+const hourCtx = document.getElementById('hourChart').getContext('2d');
+new Chart(hourCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for h in by_hour %}"{{ h.hour|date:'H:i' }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Votes per Hour',
+            data: [{% for h in by_hour %}{{ h.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#7c3aed',
+            backgroundColor: 'rgba(124,58,237,0.1)',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#7c3aed',
+            pointRadius: 4,
+            fill: true,
+            tension: 0.4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+});
+{% endif %}
+
+// ── Leaflet heatmap ────────────────────────────────────────────────────────
+const map = L.map('voteMap', { scrollWheelZoom: false }).setView([9.0820, 8.6753], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 18,
+}).addTo(map);
+
+const geoPoints = {{ geo_points|safe }};
+if (geoPoints.length > 0) {
+    const heatData = geoPoints.map(p => [p.latitude, p.longitude, 0.8]);
+    L.heatLayer(heatData, {
+        radius: 25, blur: 15,
+        gradient: { 0.2: '#0d6b52', 0.5: '#c9a84c', 0.8: '#e74c3c' }
+    }).addTo(map);
+} else {
+    // Show Nigeria center pin if no data
+    L.marker([9.0820, 8.6753])
+     .addTo(map)
+     .bindPopup('Vote location data will appear here.')
+     .openPopup();
+}
+</script>
+{% endblock %}

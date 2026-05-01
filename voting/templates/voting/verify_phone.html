@@ -1,0 +1,361 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Verify Phone Number{% endblock %}
+{% block header %}Phone Verification{% endblock %}
+
+{% block body %}
+<style>
+.vp-section {
+    background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
+    min-height: calc(100vh - 220px);
+    display: flex; align-items: center;
+    padding: 3rem 1rem;
+}
+.vp-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 12px 50px rgba(10,79,60,0.12);
+    border: 1px solid var(--nhea-border);
+    max-width: 480px; width: 100%;
+    margin: 0 auto; overflow: hidden;
+}
+.vp-card-top {
+    background: linear-gradient(135deg, #065f46, #10b981);
+    padding: 2.5rem 2rem; text-align: center;
+}
+.vp-icon {
+    width: 72px; height: 72px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 1.8rem; color: #fff;
+}
+.vp-card-top h3 { color: #fff; font-size: 1.6rem; margin-bottom: 0.25rem; }
+.vp-card-top p  { color: rgba(255,255,255,0.7); font-size: 0.88rem; margin: 0; }
+.vp-card-body   { padding: 2rem; }
+
+/* Steps */
+.vp-step {
+    background: #f0faf5;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #b6e0cc;
+    font-size: 0.9rem; color: #1a4a3a;
+    display: flex; align-items: flex-start; gap: 0.75rem;
+}
+.vp-step-num {
+    width: 26px; height: 26px;
+    background: #065f46; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.75rem; font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Phone display */
+.phone-display {
+    background: #f8fdf9;
+    border: 2px solid var(--nhea-border);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.phone-display i { font-size: 1.2rem; color: #065f46; }
+.phone-num { font-weight: 700; color: #1a2e28; font-size: 1.05rem; font-family: monospace; }
+
+/* OTP Input row */
+.otp-inputs {
+    display: flex; gap: 0.6rem;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
+.otp-digit {
+    width: 52px; height: 60px;
+    border: 2px solid var(--nhea-border);
+    border-radius: 10px;
+    font-size: 1.6rem; font-weight: 700;
+    text-align: center; color: #1a2e28;
+    background: var(--nhea-cream);
+    outline: none;
+    transition: all 0.2s;
+}
+.otp-digit:focus {
+    border-color: #065f46;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(6,95,70,0.1);
+}
+
+/* Buttons */
+.btn-verify-phone {
+    width: 100%; padding: 1rem;
+    background: linear-gradient(135deg, #065f46, #10b981);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 700;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    transition: all 0.3s; display: flex; align-items: center;
+    justify-content: center; gap: 0.6rem;
+    box-shadow: 0 6px 20px rgba(6,95,70,0.25);
+}
+.btn-verify-phone:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(6,95,70,0.35); }
+.btn-verify-phone:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-send-otp {
+    width: 100%; padding: 0.9rem;
+    background: linear-gradient(135deg, #065f46, #10b981);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 700;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    transition: all 0.3s; display: flex; align-items: center;
+    justify-content: center; gap: 0.6rem;
+    box-shadow: 0 6px 20px rgba(6,95,70,0.25); margin-bottom: 1rem;
+}
+.btn-send-otp:hover { transform: translateY(-2px); }
+
+.btn-email-fallback {
+    width: 100%; padding: 0.85rem;
+    background: #f0f7f4; color: var(--nhea-green);
+    border: 1.5px solid var(--nhea-border); border-radius: 12px;
+    font-size: 0.9rem; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    transition: all 0.3s; display: flex; align-items: center;
+    justify-content: center; gap: 0.5rem; text-decoration: none;
+}
+.btn-email-fallback:hover { background: #e0f0e8; border-color: var(--nhea-green); color: var(--nhea-green); }
+
+/* Status panels */
+.status-panel {
+    border-radius: 10px; padding: 0.85rem 1rem;
+    font-size: 0.88rem; display: flex; align-items: center; gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+.status-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+.status-error   { background: #fef2f2; border: 1px solid #fca5a5; color: #7f1d1d; }
+.status-info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+
+/* Phase panels */
+#phaseRecaptcha, #phaseSendOtp, #phaseVerify { display: none; }
+#phaseRecaptcha.active, #phaseSendOtp.active, #phaseVerify.active { display: block; }
+
+/* reCAPTCHA container */
+#recaptcha-container { margin: 1rem 0; }
+</style>
+
+<section class="vp-section">
+<div class="container">
+<div class="vp-card" data-aos="fade-up">
+
+    <div class="vp-card-top">
+        <div class="vp-icon"><i class="fas fa-mobile-alt"></i></div>
+        <h3>Verify Your Phone</h3>
+        <p>We'll send a one-time code via SMS to confirm your number</p>
+    </div>
+
+    <div class="vp-card-body">
+
+        {% if messages %}
+        {% for m in messages %}
+        <div class="status-panel {% if 'error' in m.tags %}status-error{% elif 'success' in m.tags %}status-success{% else %}status-info{% endif %}">
+            <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% elif 'success' in m.tags %}check-circle{% else %}info-circle{% endif %}"></i>
+            {{ m }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Phone display -->
+        <div class="phone-display">
+            <i class="fas fa-phone-alt"></i>
+            <div>
+                <div style="font-size:0.75rem;color:var(--nhea-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Registered number</div>
+                <div class="phone-num">{{ voter.phone_number }}</div>
+            </div>
+        </div>
+
+        <!-- Steps overview -->
+        <div class="vp-step">
+            <div class="vp-step-num">1</div>
+            <div>Click <strong>"Send SMS Code"</strong> below. Complete the security check if prompted.</div>
+        </div>
+        <div class="vp-step">
+            <div class="vp-step-num">2</div>
+            <div>Enter the <strong>6-digit code</strong> you receive by SMS.</div>
+        </div>
+        <div class="vp-step">
+            <div class="vp-step-num">3</div>
+            <div>If the SMS doesn't arrive, use <strong>"Use email instead"</strong>.</div>
+        </div>
+
+        <div id="statusMsg"></div>
+
+        <!-- Phase 1: reCAPTCHA (invisible but needs a container) -->
+        <div id="phaseRecaptcha" class="active">
+            <div id="recaptcha-container"></div>
+            <button class="btn-send-otp" id="btnSendSms" type="button">
+                <i class="fas fa-paper-plane"></i> Send SMS Code
+            </button>
+        </div>
+
+        <!-- Phase 2: OTP entry (shown after SMS sent) -->
+        <div id="phaseVerify">
+            <p style="text-align:center;font-size:0.9rem;color:var(--nhea-muted);margin-bottom:0.5rem;">
+                Enter the 6-digit code sent to your phone
+            </p>
+            <div class="otp-inputs" id="otpInputs">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="0">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="1">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="2">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="3">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="4">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="5">
+            </div>
+            <button class="btn-verify-phone" id="btnConfirmOtp" type="button" disabled>
+                <i class="fas fa-check-circle"></i> Verify & Continue
+            </button>
+        </div>
+
+        <!-- Hidden Django form – submitted after Firebase confirms token -->
+        <form method="post" id="djangoVerifyForm" style="display:none;">
+            {% csrf_token %}
+            {{ phone_form.firebase_id_token }}
+        </form>
+
+        <!-- Fallback divider -->
+        <hr style="margin:1.75rem 0;border-color:var(--nhea-border);">
+        <div style="text-align:center;font-size:0.88rem;color:var(--nhea-muted);margin-bottom:0.75rem;">
+            Didn't receive the SMS?
+        </div>
+        <a href="{% url 'use_email_instead' %}" class="btn-email-fallback">
+            <i class="fas fa-envelope"></i> Use email instead
+            {% if voter.email %}({{ voter.email }}){% endif %}
+        </a>
+
+    </div>
+</div>
+</div>
+</section>
+
+<!-- Firebase JS SDK (compat version, works fine with CDN) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script>
+// ── Firebase init ──────────────────────────────────────────────────────────
+// REPLACE these values with your actual Firebase project config
+// (Project Settings → General → Your apps → Firebase SDK snippet → Config)
+const firebaseConfig = {
+    apiKey:            "{{ firebase_api_key }}",   // set FIREBASE_WEB_API_KEY in .env
+    authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID",
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth             = firebase.auth();
+const phoneNumber      = "{{ voter.phone_number }}";
+let   confirmationResult = null;
+
+// ── reCAPTCHA ──────────────────────────────────────────────────────────────
+let recaptchaVerifier;
+window.addEventListener('DOMContentLoaded', () => {
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible',
+        callback: () => { /* reCAPTCHA solved */ },
+    });
+    recaptchaVerifier.render();
+});
+
+// ── Send SMS ───────────────────────────────────────────────────────────────
+document.getElementById('btnSendSms').addEventListener('click', async () => {
+    const btn = document.getElementById('btnSendSms');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+    setStatus('info', 'Sending SMS to ' + phoneNumber + '…');
+
+    try {
+        confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier);
+        // Show OTP entry panel
+        document.getElementById('phaseRecaptcha').classList.remove('active');
+        document.getElementById('phaseVerify').classList.add('active');
+        setStatus('success', 'SMS sent! Enter the 6-digit code below.');
+        document.querySelector('.otp-digit').focus();
+    } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Retry Send';
+        setStatus('error', 'Could not send SMS: ' + (err.message || 'Unknown error'));
+        recaptchaVerifier.render(); // re-render reCAPTCHA
+    }
+});
+
+// ── OTP digit navigation ───────────────────────────────────────────────────
+const digits = document.querySelectorAll('.otp-digit');
+digits.forEach((inp, i) => {
+    inp.addEventListener('input', e => {
+        const val = e.target.value.replace(/\D/g, '');
+        e.target.value = val ? val[0] : '';
+        if (val && i < digits.length - 1) digits[i + 1].focus();
+        checkAllFilled();
+    });
+    inp.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !e.target.value && i > 0) {
+            digits[i - 1].focus();
+        }
+    });
+    inp.addEventListener('paste', e => {
+        const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+        if (paste.length >= 6) {
+            digits.forEach((d, idx) => { d.value = paste[idx] || ''; });
+            checkAllFilled();
+            e.preventDefault();
+        }
+    });
+});
+
+function checkAllFilled() {
+    const code = getOtpCode();
+    document.getElementById('btnConfirmOtp').disabled = code.length < 6;
+}
+
+function getOtpCode() {
+    return Array.from(digits).map(d => d.value).join('');
+}
+
+// ── Confirm OTP ────────────────────────────────────────────────────────────
+document.getElementById('btnConfirmOtp').addEventListener('click', async () => {
+    const btn  = document.getElementById('btnConfirmOtp');
+    const code = getOtpCode();
+    if (code.length < 6 || !confirmationResult) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…';
+    setStatus('info', 'Verifying your code…');
+
+    try {
+        const result  = await confirmationResult.confirm(code);
+        const idToken = await result.user.getIdToken();
+
+        // Inject the token into the hidden Django form and submit
+        document.querySelector('[name="firebase_id_token"]').value = idToken;
+        setStatus('success', 'Code confirmed! Completing verification…');
+        document.getElementById('djangoVerifyForm').submit();
+    } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Continue';
+        setStatus('error', 'Incorrect code. Please try again.');
+        digits.forEach(d => d.value = '');
+        digits[0].focus();
+    }
+});
+
+function setStatus(type, msg) {
+    const icons = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle' };
+    document.getElementById('statusMsg').innerHTML =
+        `<div class="status-panel status-${type}">
+           <i class="fas fa-${icons[type]}"></i>${msg}
+         </div>`;
+}
+</script>
+{% endblock %}

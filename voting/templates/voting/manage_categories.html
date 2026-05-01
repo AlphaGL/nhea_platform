@@ -1,0 +1,151 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Manage Categories{% endblock %}
+{% block header %}Manage Award Categories{% endblock %}
+{% block body %}
+<style>
+.mc-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+@media(max-width:900px){.mc-grid{grid-template-columns:1fr;}}
+.mc-card{background:#fff;border-radius:20px;border:1px solid var(--nhea-border);box-shadow:0 4px 24px rgba(10,79,60,0.07);overflow:hidden;}
+.mc-card-top{padding:1.5rem 2rem;border-bottom:1px solid var(--nhea-border);display:flex;align-items:center;gap:0.75rem;}
+.mc-card-top-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0;}
+.mc-card-top h5{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--nhea-text);margin:0;}
+.mc-card-top p{font-size:0.8rem;color:var(--nhea-muted);margin:0;}
+.mc-card-body{padding:1.75rem 2rem;}
+.field-group{margin-bottom:1.25rem;}
+.field-group label{font-weight:600;font-size:0.85rem;color:var(--nhea-text);margin-bottom:0.4rem;display:block;}
+.field-group input,.field-group textarea,.field-group select{width:100%;padding:0.85rem 1.1rem;border:2px solid var(--nhea-border);border-radius:10px;background:var(--nhea-cream);font-family:'DM Sans',sans-serif;font-size:0.92rem;transition:all 0.3s;outline:none;color:var(--nhea-text);}
+.field-group input:focus,.field-group textarea:focus,.field-group select:focus{border-color:var(--nhea-green);background:#fff;box-shadow:0 0 0 4px rgba(10,79,60,0.08);}
+.field-group textarea{resize:vertical;min-height:80px;}
+.errorlist{list-style:none;padding:0;margin:0.35rem 0 0;}
+.errorlist li{background:#fef2f2;border:1px solid #fca5a5;color:#7f1d1d;border-radius:8px;padding:0.35rem 0.7rem;font-size:0.8rem;}
+.btn-add-cat{width:100%;padding:0.95rem;background:var(--gradient-hero);color:#fff;border:none;border-radius:12px;font-size:0.95rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.3s;box-shadow:0 6px 20px rgba(10,79,60,0.2);}
+.btn-add-cat:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(10,79,60,0.3);}
+.cat-list{max-height:460px;overflow-y:auto;padding-right:0.25rem;}
+.cat-list::-webkit-scrollbar{width:5px;}
+.cat-list::-webkit-scrollbar-thumb{background:#d4e6df;border-radius:3px;}
+.cat-item{background:#f8fdf9;border:1px solid var(--nhea-border);border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:all 0.2s;}
+.cat-item:hover{background:#fff;box-shadow:0 4px 16px rgba(10,79,60,0.08);transform:translateX(4px);}
+.cat-item-info{}
+.cat-item-name{font-weight:700;color:var(--nhea-text);font-size:0.95rem;margin-bottom:0.2rem;}
+.cat-item-desc{font-size:0.78rem;color:var(--nhea-muted);line-height:1.4;max-width:280px;}
+.imp-badge{display:inline-block;padding:0.2rem 0.55rem;border-radius:20px;font-size:0.72rem;font-weight:700;margin-top:0.3rem;}
+.imp-high{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+.imp-med{background:#fffbeb;color:#d97706;border:1px solid #fde68a;}
+.imp-low{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;}
+.btn-del-cat{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:8px;padding:0.4rem 0.85rem;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
+.btn-del-cat:hover{background:#dc2626;color:#fff;}
+.empty-cats{text-align:center;padding:3rem 2rem;color:var(--nhea-muted);}
+.empty-cats i{font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.4;}
+</style>
+
+<section class="mc-section">
+<div class="container">
+
+    <div style="margin-bottom:2rem;" data-aos="fade-up">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin:0 0 0.25rem;">Award Category Management</h5>
+        <p style="color:var(--nhea-muted);font-size:0.88rem;margin:0;">Add and manage the award categories for the NHEA election.</p>
+    </div>
+
+    {% if messages %}
+    {% for m in messages %}
+    <div style="background:{% if 'error' in m.tags %}#fef2f2;border-color:#fca5a5;color:#7f1d1d{% else %}#ecfdf5;border-color:#a7f3d0;color:#065f46{% endif %};border:1px solid;border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.88rem;display:flex;align-items:center;gap:0.6rem;" data-aos="fade-up">
+        <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% else %}check-circle{% endif %}"></i>{{ m }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="mc-grid">
+
+        <!-- Add Category Form -->
+        <div class="mc-card" data-aos="fade-up">
+            <div class="mc-card-top">
+                <div class="mc-card-top-icon" style="background:var(--gradient-hero);"><i class="fas fa-plus"></i></div>
+                <div>
+                    <h5>Add New Category</h5>
+                    <p>Create an award category for the election</p>
+                </div>
+            </div>
+            <div class="mc-card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="field-group">
+                        <label><i class="fas fa-tag me-1" style="color:var(--nhea-green);"></i>Category Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<ul class="errorlist">{% for e in form.name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+                    <div class="field-group">
+                        <label><i class="fas fa-align-left me-1" style="color:var(--nhea-green);"></i>Description <span style="font-weight:400;color:var(--nhea-muted);">(optional)</span></label>
+                        {{ form.description }}
+                        {% if form.description.errors %}<ul class="errorlist">{% for e in form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+                    <div class="field-group">
+                        <label><i class="fas fa-star me-1" style="color:#d97706;"></i>Importance Level
+                            <span style="font-weight:400;color:var(--nhea-muted);font-size:0.78rem;">— 1 = highest priority</span>
+                        </label>
+                        {{ form.importance }}
+                        {% if form.importance.errors %}<ul class="errorlist">{% for e in form.importance.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:0.75rem;margin-bottom:1rem;color:#7f1d1d;font-size:0.85rem;">
+                        {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn-add-cat">
+                        <i class="fas fa-plus-circle me-2"></i>Add Category
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Category List -->
+        <div class="mc-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="mc-card-top">
+                <div class="mc-card-top-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><i class="fas fa-list"></i></div>
+                <div>
+                    <h5>Current Categories</h5>
+                    <p>{{ categories|length }} categor{{ categories|length|pluralize:"y,ies" }} registered</p>
+                </div>
+            </div>
+            <div class="mc-card-body">
+                <div class="cat-list">
+                    {% for cat in categories %}
+                    <div class="cat-item">
+                        <div class="cat-item-info">
+                            <div class="cat-item-name"><i class="fas fa-trophy me-1" style="color:var(--nhea-gold);font-size:0.85rem;"></i>{{ cat.name }}</div>
+                            {% if cat.description %}
+                            <div class="cat-item-desc">{{ cat.description|truncatewords:12 }}</div>
+                            {% endif %}
+                            <span class="imp-badge {% if cat.importance <= 3 %}imp-high{% elif cat.importance <= 7 %}imp-med{% else %}imp-low{% endif %}">
+                                Priority {{ cat.importance }}
+                            </span>
+                        </div>
+                        <form method="post" style="display:inline;" onsubmit="return confirm('Delete category \'{{ cat.name }}\'? This cannot be undone.')">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_category_id" value="{{ cat.id }}">
+                            <button type="submit" class="btn-del-cat"><i class="fas fa-trash-alt me-1"></i>Delete</button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="empty-cats">
+                        <i class="fas fa-trophy"></i>
+                        <p>No categories added yet.<br>Use the form to create your first one.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-4" data-aos="fade-up">
+        <a href="{% url 'admin_dashboard' %}" style="color:var(--nhea-green);font-weight:600;font-size:0.9rem;text-decoration:none;">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+</div>
+</section>
+{% endblock %}

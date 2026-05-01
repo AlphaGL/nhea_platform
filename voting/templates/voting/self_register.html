@@ -4,208 +4,73 @@
 
 {% block body %}
 <style>
-.sr-section {
-    background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
-    min-height: calc(100vh - 220px);
-    padding: 3.5rem 0 5rem;
-}
-.sr-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 2.5rem;
-    align-items: start;
-}
-@media(max-width:900px){ .sr-grid { grid-template-columns: 1fr; } }
+.sr-section { background: linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%); min-height:calc(100vh - 220px); padding:3.5rem 0 5rem; }
+.sr-grid { display:grid; grid-template-columns:1fr 1.1fr; gap:2.5rem; align-items:start; }
+@media(max-width:900px){ .sr-grid { grid-template-columns:1fr; } }
 
-/* ── Info panel ── */
-.sr-info {
-    background: var(--gradient-hero);
-    border-radius: 20px;
-    padding: 2.5rem;
-    color: #fff;
-    position: sticky;
-    top: 90px;
-}
-.sr-info-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.9rem;
-    font-weight: 700;
-    margin-bottom: 0.4rem;
-    color: #fff;
-}
-.sr-info-sub {
-    color: rgba(255,255,255,0.65);
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
-    line-height: 1.6;
-}
-.sr-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-}
-.sr-step-num {
-    width: 32px; height: 32px;
-    background: rgba(201,168,76,0.3);
-    border: 1.5px solid rgba(201,168,76,0.6);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--nhea-gold-light);
-    flex-shrink: 0;
-}
-.sr-step-text strong {
-    display: block;
-    color: #fff;
-    font-size: 0.9rem;
-    margin-bottom: 0.1rem;
-}
-.sr-step-text span {
-    color: rgba(255,255,255,0.6);
-    font-size: 0.83rem;
-    line-height: 1.5;
-}
-.sr-id-preview {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(201,168,76,0.35);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    margin-top: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-.sr-id-preview i { color: var(--nhea-gold-light); font-size: 1.3rem; }
-.sr-id-preview-text strong {
-    display: block;
-    color: var(--nhea-gold-light);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    margin-bottom: 0.2rem;
-}
-.sr-id-preview-text span {
-    color: rgba(255,255,255,0.7);
-    font-size: 0.83rem;
-}
+/* Info panel */
+.sr-info { background:var(--gradient-hero); border-radius:20px; padding:2.5rem; color:#fff; position:sticky; top:90px; }
+.sr-info-title { font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:700; margin-bottom:0.4rem; color:#fff; }
+.sr-info-sub { color:rgba(255,255,255,0.65); font-size:0.9rem; margin-bottom:2rem; line-height:1.6; }
+.sr-step { display:flex; align-items:flex-start; gap:1rem; margin-bottom:1.25rem; }
+.sr-step-num { width:32px; height:32px; background:rgba(201,168,76,0.3); border:1.5px solid rgba(201,168,76,0.6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; color:var(--nhea-gold-light); flex-shrink:0; }
+.sr-step-text strong { display:block; color:#fff; font-size:0.9rem; margin-bottom:0.1rem; }
+.sr-step-text span { color:rgba(255,255,255,0.6); font-size:0.83rem; line-height:1.5; }
+.sr-id-preview { background:rgba(255,255,255,0.1); border:1px solid rgba(201,168,76,0.35); border-radius:12px; padding:1rem 1.25rem; margin-top:2rem; display:flex; align-items:center; gap:0.75rem; }
+.sr-id-preview i { color:var(--nhea-gold-light); font-size:1.3rem; }
+.sr-id-preview-text strong { display:block; color:var(--nhea-gold-light); font-size:0.78rem; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; margin-bottom:0.2rem; }
+.sr-id-preview-text span { color:rgba(255,255,255,0.7); font-size:0.83rem; }
 
-/* ── Registration Card ── */
-.sr-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 12px 50px rgba(10,79,60,0.1);
-    border: 1px solid var(--nhea-border);
-    overflow: hidden;
-}
-.sr-card-top {
-    background: var(--gradient-hero);
-    padding: 2rem 2rem 1.75rem;
-    text-align: center;
-}
-.sr-card-top h3 {
-    color: #fff;
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-}
-.sr-card-top p {
-    color: rgba(255,255,255,0.65);
-    font-size: 0.87rem;
-    margin: 0;
-}
-.sr-card-body { padding: 2rem 2rem 2.25rem; }
+/* Registration Card */
+.sr-card { background:#fff; border-radius:20px; box-shadow:0 12px 50px rgba(10,79,60,0.1); border:1px solid var(--nhea-border); overflow:hidden; }
+.sr-card-top { background:var(--gradient-hero); padding:2rem 2rem 1.75rem; text-align:center; }
+.sr-card-top h3 { color:#fff; font-size:1.5rem; margin-bottom:0.25rem; }
+.sr-card-top p { color:rgba(255,255,255,0.65); font-size:0.87rem; margin:0; }
+.sr-card-body { padding:2rem 2rem 2.25rem; }
 
-.field-group { margin-bottom: 1.5rem; }
-.field-group label {
-    font-weight: 600;
-    font-size: 0.88rem;
-    color: var(--nhea-text);
-    margin-bottom: 0.4rem;
-    display: block;
-}
-.field-group input {
-    width: 100%;
-    padding: 0.9rem 1.2rem;
-    border: 2px solid var(--nhea-border);
-    border-radius: 10px;
-    background: var(--nhea-cream);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem;
-    transition: all 0.3s;
-    outline: none;
-}
-.field-group input:focus {
-    border-color: var(--nhea-green);
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(10,79,60,0.08);
-}
-.field-group .errorlist {
-    list-style: none; padding: 0; margin: 0.4rem 0 0;
-}
-.field-group .errorlist li {
-    background: #fef2f2;
-    border: 1px solid #fca5a5;
-    color: #7f1d1d;
-    border-radius: 8px;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.82rem;
-}
+.field-group { margin-bottom:1.5rem; }
+.field-group label { font-weight:600; font-size:0.88rem; color:var(--nhea-text); margin-bottom:0.4rem; display:block; }
+.field-group input { width:100%; padding:0.9rem 1.2rem; border:2px solid var(--nhea-border); border-radius:10px; background:var(--nhea-cream); font-family:'DM Sans',sans-serif; font-size:0.95rem; transition:all 0.3s; outline:none; }
+.field-group input:focus { border-color:var(--nhea-green); background:#fff; box-shadow:0 0 0 4px rgba(10,79,60,0.08); }
+.field-group .errorlist { list-style:none; padding:0; margin:0.4rem 0 0; }
+.field-group .errorlist li { background:#fef2f2; border:1px solid #fca5a5; color:#7f1d1d; border-radius:8px; padding:0.4rem 0.75rem; font-size:0.82rem; }
+.field-group .field-hint { font-size:0.78rem; color:var(--nhea-muted); margin-top:0.3rem; }
 
-.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-@media(max-width:560px){ .form-row-2 { grid-template-columns: 1fr; } }
+.form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:560px){ .form-row-2 { grid-template-columns:1fr; } }
 
-.btn-register-nhea {
-    width: 100%;
-    padding: 1rem;
-    background: var(--gradient-hero);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 6px 20px rgba(10,79,60,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-top: 0.5rem;
+/* Contact row – phone primary, email secondary */
+.contact-primary-label {
+    display:inline-flex; align-items:center; gap:0.35rem;
+    background:#065f46; color:#fff; font-size:0.7rem; font-weight:700;
+    letter-spacing:0.6px; text-transform:uppercase;
+    padding:0.2rem 0.6rem; border-radius:20px; margin-left:0.4rem;
 }
-.btn-register-nhea:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(10,79,60,0.35);
+.contact-fallback-label {
+    display:inline-flex; align-items:center; gap:0.35rem;
+    background:#0369a1; color:#fff; font-size:0.7rem; font-weight:700;
+    letter-spacing:0.6px; text-transform:uppercase;
+    padding:0.2rem 0.6rem; border-radius:20px; margin-left:0.4rem;
 }
+.contact-note {
+    background:#fffbeb; border:1px solid #fde68a; border-radius:10px;
+    padding:0.75rem 1rem; font-size:0.82rem; color:#92400e;
+    display:flex; align-items:flex-start; gap:0.6rem;
+    margin-bottom:1.25rem; line-height:1.6;
+}
+.contact-note i { flex-shrink:0; margin-top:0.1rem; color:#d97706; }
 
-.divider-or {
-    display: flex; align-items: center; gap: 0.75rem;
-    color: var(--nhea-muted); font-size: 0.82rem;
-    margin: 1.5rem 0;
-}
-.divider-or::before, .divider-or::after {
-    content: ''; flex: 1;
-    border-top: 1px solid var(--nhea-border);
-}
+.btn-register-nhea { width:100%; padding:1rem; background:var(--gradient-hero); color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all 0.3s; box-shadow:0 6px 20px rgba(10,79,60,0.25); display:flex; align-items:center; justify-content:center; gap:0.6rem; margin-top:0.5rem; }
+.btn-register-nhea:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(10,79,60,0.35); }
 
-.strength-bar-wrap { margin-top: 0.4rem; }
-.strength-bar-track {
-    height: 4px; background: #e5e7eb;
-    border-radius: 99px; overflow: hidden;
-}
-.strength-bar-fill {
-    height: 100%; border-radius: 99px;
-    transition: width 0.4s, background 0.4s;
-    width: 0%;
-}
-.strength-label {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-    font-weight: 600;
-    transition: color 0.3s;
-}
+.divider-or { display:flex; align-items:center; gap:0.75rem; color:var(--nhea-muted); font-size:0.82rem; margin:1.5rem 0; }
+.divider-or::before, .divider-or::after { content:''; flex:1; border-top:1px solid var(--nhea-border); }
+
+/* Password strength */
+.strength-bar-wrap { margin-top:0.4rem; }
+.strength-bar-track { height:4px; background:#e5e7eb; border-radius:99px; overflow:hidden; }
+.strength-bar-fill { height:100%; border-radius:99px; transition:width 0.4s,background 0.4s; width:0%; }
+.strength-label { font-size:0.75rem; margin-top:0.25rem; font-weight:600; transition:color 0.3s; }
 </style>
 
 <section class="sr-section">
@@ -222,21 +87,21 @@
                 <div class="sr-step-num">1</div>
                 <div class="sr-step-text">
                     <strong>Fill in your details</strong>
-                    <span>Provide your full name and organisation.</span>
+                    <span>Provide your full name, organisation, phone number and email.</span>
                 </div>
             </div>
             <div class="sr-step">
                 <div class="sr-step-num">2</div>
                 <div class="sr-step-text">
-                    <strong>Get your Voter ID</strong>
-                    <span>A unique Voter ID (e.g. NHEA-{% now "Y" %}-AB3XY) is generated automatically — no need to create one.</span>
+                    <strong>Verify your identity</strong>
+                    <span>You'll receive a one-time code by SMS (or email as backup) to confirm your account.</span>
                 </div>
             </div>
             <div class="sr-step">
                 <div class="sr-step-num">3</div>
                 <div class="sr-step-text">
-                    <strong>Save your credentials</strong>
-                    <span>Copy your Voter ID and password — you'll need them every time you log in.</span>
+                    <strong>Get your Voter ID</strong>
+                    <span>After verification, your unique Voter ID (e.g. NHEA-{% now "Y" %}-AB3XY) is displayed. Save it!</span>
                 </div>
             </div>
             <div class="sr-step">
@@ -262,7 +127,7 @@
         <div class="sr-card">
             <div class="sr-card-top">
                 <h3><i class="fas fa-user-plus me-2"></i>Create Your Account</h3>
-                <p>Your Voter ID will be generated automatically</p>
+                <p>Your Voter ID is generated automatically after verification</p>
             </div>
             <div class="sr-card-body">
 
@@ -281,18 +146,46 @@
                     <div class="field-group">
                         <label for="id_full_name"><i class="fas fa-user me-1" style="color:var(--nhea-green);"></i>Full Name</label>
                         {{ form.full_name }}
-                        {% if form.full_name.errors %}
-                        <ul class="errorlist">{% for e in form.full_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>
-                        {% endif %}
+                        {% if form.full_name.errors %}<ul class="errorlist">{% for e in form.full_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
                     </div>
 
                     <!-- Organisation -->
                     <div class="field-group">
                         <label for="id_organization"><i class="fas fa-building me-1" style="color:var(--nhea-green);"></i>Organisation / Institution</label>
                         {{ form.organization }}
-                        {% if form.organization.errors %}
-                        <ul class="errorlist">{% for e in form.organization.errors %}<li>{{ e }}</li>{% endfor %}</ul>
-                        {% endif %}
+                        {% if form.organization.errors %}<ul class="errorlist">{% for e in form.organization.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+
+                    <!-- Phone (primary) -->
+                    <div class="field-group">
+                        <label for="id_phone_number">
+                            <i class="fas fa-mobile-alt me-1" style="color:#065f46;"></i>
+                            Phone Number
+                            <span class="contact-primary-label"><i class="fas fa-star" style="font-size:0.6rem;"></i>Primary</span>
+                        </label>
+                        {{ form.phone_number }}
+                        <div class="field-hint"><i class="fas fa-info-circle me-1"></i>International format required, e.g. +2348100000000</div>
+                        {% if form.phone_number.errors %}<ul class="errorlist">{% for e in form.phone_number.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+
+                    <!-- Email (fallback) -->
+                    <div class="field-group">
+                        <label for="id_email">
+                            <i class="fas fa-envelope me-1" style="color:#0369a1;"></i>
+                            Email Address
+                            <span class="contact-fallback-label"><i class="fas fa-life-ring" style="font-size:0.6rem;"></i>Fallback</span>
+                        </label>
+                        {{ form.email }}
+                        <div class="field-hint"><i class="fas fa-info-circle me-1"></i>Used if SMS doesn't arrive. At least one of phone or email is required.</div>
+                        {% if form.email.errors %}<ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+
+                    <div class="contact-note">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>
+                            You <strong>must</strong> provide at least a phone number or email. Phone receives an SMS code first;
+                            email is used as a fallback if the SMS doesn't arrive.
+                        </span>
                     </div>
 
                     <!-- Passwords -->
@@ -304,16 +197,12 @@
                                 <div class="strength-bar-track"><div class="strength-bar-fill" id="strengthFill"></div></div>
                                 <div class="strength-label" id="strengthLabel"></div>
                             </div>
-                            {% if form.password1.errors %}
-                            <ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>
-                            {% endif %}
+                            {% if form.password1.errors %}<ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
                         </div>
                         <div class="field-group">
                             <label for="id_password2"><i class="fas fa-lock me-1" style="color:var(--nhea-green);"></i>Confirm Password</label>
                             {{ form.password2 }}
-                            {% if form.password2.errors %}
-                            <ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>
-                            {% endif %}
+                            {% if form.password2.errors %}<ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
                         </div>
                     </div>
 
@@ -324,7 +213,7 @@
                     {% endif %}
 
                     <button type="submit" class="btn-register-nhea" id="registerBtn">
-                        <i class="fas fa-user-check"></i>Register & Get My Voter ID
+                        <i class="fas fa-user-check"></i>Register & Verify Identity
                     </button>
                 </form>
 
@@ -343,10 +232,10 @@
 </section>
 
 <script>
-// Password strength meter
+// Password strength
 const pwField = document.getElementById('id_password1');
-const fill = document.getElementById('strengthFill');
-const label = document.getElementById('strengthLabel');
+const fill    = document.getElementById('strengthFill');
+const label   = document.getElementById('strengthLabel');
 
 if (pwField) {
     pwField.addEventListener('input', function() {
@@ -357,19 +246,18 @@ if (pwField) {
         if (/[A-Z]/.test(val)) score++;
         if (/[0-9]/.test(val)) score++;
         if (/[^A-Za-z0-9]/.test(val)) score++;
-
         const levels = [
-            { pct: 0,   color: '#e5e7eb', text: '' },
-            { pct: 25,  color: '#ef4444', text: 'Too weak' },
-            { pct: 50,  color: '#f59e0b', text: 'Fair' },
-            { pct: 75,  color: '#3b82f6', text: 'Good' },
-            { pct: 100, color: '#10b981', text: 'Strong' },
+            {pct:0,   color:'#e5e7eb', text:''},
+            {pct:25,  color:'#ef4444', text:'Too weak'},
+            {pct:50,  color:'#f59e0b', text:'Fair'},
+            {pct:75,  color:'#3b82f6', text:'Good'},
+            {pct:100, color:'#10b981', text:'Strong'},
         ];
         const lvl = levels[Math.min(score, 4)];
-        fill.style.width = lvl.pct + '%';
+        fill.style.width      = lvl.pct + '%';
         fill.style.background = lvl.color;
-        label.textContent = lvl.text;
-        label.style.color = lvl.color;
+        label.textContent     = lvl.text;
+        label.style.color     = lvl.color;
     });
 }
 
@@ -377,7 +265,7 @@ if (pwField) {
 document.getElementById('registerForm').addEventListener('submit', function() {
     const btn = document.getElementById('registerBtn');
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering…';
-    btn.disabled = true;
+    btn.disabled  = true;
 });
 </script>
-{% endblock %}
+{% endblock %}verify_phone.html

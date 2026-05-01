@@ -1,0 +1,106 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Manage Admins{% endblock %}
+{% block header %}Admin Accounts{% endblock %}
+{% block body %}
+<style>
+.ma-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.ma-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.admin-table-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);overflow:hidden;}
+.admin-table{width:100%;border-collapse:collapse;}
+.admin-table th{background:#f8fdf9;padding:0.85rem 1.25rem;text-align:left;font-size:0.8rem;font-weight:700;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--nhea-border);}
+.admin-table td{padding:0.9rem 1.25rem;border-bottom:1px solid var(--nhea-border);font-size:0.9rem;color:var(--nhea-text);}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:#f8fdf9;}
+.avatar{width:36px;height:36px;background:var(--gradient-hero);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:0.9rem;font-weight:700;margin-right:0.5rem;}
+.badge-must-change{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:600;}
+.badge-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:600;}
+.btn-del{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:0.35rem 0.75rem;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-del:hover{background:#dc2626;color:#fff;}
+.empty-state{text-align:center;padding:3.5rem 2rem;}
+</style>
+
+<section class="ma-section">
+<div class="container">
+
+    <div class="ma-header" data-aos="fade-up">
+        <div>
+            <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin:0;">Admin Accounts</h5>
+            <p style="color:var(--nhea-muted);font-size:0.88rem;margin:0;">{{ admins|length }} admin{{ admins|length|pluralize }} registered</p>
+        </div>
+        <a href="{% url 'create_admin' %}" class="btn-nhea-gold">
+            <i class="fas fa-user-plus"></i>Create New Admin
+        </a>
+    </div>
+
+    {% if messages %}
+    {% for m in messages %}
+    <div style="background:{% if 'error' in m.tags %}#fef2f2;border:1px solid #fca5a5;color:#7f1d1d{% else %}#ecfdf5;border:1px solid #a7f3d0;color:#065f46{% endif %};border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.5rem;font-size:0.88rem;" data-aos="fade-up">
+        {{ m }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="admin-table-card" data-aos="fade-up">
+        {% if admins %}
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Admin</th>
+                        <th>Voter ID</th>
+                        <th>Email</th>
+                        <th>Organization</th>
+                        <th>Password Status</th>
+                        <th>Created By</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for admin in admins %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <span class="avatar">{{ admin.full_name|first }}</span>
+                            {{ admin.full_name }}
+                        </td>
+                        <td><code style="background:#f0f7f4;padding:0.2rem 0.5rem;border-radius:4px;color:var(--nhea-green);font-size:0.82rem;">{{ admin.voter_id }}</code></td>
+                        <td>{{ admin.email|default:"—" }}</td>
+                        <td>{{ admin.organization|default:"—" }}</td>
+                        <td>
+                            {% if admin.must_change_password %}
+                            <span class="badge-must-change"><i class="fas fa-exclamation-circle me-1"></i>Must Change</span>
+                            {% else %}
+                            <span class="badge-ok"><i class="fas fa-check-circle me-1"></i>Set</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ admin.created_by.full_name|default:"System" }}</td>
+                        <td>
+                            <form method="post" style="display:inline;" onsubmit="return confirm('Remove admin {{ admin.full_name }}?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="delete_admin_id" value="{{ admin.id }}">
+                                <button type="submit" class="btn-del"><i class="fas fa-trash-alt me-1"></i>Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-user-slash" style="font-size:3rem;color:var(--nhea-muted);display:block;margin-bottom:1rem;"></i>
+            <p style="color:var(--nhea-muted);">No admin accounts created yet.</p>
+            <a href="{% url 'create_admin' %}" class="btn-nhea-gold mt-2"><i class="fas fa-user-plus"></i>Create First Admin</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="text-center mt-4" data-aos="fade-up">
+        <a href="{% url 'list_voters' %}" style="color:var(--nhea-green);font-weight:600;font-size:0.9rem;text-decoration:none;">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+</section>
+{% endblock %}

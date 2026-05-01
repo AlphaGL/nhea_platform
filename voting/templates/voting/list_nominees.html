@@ -1,0 +1,68 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Nominees{% endblock %}
+{% block header %}Nominees{% endblock %}
+{% block body %}
+<style>
+.nom-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.nom-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.nom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;}
+.nom-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);overflow:hidden;transition:all 0.35s;}
+.nom-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(10,79,60,0.12);}
+.nom-card-img{height:180px;object-fit:cover;width:100%;display:block;}
+.nom-card-img-placeholder{height:180px;background:var(--gradient-hero);display:flex;align-items:center;justify-content:center;font-size:3.5rem;color:rgba(255,255,255,0.6);}
+.nom-card-body{padding:1.25rem;}
+.nom-category-tag{display:inline-block;background:#f0f7f4;color:var(--nhea-green);padding:0.25rem 0.7rem;border-radius:20px;font-size:0.75rem;font-weight:600;margin-bottom:0.5rem;border:1px solid var(--nhea-border);}
+.nom-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:var(--nhea-text);margin-bottom:0.25rem;}
+.nom-org{font-size:0.83rem;color:var(--nhea-muted);}
+.btn-del-nom{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:8px;padding:0.45rem 0.9rem;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:0.4rem;text-decoration:none;margin-top:1rem;}
+.btn-del-nom:hover{background:#dc2626;color:#fff;}
+</style>
+<section class="nom-section">
+<div class="container">
+  <div class="nom-actions" data-aos="fade-up">
+    <div>
+      <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin:0;">All Nominees</h5>
+      <p style="color:var(--nhea-muted);font-size:0.88rem;margin:0;">{{ nominees|length }} nominee{{ nominees|length|pluralize }} registered</p>
+    </div>
+    <a href="{% url 'add_nominee' %}" class="btn-nhea-gold">
+      <i class="fas fa-plus"></i>Add Nominee
+    </a>
+  </div>
+
+  {% if nominees %}
+  <div class="nom-grid">
+    {% for nominee in nominees %}
+    <div class="nom-card" data-aos="fade-up">
+      {% if nominee.image %}
+        <img src="{{ nominee.image.url }}" alt="{{ nominee.name }}" class="nom-card-img">
+      {% else %}
+        <div class="nom-card-img-placeholder"><i class="fas fa-user-tie"></i></div>
+      {% endif %}
+      <div class="nom-card-body">
+        <span class="nom-category-tag">{{ nominee.category.name }}</span>
+        <div class="nom-name">{{ nominee.name }}</div>
+        <div class="nom-org">{{ nominee.organization|default:"—" }}</div>
+        <a href="{% url 'delete_nominee' nominee.id %}" class="btn-del-nom"
+           onclick="return confirm('Remove {{ nominee.name }}?')">
+          <i class="fas fa-trash-alt"></i>Remove
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="nhea-card" style="text-align:center;padding:3rem;" data-aos="fade-up">
+    <i class="fas fa-user-slash" style="font-size:3rem;color:var(--nhea-muted);display:block;margin-bottom:1rem;"></i>
+    <p style="color:var(--nhea-muted);">No nominees added yet.</p>
+    <a href="{% url 'add_nominee' %}" class="btn-nhea-gold mt-2"><i class="fas fa-plus"></i>Add First Nominee</a>
+  </div>
+  {% endif %}
+
+  <div class="text-center mt-4">
+    <a href="{% url 'admin_dashboard' %}" style="color:var(--nhea-green);font-weight:600;font-size:0.9rem;text-decoration:none;">
+      <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+    </a>
+  </div>
+</div>
+</section>
+{% endblock %}

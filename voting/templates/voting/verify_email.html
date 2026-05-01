@@ -1,0 +1,259 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Verify Email{% endblock %}
+{% block header %}Email Verification{% endblock %}
+
+{% block body %}
+<style>
+.ve-section {
+    background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
+    min-height: calc(100vh - 220px);
+    display: flex; align-items: center; padding: 3rem 1rem;
+}
+.ve-card {
+    background: #fff; border-radius: 20px;
+    box-shadow: 0 12px 50px rgba(10,79,60,0.12);
+    border: 1px solid var(--nhea-border);
+    max-width: 480px; width: 100%; margin: 0 auto; overflow: hidden;
+}
+.ve-card-top {
+    background: linear-gradient(135deg, #0369a1, #0ea5e9);
+    padding: 2.5rem 2rem; text-align: center;
+}
+.ve-icon {
+    width: 72px; height: 72px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.25rem; font-size: 1.8rem; color: #fff;
+}
+.ve-card-top h3 { color: #fff; font-size: 1.6rem; margin-bottom: 0.25rem; }
+.ve-card-top p  { color: rgba(255,255,255,0.7); font-size: 0.88rem; margin: 0; }
+.ve-card-body   { padding: 2rem; }
+
+/* Email display */
+.email-display {
+    background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px;
+    padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.email-display i { font-size: 1.2rem; color: #0369a1; }
+.email-addr { font-weight: 700; color: #1e3a5f; font-size: 0.97rem; word-break: break-all; }
+
+/* OTP inputs */
+.otp-inputs {
+    display: flex; gap: 0.6rem; justify-content: center; margin: 1.5rem 0;
+}
+.otp-digit {
+    width: 52px; height: 60px;
+    border: 2px solid var(--nhea-border); border-radius: 10px;
+    font-size: 1.6rem; font-weight: 700; text-align: center; color: #1a2e28;
+    background: var(--nhea-cream); outline: none; transition: all 0.2s;
+}
+.otp-digit:focus {
+    border-color: #0369a1; background: #fff;
+    box-shadow: 0 0 0 4px rgba(3,105,161,0.1);
+}
+
+/* Buttons */
+.btn-verify-email {
+    width: 100%; padding: 1rem;
+    background: linear-gradient(135deg, #0369a1, #0ea5e9);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 700; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.3s; display: flex;
+    align-items: center; justify-content: center; gap: 0.6rem;
+    box-shadow: 0 6px 20px rgba(3,105,161,0.25); margin-bottom: 1rem;
+}
+.btn-verify-email:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(3,105,161,0.4); }
+.btn-verify-email:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-resend {
+    width: 100%; padding: 0.85rem;
+    background: #f0f9ff; color: #0369a1;
+    border: 1.5px solid #bfdbfe; border-radius: 12px;
+    font-size: 0.9rem; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    transition: all 0.3s; display: flex;
+    align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.75rem;
+}
+.btn-resend:hover { background: #e0f2fe; border-color: #0369a1; }
+.btn-resend:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-phone-fallback {
+    width: 100%; padding: 0.85rem;
+    background: #f0f7f4; color: var(--nhea-green);
+    border: 1.5px solid var(--nhea-border); border-radius: 12px;
+    font-size: 0.9rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    text-decoration: none;
+}
+.btn-phone-fallback:hover { background: #e0f0e8; border-color: var(--nhea-green); color: var(--nhea-green); }
+
+/* Status */
+.status-panel {
+    border-radius: 10px; padding: 0.85rem 1rem; font-size: 0.88rem;
+    display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem;
+}
+.status-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+.status-error   { background: #fef2f2; border: 1px solid #fca5a5; color: #7f1d1d; }
+.status-info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+
+/* Countdown */
+#countdown { font-size: 0.85rem; color: var(--nhea-muted); text-align: center; margin-bottom: 0.5rem; }
+</style>
+
+<section class="ve-section">
+<div class="container">
+<div class="ve-card" data-aos="fade-up">
+
+    <div class="ve-card-top">
+        <div class="ve-icon"><i class="fas fa-envelope-open-text"></i></div>
+        <h3>Check Your Email</h3>
+        <p>Enter the 6-digit code we sent to your inbox</p>
+    </div>
+
+    <div class="ve-card-body">
+
+        {% if messages %}
+        {% for m in messages %}
+        <div class="status-panel {% if 'error' in m.tags %}status-error{% elif 'success' in m.tags %}status-success{% else %}status-info{% endif %}">
+            <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% elif 'success' in m.tags %}check-circle{% else %}info-circle{% endif %}"></i>
+            {{ m }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="status-panel status-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {% for field in form %}{% for err in field.errors %}{{ err }}{% endfor %}{% endfor %}
+            {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Email display -->
+        <div class="email-display">
+            <i class="fas fa-envelope"></i>
+            <div>
+                <div style="font-size:0.73rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Code sent to</div>
+                <div class="email-addr">{{ voter.email }}</div>
+            </div>
+        </div>
+
+        <p style="font-size:0.88rem;color:var(--nhea-muted);margin-bottom:0.5rem;text-align:center;">
+            <i class="fas fa-clock me-1"></i> The code expires in <strong>5 minutes</strong>. Check spam if needed.
+        </p>
+
+        <!-- OTP form -->
+        <form method="post" id="emailOtpForm">
+            {% csrf_token %}
+            <div class="otp-inputs" id="otpInputs">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="0">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="1">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="2">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="3">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="4">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" type="text" data-idx="5">
+            </div>
+            <!-- Hidden field that forms.EmailOTPVerifyForm expects -->
+            <input type="hidden" name="otp_code" id="otpCodeHidden">
+
+            <button type="submit" class="btn-verify-email" id="btnVerify" disabled>
+                <i class="fas fa-check-circle"></i> Verify & Continue
+            </button>
+        </form>
+
+        <hr style="margin:1.25rem 0;border-color:var(--nhea-border);">
+
+        <!-- Resend -->
+        <div id="countdown"></div>
+        <form method="post" id="resendForm">
+            {% csrf_token %}
+            <input type="hidden" name="resend" value="1">
+            <button type="submit" class="btn-resend" id="btnResend" disabled>
+                <i class="fas fa-redo"></i> Resend Code
+            </button>
+        </form>
+
+        {% if has_phone %}
+        <a href="{% url 'verify_phone' %}" class="btn-phone-fallback mt-2">
+            <i class="fas fa-mobile-alt"></i> Back to SMS verification
+        </a>
+        {% endif %}
+
+    </div>
+</div>
+</div>
+</section>
+
+<script>
+// ── OTP digit navigation ───────────────────────────────────────────────────
+const digits = document.querySelectorAll('.otp-digit');
+const hidden = document.getElementById('otpCodeHidden');
+const btn    = document.getElementById('btnVerify');
+
+digits.forEach((inp, i) => {
+    inp.addEventListener('input', e => {
+        const val = e.target.value.replace(/\D/g, '');
+        e.target.value = val ? val[0] : '';
+        if (val && i < digits.length - 1) digits[i + 1].focus();
+        syncHidden();
+    });
+    inp.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !e.target.value && i > 0) digits[i - 1].focus();
+    });
+    inp.addEventListener('paste', e => {
+        const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+        if (paste.length >= 6) {
+            digits.forEach((d, idx) => { d.value = paste[idx] || ''; });
+            syncHidden();
+            e.preventDefault();
+        }
+    });
+});
+
+function syncHidden() {
+    const code = Array.from(digits).map(d => d.value).join('');
+    hidden.value = code;
+    btn.disabled = code.length < 6;
+}
+
+// Auto-submit when all 6 filled
+digits[digits.length - 1].addEventListener('input', () => {
+    if (Array.from(digits).every(d => d.value)) {
+        syncHidden();
+        if (!btn.disabled) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…';
+            btn.disabled = true;
+            document.getElementById('emailOtpForm').submit();
+        }
+    }
+});
+
+// ── Resend countdown ───────────────────────────────────────────────────────
+let secs = 60;
+const countEl  = document.getElementById('countdown');
+const resendBtn = document.getElementById('btnResend');
+
+function tick() {
+    if (secs > 0) {
+        countEl.textContent = `You can resend in ${secs}s`;
+        secs--;
+        setTimeout(tick, 1000);
+    } else {
+        countEl.textContent = '';
+        resendBtn.disabled = false;
+    }
+}
+tick();
+
+// Submit feedback
+document.getElementById('emailOtpForm').addEventListener('submit', function() {
+    syncHidden();
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying…';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

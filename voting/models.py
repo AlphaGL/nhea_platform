@@ -55,6 +55,29 @@ class Voter(AbstractBaseUser):
     voter_id = models.CharField(max_length=100, unique=True, default=generate_voter_id)
     full_name = models.CharField(max_length=255)
     organization = models.CharField(max_length=255, blank=True, null=True)
+
+    # ── Contact & Verification fields ───────────────────────────────────────
+    email = models.EmailField(unique=True, blank=True, null=True)
+    phone_number = models.CharField(
+        max_length=20, unique=True, blank=True, null=True,
+        help_text="International format, e.g. +2348100000000"
+    )
+    is_phone_verified = models.BooleanField(default=False)
+    is_email_verified = models.BooleanField(default=False)
+
+    # ── Admin role fields ────────────────────────────────────────────────────
+    is_admin = models.BooleanField(default=False, help_text="Can manage election operations")
+    must_change_password = models.BooleanField(
+        default=False,
+        help_text="Force password change on next login (set by superadmin)"
+    )
+    created_by = models.ForeignKey(
+        'self', null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='created_users',
+        help_text="Superadmin who created this admin account"
+    )
+    date_joined = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -66,6 +89,11 @@ class Voter(AbstractBaseUser):
 
     def __str__(self):
         return self.full_name
+
+    @property
+    def is_verified(self):
+        """Voter is considered verified if phone OR email is verified."""
+        return self.is_phone_verified or self.is_email_verified
 
     def has_voted_for_category(self, category):
         return Vote.objects.filter(voter=self, category=category).exists()
@@ -102,6 +130,14 @@ class Vote(models.Model):
     nominee = models.ForeignKey(Nominee, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    # ── Location tracking ────────────────────────────────────────────────────
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['voter', 'category'], name='unique_vote_per_category')
@@ -113,3 +149,67 @@ class Vote(models.Model):
     @classmethod
     def validate_vote(cls, voter, category):
         return cls.objects.filter(voter=voter, category=category).exists()
+
+
+# ── Activity Log ──────────────────────────────────────────────────────────────
+
+class ActivityLog(models.Model):
+    """Audit log for all important actions on the platform."""
+
+    ACTION_CHOICES = [
+        # Auth
+        ('LOGIN',               'User Login'),
+        ('LOGOUT',              'User Logout'),
+        ('LOGIN_FAILED',        'Failed Login Attempt'),
+        ('PASSWORD_CHANGE',     'Password Changed'),
+        ('PASSWORD_RESET',      'Password Reset'),
+        # Voting
+        ('VOTE_CAST',           'Vote Cast'),
+        ('VOTES_RESET',         'All Votes Reset'),
+        # Admin / User management
+        ('ADMIN_CREATED',       'Admin Account Created'),
+        ('VOTER_CREATED',       'Voter Registered'),
+        ('VOTER_DELETED',       'Voter Deleted'),
+        # Category / Nominee
+        ('CATEGORY_CREATED',    'Category Created'),
+        ('CATEGORY_UPDATED',    'Category Updated'),
+        ('CATEGORY_DELETED',    'Category Deleted'),
+        ('NOMINEE_CREATED',     'Nominee Added'),
+        ('NOMINEE_DELETED',     'Nominee Deleted'),
+        # Verification
+        ('PHONE_VERIFIED',      'Phone Verified'),
+        ('EMAIL_VERIFIED',      'Email Verified'),
+        # System
+        ('ACCESS_CODE_USED',    'Access Code Used'),
+        ('SYSTEM_UPDATE',       'System Update'),
+    ]
+
+    actor = models.ForeignKey(
+        Voter, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='activity_logs',
+        help_text="The user who performed this action (null = anonymous/system)"
+    )
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    description = models.TextField(blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    # Network / location
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    user_agent = models.CharField(max_length=500, blank=True, null=True)
+
+    # Optional target object info
+    target_model = models.CharField(max_length=100, blank=True, null=True)
+    target_id = models.CharField(max_length=100, blank=True, null=True)
+    target_repr = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = "Activity Log"
+        verbose_name_plural = "Activity Logs"
+
+    def __str__(self):
+        actor_name = self.actor.full_name if self.actor else "Anonymous"
+        return f"[{self.timestamp:%Y-%m-%d %H:%M}] {actor_name} – {self.get_action_display()}"

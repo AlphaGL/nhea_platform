@@ -340,10 +340,61 @@
 }
 .btn-modal-confirm:hover { transform: translateY(-1px); }
 
+/* ── Back / Skip bar ── */
+.vote-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+.btn-back-dash {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--nhea-green);
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--nhea-border);
+    border-radius: 50px;
+    background: #fff;
+    transition: all 0.25s;
+}
+.btn-back-dash:hover {
+    background: var(--nhea-green);
+    color: #fff;
+    border-color: var(--nhea-green);
+}
+.btn-skip-cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--nhea-muted);
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px dashed var(--nhea-border);
+    border-radius: 50px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif;
+}
+.btn-skip-cat:hover {
+    border-color: var(--nhea-muted);
+    color: var(--nhea-text);
+    background: #f8fdf9;
+}
+
 @media (max-width: 640px) {
     .nominees-grid { grid-template-columns: 1fr 1fr; }
     .confirm-strip { flex-direction: column; align-items: stretch; }
     .btn-cast-vote { width: 100%; justify-content: center; }
+    .vote-nav-bar { flex-direction: column; align-items: stretch; }
+    .btn-back-dash, .btn-skip-cat { justify-content: center; }
 }
 @media (max-width: 420px) {
     .nominees-grid { grid-template-columns: 1fr; }
@@ -367,11 +418,24 @@
 <div class="container">
 <div class="vote-container">
 
+    <!-- Nav Bar: Back + Skip -->
+    <div class="vote-nav-bar" data-aos="fade-up">
+        <a href="{% url 'voting_dashboard' %}" class="btn-back-dash">
+            <i class="fas fa-th-large"></i> All Categories
+        </a>
+        <form method="post" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" name="skip" value="1" class="btn-skip-cat">
+                <i class="fas fa-forward"></i> Skip This Category
+            </button>
+        </form>
+    </div>
+
     <!-- Category Header -->
     <div class="cat-header" data-aos="fade-up">
         <div class="cat-badge">
             <i class="fas fa-trophy"></i>
-            Category {{ voted_count|add:1 }} of {{ total_categories }}
+            {{ position.name }}
         </div>
         <h2 class="cat-title">{{ position.name }}</h2>
         {% if position.description %}
@@ -379,6 +443,10 @@
         {% else %}
         <p class="cat-desc">Select the nominee you wish to vote for in this category. Your choice is final.</p>
         {% endif %}
+        <p style="font-size:0.8rem;color:var(--nhea-muted);margin-top:0.5rem;">
+            <i class="fas fa-info-circle me-1"></i>
+            Voting here is optional — you can skip and return, or vote in only the categories you want.
+        </p>
     </div>
 
     <!-- Voting Form -->
