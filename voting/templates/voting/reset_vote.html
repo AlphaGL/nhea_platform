@@ -1,343 +1,50 @@
 {% extends 'voting/main.html' %}
-{% block title %}Reset All Votes{% endblock %}
-{% block header %}Reset All Votes{% endblock %}
-
+{% block title %}NHEA – Reset All Votes{% endblock %}
+{% block header %}Reset Votes{% endblock %}
 {% block body %}
-<div class="min-vh-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">
-    <!-- Animated Warning Background Elements -->
-    <div class="position-absolute w-100 h-100">
-        <div class="position-absolute" style="width: 200px; height: 200px; top: 10%; right: 15%; opacity: 0.1; animation: pulse 4s ease-in-out infinite;">
-            <i class="fas fa-exclamation-triangle text-white" style="font-size: 12rem;"></i>
-        </div>
-        <div class="position-absolute" style="width: 150px; height: 150px; bottom: 20%; left: 10%; opacity: 0.08; animation: pulse 6s ease-in-out infinite reverse;">
-            <i class="fas fa-trash-alt text-white" style="font-size: 9rem;"></i>
-        </div>
-        <div class="position-absolute rounded-circle bg-white" style="width: 300px; height: 300px; top: -150px; left: -150px; opacity: 0.05; animation: float 8s ease-in-out infinite;"></div>
-        <div class="position-absolute rounded-circle bg-white" style="width: 250px; height: 250px; bottom: -125px; right: -125px; opacity: 0.03; animation: float 10s ease-in-out infinite reverse;"></div>
-    </div>
-
-    <div class="container py-5 position-relative">
-        <div class="row justify-content-center">
-            <div class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-                <!-- Main Card -->
-                <div class="card border-0 shadow-lg" style="backdrop-filter: blur(20px); background: rgba(255, 255, 255, 0.95); border-radius: 20px; animation: slideUp 0.8s ease-out;">
-                    
-                    <!-- Danger Header Section -->
-                    <div class="card-header border-0 text-center py-4" style="background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%); border-radius: 20px 20px 0 0;">
-                        <div class="mb-3">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm" style="width: 80px; height: 80px;">
-                                <i class="fas fa-exclamation-triangle text-danger" style="font-size: 2rem; animation: shake 2s infinite;"></i>
-                            </div>
-                        </div>
-                        <h2 class="fw-bold text-white mb-1" style="font-size: 1.6rem; letter-spacing: 0.5px;">DANGER ZONE</h2>
-                        <p class="text-white-50 mb-0">Reset All Votes & Contestants</p>
-                    </div>
-
-                    <!-- Warning Banner -->
-                    <div class="alert alert-danger border-0 m-4 mb-0" style="border-radius: 12px; background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-shield-alt text-danger me-3" style="font-size: 1.5rem;"></i>
-                            <div>
-                                <h6 class="fw-bold text-danger mb-1">Critical Action Required</h6>
-                                <p class="text-danger-emphasis mb-0 small">This action will permanently delete all votes and contestant data. This cannot be undone.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Form Body -->
-                    <div class="card-body p-4">
-                        <form method="POST" class="needs-validation" novalidate id="resetForm">
-                            {% csrf_token %}
-                            
-                            <!-- Access Code Field -->
-                            <div class="mb-4">
-                                <label for="{{ form.access_code.id_for_label }}" class="form-label fw-semibold text-dark mb-2" style="font-size: 0.9rem;">
-                                    <i class="fas fa-key text-warning me-2"></i>
-                                    Administrative Access Code
-                                </label>
-                                <div class="position-relative">
-                                    <i class="fas fa-lock position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%); z-index: 5;"></i>
-                                    {{ form.access_code }}
-                                </div>
-                                {% if form.access_code.help_text %}
-                                    <div class="form-text text-muted mt-2" style="font-size: 0.8rem;">
-                                        <i class="fas fa-info-circle me-1"></i>{{ form.access_code.help_text }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Confirmation Field -->
-                            <div class="mb-4">
-                                <label for="{{ form.confirm_reset.id_for_label }}" class="form-label fw-semibold text-dark mb-2" style="font-size: 0.9rem;">
-                                    <i class="fas fa-check-double text-success me-2"></i>
-                                    Confirmation
-                                </label>
-                                <div class="position-relative">
-                                    <i class="fas fa-clipboard-check position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%); z-index: 5;"></i>
-                                    {{ form.confirm_reset }}
-                                </div>
-                                {% if form.confirm_reset.help_text %}
-                                    <div class="form-text text-muted mt-2" style="font-size: 0.8rem;">
-                                        <i class="fas fa-info-circle me-1"></i>{{ form.confirm_reset.help_text }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Confirmation Checklist -->
-                            <div class="bg-light p-3 rounded-3 mb-4" style="border-left: 4px solid #ffc107;">
-                                <h6 class="fw-bold text-dark mb-3">
-                                    <i class="fas fa-clipboard-list text-warning me-2"></i>
-                                    Before proceeding, confirm that:
-                                </h6>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="confirm1" required>
-                                    <label class="form-check-label text-dark" for="confirm1">
-                                        I understand this will delete ALL voting data permanently
-                                    </label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="confirm2" required>
-                                    <label class="form-check-label text-dark" for="confirm2">
-                                        I have backed up any necessary data
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="confirm3" required>
-                                    <label class="form-check-label text-dark" for="confirm3">
-                                        I have administrative authorization for this action
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Messages Display -->
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}warning{% endif %} border-0 mb-4" 
-                                         style="border-radius: 12px; animation: slideDown 0.5s ease-out;">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
-                                            {{ message }}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-
-                            <!-- Danger Button -->
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-lg text-white fw-bold position-relative overflow-hidden" 
-                                        style="background: linear-gradient(135deg, #ff4757 0%, #c44569 100%); 
-                                               border: none; 
-                                               border-radius: 12px; 
-                                               padding: 15px; 
-                                               transition: all 0.3s ease; 
-                                               box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);"
-                                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 71, 87, 0.6)'"
-                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 71, 87, 0.4)'"
-                                        onclick="return confirmReset()">
-                                    <i class="fas fa-trash-alt me-2"></i>
-                                    RESET ALL DATA
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Footer Links -->
-                    <div class="card-footer border-0 text-center py-4" style="background: transparent;">
-                        <div class="d-flex justify-content-center gap-4 flex-wrap">
-                            <a href="#" class="text-decoration-none text-muted fw-medium" style="font-size: 0.9rem; transition: color 0.3s ease;" 
-                               onmouseover="this.style.color='#ff4757'" 
-                               onmouseout="this.style.color=''">
-                                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
-                            </a>
-                            <a href="#" class="text-decoration-none text-muted fw-medium" style="font-size: 0.9rem; transition: color 0.3s ease;" 
-                               onmouseover="this.style.color='#ff4757'" 
-                               onmouseout="this.style.color=''">
-                                <i class="fas fa-download me-1"></i>Export Data
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Security Notice -->
-                <div class="text-center mt-4">
-                    <div class="d-inline-flex align-items-center bg-white rounded-pill px-4 py-2 shadow-sm" style="backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9);">
-                        <i class="fas fa-user-shield text-primary me-2"></i>
-                        <span class="text-dark fw-medium small">Administrative Action Logged</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Custom CSS for animations and additional styling -->
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    body {
-        font-family: 'Inter', sans-serif;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-    }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.1; }
-        50% { transform: scale(1.1); opacity: 0.15; }
-    }
-    
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-        20%, 40%, 60%, 80% { transform: translateX(2px); }
-    }
-    
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    /* Style Django form fields */
-    #id_access_code,
-    #id_confirm_reset {
-        width: 100%;
-        padding: 12px 15px 12px 45px;
-        border: none;
-        background-color: #f8fafc;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        font-size: 1rem;
-    }
-    
-    #id_access_code:focus,
-    #id_confirm_reset:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1), 0 4px 15px rgba(0,0,0,0.15);
-        background-color: #fff;
-        transform: translateY(-2px);
-    }
-    
-    #id_access_code:hover,
-    #id_confirm_reset:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    }
-    
-    /* Form validation */
-    .form-check-input:checked {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .card {
-            margin: 1rem;
-            border-radius: 15px !important;
-        }
-        
-        .card-header {
-            border-radius: 15px 15px 0 0 !important;
-            padding: 1.5rem 1rem !important;
-        }
-        
-        .card-header h2 {
-            font-size: 1.4rem !important;
-        }
-        
-        .card-body {
-            padding: 1.5rem 1rem !important;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .card-footer .d-flex {
-            flex-direction: column !important;
-            gap: 0.5rem !important;
-        }
-        
-        .alert {
-            margin: 1rem !important;
-        }
-    }
+.rv-section{background:linear-gradient(160deg,#fef2f2,#fff7ed);min-height:calc(100vh - 220px);display:flex;align-items:center;padding:3rem 1rem;}
+.rv-card{background:#fff;border-radius:20px;box-shadow:0 12px 50px rgba(192,57,43,0.1);border:1px solid #fca5a5;overflow:hidden;max-width:520px;width:100%;margin:0 auto;}
+.rv-card-top{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:2.5rem 2rem;text-align:center;}
+.rv-icon{width:76px;height:76px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:2rem;color:#fff;}
+.rv-card-top h3{color:#fff;font-size:1.6rem;margin-bottom:0.25rem;}
+.rv-card-top p{color:rgba(255,255,255,0.65);font-size:0.88rem;margin:0;}
+.rv-card-body{padding:2rem;}
+.warning-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1.5rem;}
+.warning-box i{color:#dc2626;flex-shrink:0;margin-top:0.1rem;}
+.warning-box p{color:#7f1d1d;font-size:0.88rem;margin:0;line-height:1.6;}
+.form-fields-container p{margin-bottom:1.25rem;}
+.form-fields-container label{font-weight:600;font-size:0.88rem;color:var(--nhea-text);margin-bottom:0.4rem;display:block;}
+.form-fields-container input[type=password]{width:100%;padding:0.9rem 1.2rem;border:2px solid #fca5a5;border-radius:10px;background:#fff;font-family:'DM Sans',sans-serif;font-size:0.95rem;transition:all 0.3s;outline:none;}
+.form-fields-container input[type=password]:focus{border-color:#dc2626;box-shadow:0 0 0 4px rgba(220,38,38,0.08);}
+.form-fields-container input[type=checkbox]{width:18px;height:18px;accent-color:#dc2626;margin-right:0.5rem;}
+.form-fields-container .errorlist{list-style:none;padding:0;margin:0.35rem 0 0;}
+.form-fields-container .errorlist li{background:#fef2f2;border:1px solid #fca5a5;color:#7f1d1d;border-radius:8px;padding:0.4rem 0.75rem;font-size:0.82rem;}
+.btn-danger-nhea{width:100%;padding:1rem;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.3s;box-shadow:0 6px 20px rgba(192,57,43,0.3);}
+.btn-danger-nhea:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(192,57,43,0.45);}
 </style>
-
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- JavaScript for enhanced UX -->
-<script>
-    function confirmReset() {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-        
-        if (!allChecked) {
-            alert('Please confirm all checkboxes before proceeding.');
-            return false;
-        }
-        
-        const confirmed = confirm(
-            '⚠️ FINAL WARNING ⚠️\n\n' +
-            'This action will PERMANENTLY DELETE:\n' +
-            '• All student votes\n' +
-            '• All contestant data\n' +
-            '• All voting history\n\n' +
-            'This action CANNOT be undone!\n\n' +
-            'Are you absolutely certain you want to proceed?'
-        );
-        
-        if (confirmed) {
-            const finalConfirm = confirm('Last chance to cancel. Proceed with data deletion?');
-            return finalConfirm;
-        }
-        
-        return false;
-    }
-    
-    // Add form validation
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('resetForm');
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        const submitBtn = form.querySelector('button[type="submit"]');
-        
-        function updateButtonState() {
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-            if (allChecked) {
-                submitBtn.style.opacity = '1';
-                submitBtn.style.pointerEvents = 'auto';
-            } else {
-                submitBtn.style.opacity = '0.6';
-                submitBtn.style.pointerEvents = 'none';
-            }
-        }
-        
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', updateButtonState);
-        });
-        
-        // Initial state
-        updateButtonState();
-    });
-</script>
-
+<section class="rv-section">
+<div class="container">
+  <div class="rv-card" data-aos="fade-up">
+    <div class="rv-card-top">
+      <div class="rv-icon"><i class="fas fa-exclamation-triangle"></i></div>
+      <h3>Reset All Votes</h3>
+      <p>This action is irreversible. Proceed with caution.</p>
+    </div>
+    <div class="rv-card-body">
+      <div class="warning-box">
+        <i class="fas fa-exclamation-circle fa-lg"></i>
+        <p>Resetting votes will permanently delete <strong>all voting data</strong> for the current NHEA session. This cannot be undone. Only authorised administrators should perform this action.</p>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-fields-container">{{ form.as_p }}</div>
+        <button type="submit" class="btn-danger-nhea" onclick="return confirm('FINAL WARNING: Reset ALL votes? This cannot be undone!')">
+          <i class="fas fa-trash-alt me-2"></i>Confirm Reset All Votes
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+</section>
 {% endblock %}

@@ -1,536 +1,62 @@
-{% extends "voting/main.html" %}
-
-{% block title %}List of Contestants{% endblock %}
-{% block header %}Contestant Management{% endblock %}
-
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Nominees{% endblock %}
+{% block header %}Nominees{% endblock %}
 {% block body %}
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
 <style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        min-height: 100vh;
-    }
-    
-    .main-container {
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
-    
-    .header-section {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    
-    .page-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 0.5rem;
-    }
-    
-    .page-subtitle {
-        font-size: 1.1rem;
-        color: #64748b;
-        font-weight: 400;
-    }
-    
-    .management-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border: 1px solid #e2e8f0;
-        overflow: hidden;
-        animation: slideIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    
-    @keyframes slideIn {
-        0% {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .card-header {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-        position: relative;
-    }
-    
-    .header-icon {
-        width: 60px;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem auto;
-    }
-    
-    .header-icon i {
-        font-size: 1.5rem;
-    }
-    
-    .header-title {
-        font-size: 1.75rem;
-        font-weight: 600;
-        margin: 0;
-    }
-    
-    .stats-bar {
-        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-        padding: 1.5rem 2rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 3rem;
-        border-bottom: 1px solid #e2e8f0;
-    }
-    
-    .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-weight: 500;
-        color: #1e293b;
-    }
-    
-    .stat-item i {
-        color: #3b82f6;
-        font-size: 1.1rem;
-    }
-    
-    .stat-number {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        color: white;
-        padding: 0.375rem 0.875rem;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        min-width: 2rem;
-        text-align: center;
-    }
-    
-    .contestants-section {
-        padding: 2rem;
-        min-height: 300px;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 3rem 2rem;
-        color: #64748b;
-    }
-    
-    .empty-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem auto;
-    }
-    
-    .empty-icon i {
-        font-size: 2rem;
-        color: #94a3b8;
-    }
-    
-    .empty-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: #1e293b;
-    }
-    
-    .empty-message {
-        font-size: 1rem;
-        margin-bottom: 2rem;
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.6;
-    }
-    
-    .contestant-item {
-        background: #f8fafc;
-        border: 2px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        transition: all 0.3s ease;
-        animation: fadeInUp 0.6s ease-out both;
-    }
-    
-    .contestant-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        border-color: #3b82f6;
-        background: white;
-    }
-    
-    .contestant-info {
-        display: flex;
-        align-items: center;
-        flex: 1;
-    }
-    
-    .contestant-avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-right: 1rem;
-    }
-    
-    .default-avatar {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 1rem;
-        color: white;
-        font-size: 1.25rem;
-        font-weight: 600;
-        border: 3px solid white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .contestant-details {
-        flex: 1;
-    }
-    
-    .contestant-name {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 0.25rem;
-    }
-    
-    .contestant-position {
-        font-size: 0.875rem;
-        color: #64748b;
-        background: #e2e8f0;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
-        display: inline-block;
-        font-weight: 500;
-    }
-    
-    .contestant-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .delete-btn {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.75rem 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-    }
-    
-    .delete-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-    }
-    
-    .card-footer {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        padding: 2rem;
-        text-align: center;
-        border-top: 1px solid #e2e8f0;
-    }
-    
-    .add-contestant-btn {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        font-weight: 600;
-        padding: 1rem 2rem;
-        border-radius: 50px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        font-size: 1rem;
-    }
-    
-    .add-contestant-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-    
-    @keyframes fadeInUp {
-        0% {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .contestant-item:nth-child(1) { animation-delay: 0.1s; }
-    .contestant-item:nth-child(2) { animation-delay: 0.2s; }
-    .contestant-item:nth-child(3) { animation-delay: 0.3s; }
-    .contestant-item:nth-child(4) { animation-delay: 0.4s; }
-    .contestant-item:nth-child(5) { animation-delay: 0.5s; }
-    .contestant-item:nth-child(n+6) { animation-delay: 0.6s; }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .main-container {
-            padding: 1rem;
-        }
-        
-        .page-title {
-            font-size: 2rem;
-        }
-        
-        .stats-bar {
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1rem;
-        }
-        
-        .contestant-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1.25rem;
-        }
-        
-        .contestant-info {
-            width: 100%;
-        }
-        
-        .contestant-actions {
-            width: 100%;
-            justify-content: flex-end;
-        }
-        
-        .contestants-section {
-            padding: 1rem;
-        }
-    }
-    
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        color: white;
-        font-weight: 500;
-        z-index: 1000;
-        animation: slideInRight 0.5s ease;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-    
-    .notification.success {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    }
-    
-    .notification.info {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    }
-    
-    @keyframes slideInRight {
-        from { 
-            transform: translateX(100%); 
-            opacity: 0; 
-        }
-        to { 
-            transform: translateX(0); 
-            opacity: 1; 
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from { 
-            transform: translateX(0); 
-            opacity: 1; 
-        }
-        to { 
-            transform: translateX(100%); 
-            opacity: 0; 
-        }
-    }
+.nom-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.nom-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.nom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;}
+.nom-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);overflow:hidden;transition:all 0.35s;}
+.nom-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(10,79,60,0.12);}
+.nom-card-img{height:180px;object-fit:cover;width:100%;display:block;}
+.nom-card-img-placeholder{height:180px;background:var(--gradient-hero);display:flex;align-items:center;justify-content:center;font-size:3.5rem;color:rgba(255,255,255,0.6);}
+.nom-card-body{padding:1.25rem;}
+.nom-category-tag{display:inline-block;background:#f0f7f4;color:var(--nhea-green);padding:0.25rem 0.7rem;border-radius:20px;font-size:0.75rem;font-weight:600;margin-bottom:0.5rem;border:1px solid var(--nhea-border);}
+.nom-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:var(--nhea-text);margin-bottom:0.25rem;}
+.nom-org{font-size:0.83rem;color:var(--nhea-muted);}
+.btn-del-nom{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:8px;padding:0.45rem 0.9rem;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:0.4rem;text-decoration:none;margin-top:1rem;}
+.btn-del-nom:hover{background:#dc2626;color:#fff;}
 </style>
-
-<div class="main-container">
-    <div class="max-w-6xl mx-auto px-4">
-        <!-- Page Header -->
-        <div class="header-section">
-            <h1 class="page-title">Contestant Management</h1>
-            <p class="page-subtitle">Manage candidates for your school election</p>
-        </div>
-
-        <!-- Main Card -->
-        <div class="management-card">
-            <!-- Card Header -->
-            <div class="card-header">
-                <div class="header-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h2 class="header-title">Registered Contestants</h2>
-            </div>
-
-            <!-- Statistics Bar -->
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Total Contestants:</span>
-                    <span class="stat-number">{{ contestants|length }}</span>
-                </div>
-                <div class="stat-item">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Active Positions:</span>
-                    <span class="stat-number">
-                        {% regroup contestants by position as position_list %}
-                        {{ position_list|length }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Contestants List -->
-            <div class="contestants-section">
-                {% if contestants %}
-                    {% for contestant in contestants %}
-                    <div class="contestant-item">
-                        <div class="contestant-info">
-                            {% if contestant.image %}
-                                <img src="{{ contestant.image.url }}" alt="{{ contestant.name }}" class="contestant-avatar">
-                            {% else %}
-                                <div class="default-avatar">
-                                    {{ contestant.name|first|upper }}
-                                </div>
-                            {% endif %}
-                            <div class="contestant-details">
-                                <h3 class="contestant-name">{{ contestant.name }}</h3>
-                                <span class="contestant-position">{{ contestant.position }}</span>
-                            </div>
-                        </div>
-                        <div class="contestant-actions">
-                            <form method="post" action="{% url 'delete_contestant' contestant.id %}" 
-                                  onsubmit="return confirmDelete('{{ contestant.name }}')">
-                                {% csrf_token %}
-                                <button type="submit" class="delete-btn">
-                                    <i class="fas fa-trash-alt"></i>
-                                    Remove
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <h3 class="empty-title">No Contestants Yet</h3>
-                        <p class="empty-message">
-                            Start building your election by adding the first contestant. 
-                            Click the button below to get started!
-                        </p>
-                    </div>
-                {% endif %}
-            </div>
-
-            <!-- Card Footer -->
-            <div class="card-footer">
-                <a href="{% url 'add_contestant' %}" class="add-contestant-btn">
-                    <i class="fas fa-plus-circle"></i>
-                    Add New Contestant
-                </a>
-            </div>
-        </div>
+<section class="nom-section">
+<div class="container">
+  <div class="nom-actions" data-aos="fade-up">
+    <div>
+      <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin:0;">All Nominees</h5>
+      <p style="color:var(--nhea-muted);font-size:0.88rem;margin:0;">{{ nominees|length }} nominee{{ nominees|length|pluralize }} registered</p>
     </div>
+    <a href="{% url 'add_nominee' %}" class="btn-nhea-gold">
+      <i class="fas fa-plus"></i>Add Nominee
+    </a>
+  </div>
+
+  {% if nominees %}
+  <div class="nom-grid">
+    {% for nominee in nominees %}
+    <div class="nom-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1|multiply:50 }}">
+      {% if nominee.image %}
+        <img src="{{ nominee.image.url }}" alt="{{ nominee.name }}" class="nom-card-img">
+      {% else %}
+        <div class="nom-card-img-placeholder"><i class="fas fa-user-tie"></i></div>
+      {% endif %}
+      <div class="nom-card-body">
+        <span class="nom-category-tag">{{ nominee.category.name }}</span>
+        <div class="nom-name">{{ nominee.name }}</div>
+        <div class="nom-org">{{ nominee.organization|default:"—" }}</div>
+        <a href="{% url 'delete_nominee' nominee.id %}" class="btn-del-nom"
+           onclick="return confirm('Remove {{ nominee.name }}?')">
+          <i class="fas fa-trash-alt"></i>Remove
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="nhea-card" style="text-align:center;padding:3rem;" data-aos="fade-up">
+    <i class="fas fa-user-slash" style="font-size:3rem;color:var(--nhea-muted);display:block;margin-bottom:1rem;"></i>
+    <p style="color:var(--nhea-muted);">No nominees added yet.</p>
+    <a href="{% url 'add_nominee' %}" class="btn-nhea-gold mt-2"><i class="fas fa-plus"></i>Add First Nominee</a>
+  </div>
+  {% endif %}
 </div>
-
-<script>
-    function confirmDelete(contestantName) {
-        return confirm(`⚠️ Are you sure you want to remove "${contestantName}" from the election?\n\nThis action cannot be undone.`);
-    }
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // Show notifications based on URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        if (urlParams.get('added') === 'success') {
-            showNotification('Contestant added successfully!', 'success');
-        }
-        
-        if (urlParams.get('deleted') === 'success') {
-            showNotification('Contestant removed successfully!', 'info');
-        }
-        
-        // Keyboard shortcut for adding contestant (Ctrl+N)
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'n' && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                window.location.href = "{% url 'add_contestant' %}";
-            }
-        });
-    });
-    
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // Auto remove after 4 seconds
-        setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.5s ease forwards';
-            setTimeout(() => notification.remove(), 500);
-        }, 4000);
-        
-        // Remove on click
-        notification.addEventListener('click', () => {
-            notification.style.animation = 'slideOutRight 0.5s ease forwards';
-            setTimeout(() => notification.remove(), 500);
-        });
-    }
-</script>
-
+</section>
 {% endblock %}

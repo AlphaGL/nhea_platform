@@ -34,17 +34,34 @@ SECRET_KEY = 'django-insecure-a(1(wp+^gn^fi64_wz9)qp*9257nxj^s$c-l4@6asjbl^$n)l*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://nabes-bme-election.onrender.com", "nabes-bme-election.onrender.com", "www.nabes-bme-election.onrender.com","127.0.0.1"]
-
+ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ["https://nabes-bme-election.onrender.com", "nabes-bme-election.onrender.com", "www.nabes-bme-election.onrender.com","127.0.0.1"]
 
 # Database
+# DATABASES = {
+#     # neon.tech
+#     ## Email: thewatch2d@gmail.com
+#     'default': dj_database_url.parse(
+#         'postgresql://neondb_owner:npg_FwbGQ8WoVn1r@ep-odd-glitter-ad4ndj5m-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+#     ),
+# }
+
+# Database
+# DATABASES = {
+#     # neon.tech
+#     ## Email: nextmediahqnet@gmail.com
+#     'default': dj_database_url.parse(
+#         'postgresql://neondb_owner:npg_JG5h2RLkElnX@ep-long-truth-anhddodg-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+#     ),
+# }
+
 DATABASES = {
-    # neon.tech
-    ## Email: thewatch2d@gmail.com
-    'default': dj_database_url.parse(
-        'postgresql://neondb_owner:npg_FwbGQ8WoVn1r@ep-odd-glitter-ad4ndj5m-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
-    ),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -127,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-AUTH_USER_MODEL = 'voting.Student'
+AUTH_USER_MODEL = 'voting.Voter'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

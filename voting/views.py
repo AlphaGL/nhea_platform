@@ -1,139 +1,134 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count
 from django.contrib import messages
-from django.contrib.auth import login as auth_login, logout, authenticate
+from django.contrib.auth import login as auth_login, authenticate
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.views.generic import TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from functools import wraps
 from django.http import HttpResponseBadRequest
+from functools import wraps
 
-from .models import Position, Contestant, Vote, Student
-from .forms import VoteForm, StudentForm
-from django.contrib.auth.forms import AuthenticationForm  # Import AuthenticationForm
-from .forms import  AccessCodeForm
-from .models import Vote, Student
-from .forms import ResetAllForm, PositionForm, ContestantForm
+from .models import Category, Nominee, Vote, Voter
+from .forms import (
+    VoteForm, VoterForm, AccessCodeForm,
+    ResetAllForm, CategoryForm, NomineeForm,
+    PasswordResetForm, SelfRegistrationForm,
+)
+from django.contrib.auth.forms import AuthenticationForm
+
+ACCESS_CODE = 'NHEA2026'
 
 
-
-from .models import Student
-from django.contrib.auth import update_session_auth_hash
-from django.contrib import messages
-from .forms import PasswordResetForm
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import PasswordResetForm
-from .models import Student
+# ─── Password Reset ────────────────────────────────────────────────────────────
 
 def reset_password(request):
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
-        print("Form data:", request.POST)  # Debugging line to see form data
-
         if form.is_valid():
-            reg_number = form.cleaned_data.get('reg_number')
+            voter_id = form.cleaned_data.get('voter_id')
             new_password = form.cleaned_data.get('new_password1')
-            print("Reg Number:", reg_number)  # Debugging line
-
             try:
-                student = Student.objects.get(reg_number=reg_number)
-                student.set_password(new_password)  # Hashes the password
-                student.save()
-
+                voter = Voter.objects.get(voter_id=voter_id)
+                voter.set_password(new_password)
+                voter.save()
                 messages.success(request, 'Your password has been successfully updated!')
                 return redirect('login')
-            except Student.DoesNotExist:
-                messages.error(request, 'User with this registration number does not exist.')
+            except Voter.DoesNotExist:
+                messages.error(request, 'No voter found with this Voter ID.')
         else:
-            print("Form errors:", form.errors)  # Debugging line to see errors
             messages.error(request, 'Please correct the errors below.')
     else:
         form = PasswordResetForm()
-
     return render(request, 'voting/reset_password.html', {'form': form})
 
 
+# ─── Self-Registration ─────────────────────────────────────────────────────────
 
-
-
-def manage_positions(request):
+def self_register(request):
+    """
+    Public self-registration.
+    On success, shows the user their auto-generated Voter ID so they can
+    note it down before being redirected to login.
+    """
     if request.method == 'POST':
-        # Handle position deletion
-        delete_position_id = request.POST.get('delete_position_id')
-        if delete_position_id:
-            position = get_object_or_404(Position, id=delete_position_id)
-            position.delete()
-            messages.success(request, 'Position deleted successfully.')
-            return redirect('manage_positions')  # Refresh the page after deletion
+        form = SelfRegistrationForm(request.POST)
+        if form.is_valid():
+            voter = form.save()
+            # Store the new voter_id in session so the success page can display it
+            request.session['new_voter_id'] = voter.voter_id
+            return redirect('register_success')
+    else:
+        form = SelfRegistrationForm()
+    return render(request, 'voting/self_register.html', {'form': form})
 
-        # Handle position addition
-        form = PositionForm(request.POST)
+
+def register_success(request):
+    """Show the newly generated Voter ID to the delegate."""
+    voter_id = request.session.pop('new_voter_id', None)
+    if not voter_id:
+        return redirect('self_register')
+    return render(request, 'voting/register_success.html', {'voter_id': voter_id})
+
+
+# ─── Category Management ───────────────────────────────────────────────────────
+
+def manage_categories(request):
+    if request.method == 'POST':
+        delete_id = request.POST.get('delete_category_id')
+        if delete_id:
+            category = get_object_or_404(Category, id=delete_id)
+            category.delete()
+            messages.success(request, 'Category deleted successfully.')
+            return redirect('manage_categories')
+        form = CategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Position added successfully.')
-            return redirect('manage_positions')  # Refresh the page after addition
+            messages.success(request, 'Category added successfully.')
+            return redirect('manage_categories')
     else:
-        form = PositionForm()
-
-    positions = Position.objects.all()
-    return render(request, 'voting/manage_positions.html', {'form': form, 'positions': positions})
-
+        form = CategoryForm()
+    categories = Category.objects.all().order_by('importance')
+    return render(request, 'voting/manage_categories.html', {'form': form, 'categories': categories})
 
 
+# ─── Nominee Management ────────────────────────────────────────────────────────
 
-
-# View to add contestants
-def add_contestant(request):
+def add_nominee(request):
     if request.method == 'POST':
-        form = ContestantForm(request.POST, request.FILES)
+        form = NomineeForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('list_contestants')  # Redirect to contestant list or another page
+            messages.success(request, 'Nominee added successfully.')
+            return redirect('list_nominees')
     else:
-        form = ContestantForm()
-
-    return render(request, 'voting/add_contestant.html', {'form': form})
-
+        form = NomineeForm()
+    return render(request, 'voting/add_nominee.html', {'form': form})
 
 
+def delete_nominee(request, nominee_id):
+    nominee = get_object_or_404(Nominee, id=nominee_id)
+    nominee.delete()
+    messages.success(request, 'Nominee removed successfully.')
+    return redirect('list_nominees')
 
 
+def list_nominees(request):
+    nominees = Nominee.objects.select_related('category').all()
+    return render(request, 'voting/list_nominees.html', {'nominees': nominees})
 
 
-# View to delete contestants
-def delete_contestant(request, contestant_id):
-    contestant = get_object_or_404(Contestant, id=contestant_id)
-    contestant.delete()
-    messages.success(request, 'Contestant deleted successfully.')
-    return redirect('list_contestants')
-
-
-
-
-
-# List contestants
-
-def list_contestants(request):
-    contestants = Contestant.objects.all()
-    return render(request, 'voting/list_contestants.html', {'contestants': contestants})
-
-
-
-
+# ─── Access Code / Voter List ──────────────────────────────────────────────────
 
 def enter_access_code(request):
     if request.method == 'POST':
         form = AccessCodeForm(request.POST)
         if form.is_valid():
-            access_code = form.cleaned_data.get('access_code')
-            if access_code == 'BMEFUTO':  # Replace with your actual access code logic
-                request.session['has_access'] = True  # Set session variable
-                return redirect('list_students')  # Redirect to the list_students view
+            code = form.cleaned_data.get('access_code')
+            if code == ACCESS_CODE:
+                request.session['has_access'] = True
+                return redirect('list_voters')
             else:
                 messages.error(request, 'Invalid access code.')
     else:
@@ -141,305 +136,234 @@ def enter_access_code(request):
     return render(request, 'voting/security.html', {'form': form})
 
 
-
-def list_students(request):
+def list_voters(request):
     if not request.session.get('has_access'):
         return redirect('enter_access_code')
 
     if request.method == 'POST':
-        student_id = request.POST.get('delete_student_id')
-        if student_id:
-            student = get_object_or_404(Student, id=student_id)
-            student.delete()
-            messages.success(request, 'Student deleted successfully.')
-            return redirect('list_students')
+        voter_id = request.POST.get('delete_voter_id')
+        if voter_id:
+            voter = get_object_or_404(Voter, id=voter_id)
+            voter.delete()
+            messages.success(request, 'Voter deleted successfully.')
+            return redirect('list_voters')
 
-    students = Student.objects.all()
-    students_by_year = {}
-    student_count_by_year = {}
+    voters = Voter.objects.all()
+    voters_by_org = {}
+    count_by_org = {}
+    for voter in voters:
+        org = voter.organization or 'Unknown'
+        if org not in voters_by_org:
+            voters_by_org[org] = []
+            count_by_org[org] = 0
+        voters_by_org[org].append(voter)
+        count_by_org[org] += 1
 
-    for student in students:
-        year = student.reg_number[:4]  # Assuming reg starts with year
-        if year not in students_by_year:
-            students_by_year[year] = []
-            student_count_by_year[year] = 0
-        students_by_year[year].append(student)
-        student_count_by_year[year] += 1
+    total_voters = voters.count()
+    largest_group = max(count_by_org.values(), default=0)
 
-    total_students = students.count()
-    largest_group_size = max(student_count_by_year.values(), default=0)  # 👈 NEW
-
-    return render(request, 'voting/list_students.html', {
-        'students_by_year': students_by_year,
-        'student_count_by_year': student_count_by_year,
-        'total_students': total_students,
-        'largest_group_size': largest_group_size,  # 👈 pass to template
+    return render(request, 'voting/list_voters.html', {
+        'voters_by_org': voters_by_org,
+        'count_by_org': count_by_org,
+        'total_voters': total_voters,
+        'largest_group': largest_group,
     })
 
 
-
-def logout(request):
-    request.session.pop('has_access', None)  # Clear the session variable
-    return redirect('enter_access_code')  # Redirect to the access code page
-
-
+def logout_voter(request):
+    request.session.pop('has_access', None)
+    request.session.pop('voter_id', None)
+    return redirect('login')
 
 
-
+# ─── Vote Reset ────────────────────────────────────────────────────────────────
 
 def reset_all(request):
     if request.method == 'POST':
         form = ResetAllForm(request.POST)
         if form.is_valid():
             entered_code = form.cleaned_data.get('access_code')
-
-            # Check if the access code matches
             if entered_code != ACCESS_CODE:
                 messages.error(request, 'Invalid access code. Please try again.')
                 return redirect('reset_all')
-
-            # Check if reset is confirmed
             if form.cleaned_data.get('confirm_reset'):
-                # Reset all votes and contestants
-                Vote.objects.all().delete()  # Delete all votes
-                # Contestant.objects.all().delete()  # Delete all contestants
-                messages.success(request, 'All votes and contestants have been reset.')
+                Vote.objects.all().delete()
+                messages.success(request, 'All votes have been reset successfully.')
             else:
                 messages.error(request, 'You must confirm the reset.')
-
             return redirect('reset_all')
     else:
         form = ResetAllForm()
-
     return render(request, 'voting/reset_vote.html', {'form': form})
 
 
-
-
-
-
-ACCESS_CODE = 'BMEFUTO'  # Set your access code {this is for live count and vote reseting}
+# ─── Live Vote Count ───────────────────────────────────────────────────────────
 
 def live_vote_count(request):
     if request.method == 'POST':
-        access_code = request.POST.get('access_code')
-        if access_code == ACCESS_CODE:
+        code = request.POST.get('access_code')
+        if code == ACCESS_CODE:
             vote_data = {}
-            positions = Position.objects.all()
-
-            for position in positions:
-                contestants = Contestant.objects.filter(position=position).annotate(vote_count=Count('vote'))
-                vote_data[position] = contestants
-
-            total_voters = Vote.objects.values('student').distinct().count()  # Count unique students who have voted
-
+            categories = Category.objects.all().order_by('importance')
+            for cat in categories:
+                nominees = Nominee.objects.filter(category=cat).annotate(vote_count=Count('vote'))
+                vote_data[cat] = nominees
+            total_voters = Vote.objects.values('voter').distinct().count()
             return render(request, 'voting/live_vote_count.html', {
                 'vote_data': vote_data,
                 'total_voters': total_voters
             })
         else:
-            messages.error(request, 'Invalid access code. Please try again.')
-
+            messages.error(request, 'Invalid access code.')
     return render(request, 'voting/live_vote_count.html')
 
 
-
-
-
-
+# ─── Custom Auth Decorator ─────────────────────────────────────────────────────
 
 def custom_auth_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        reg_number = request.POST.get('reg_number', '') or request.GET.get('reg_number', '')
-        password = request.POST.get('password', '') or request.GET.get('password', '')
-
-        if reg_number and password:
-            student = authenticate(reg_number=reg_number, password=password)
-            if student:
-                return view_func(request, *args, **kwargs)
-
+        if request.user.is_authenticated:
+            return view_func(request, *args, **kwargs)
         messages.error(request, 'Unauthorized access.')
         return redirect('login')
-
     return _wrapped_view
 
 
+# ─── Admin Registration (staff only) ──────────────────────────────────────────
 
-
-
-
-def register_student(request):
+def register_voter(request):
+    """Admin-side registration; voter_id can be set manually."""
     if request.method == 'POST':
-        form = StudentForm(request.POST)
+        form = VoterForm(request.POST)
         if form.is_valid():
-            student = form.save(commit=False)
-            student.set_password(form.cleaned_data['password'])
-            student.save()
-            messages.success(request, 'Student registered successfully!')
-            return redirect('register_student')
+            voter = form.save(commit=False)
+            voter.set_password(form.cleaned_data['password'])
+            voter.save()
+            messages.success(request, f'Voter registered successfully! ID: {voter.voter_id}')
+            return redirect('register_voter')
     else:
-        form = StudentForm()
+        form = VoterForm()
     return render(request, 'voting/register_student.html', {'form': form})
 
 
+# ─── Login ─────────────────────────────────────────────────────────────────────
 
-
-
-class BmeLoginView(LoginView):
+class NheaLoginView(LoginView):
     template_name = 'voting/login.html'
-    form_class = AuthenticationForm  # Use AuthenticationForm
+    form_class = AuthenticationForm
 
     def form_valid(self, form):
-        reg_number = form.cleaned_data.get('username')
+        voter_id = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
-        student = authenticate(reg_number=reg_number, password=password)
-
-        if student is not None:
-            auth_login(self.request, student)
-            self.request.session['reg_number'] = reg_number
+        voter = authenticate(voter_id=voter_id, password=password)
+        if voter is not None:
+            auth_login(self.request, voter)
+            self.request.session['voter_id'] = voter_id
             return super().form_valid(form)
         else:
-            form.add_error(None, 'Invalid registration number or password.')
+            form.add_error(None, 'Invalid Voter ID or password.')
             return self.form_invalid(form)
 
     def get_success_url(self):
-        reg_number = self.request.session.get('reg_number')
-
-        if reg_number:
-            student = Student.objects.filter(reg_number=reg_number).first()
-
-            if student:
-                total_positions = Position.objects.count()
-                voted_positions = Vote.objects.filter(student=student).values('position').distinct().count()
-
-                if voted_positions == total_positions:
+        voter_id = self.request.session.get('voter_id')
+        if voter_id:
+            voter = Voter.objects.filter(voter_id=voter_id).first()
+            if voter:
+                total_cats = Category.objects.count()
+                voted_cats = Vote.objects.filter(voter=voter).values('category').distinct().count()
+                if voted_cats == total_cats:
                     return reverse_lazy('completed')
-                else:
-                    remaining_position = Position.objects.exclude(
-                        id__in=Vote.objects.filter(student=student).values_list('position_id', flat=True)
-                    ).order_by('importance').first()
-
-                    if remaining_position:
-                        return reverse_lazy('vote_position', kwargs={'position_id': remaining_position.id})
-                    else:
-                        return reverse_lazy('completed')
-            else:
-                return reverse_lazy('login')
-        else:
-            return reverse_lazy('login')
+                remaining = Category.objects.exclude(
+                    id__in=Vote.objects.filter(voter=voter).values_list('category_id', flat=True)
+                ).order_by('importance').first()
+                if remaining:
+                    return reverse_lazy('vote_category', kwargs={'category_id': remaining.id})
+                return reverse_lazy('completed')
+        return reverse_lazy('login')
 
 
+# ─── Voting ────────────────────────────────────────────────────────────────────
 
-
-
-
-
-def vote_position(request, position_id):
-    reg_number = request.session.get('reg_number')
-
-    if not reg_number:
+def vote_category(request, category_id):
+    voter_id = request.session.get('voter_id')
+    if not voter_id:
         return redirect('login')
 
-    student = get_object_or_404(Student, reg_number=reg_number)
-    position = get_object_or_404(Position, id=position_id)
+    voter = get_object_or_404(Voter, voter_id=voter_id)
+    category = get_object_or_404(Category, id=category_id)
+
+    # Guard: already voted here
+    if Vote.objects.filter(voter=voter, category=category).exists():
+        return redirect('next_category', category_id=category_id)
 
     if request.method == 'POST':
-        contestant_id = request.POST.get('contestant')
+        nominee_id = request.POST.get('nominee')
+        if not nominee_id:
+            messages.error(request, 'Please select a nominee before continuing.')
+            return redirect('vote_category', category_id=category_id)
+        nominee = get_object_or_404(Nominee, id=nominee_id, category=category)
+        Vote.objects.create(voter=voter, category=category, nominee=nominee)
+        messages.success(request, f'Your vote for "{nominee.name}" has been recorded!')
+        return redirect('next_category', category_id=category_id)
 
-        if not contestant_id:
-            return HttpResponseBadRequest("You must select a contestant.")
+    nominees = Nominee.objects.filter(category=category)
+    total_categories = Category.objects.count()
+    voted_count = Vote.objects.filter(voter=voter).count()
+    # Progress as a percentage for the progress bar
+    progress_pct = int((voted_count / total_categories) * 100) if total_categories else 0
 
-        contestant = get_object_or_404(Contestant, id=contestant_id)
-
-        if Vote.objects.filter(student=student, position=position).exists():
-            return render(request, 'voting/error.html', {'message': 'You have already voted for this position.'})
-
-        Vote.objects.create(student=student, position=position, contestant=contestant)
-        return redirect('next_position', position_id=position_id)
-
-    contestants = Contestant.objects.filter(position=position)
-    return render(request, 'voting/vote_position.html', {'position': position, 'contestants': contestants})
-
-
-def site_map(request):
-    return render(request, 'voting/site_map.html')
+    return render(request, 'voting/vote_position.html', {
+        'position': category,
+        'contestants': nominees,
+        'total_categories': total_categories,
+        'voted_count': voted_count,
+        'progress_pct': progress_pct,
+        'voter': voter,
+    })
 
 
-
-
-
-
-def next_position(request, position_id):
-    reg_number = request.session.get('reg_number')
-
-    if not reg_number:
+def next_category(request, category_id):
+    voter_id = request.session.get('voter_id')
+    if not voter_id:
         return redirect('login')
 
-    student = get_object_or_404(Student, reg_number=reg_number)
-    voted_positions = Vote.objects.filter(student=student).values_list('position_id', flat=True)
-    all_positions = Position.objects.all().order_by('importance')
-    remaining_positions = all_positions.exclude(id__in=voted_positions)
+    voter = get_object_or_404(Voter, voter_id=voter_id)
+    voted_cats = Vote.objects.filter(voter=voter).values_list('category_id', flat=True)
+    remaining = Category.objects.exclude(id__in=voted_cats).order_by('importance')
 
-    if remaining_positions.exists():
-        next_position = remaining_positions.first()
-        return redirect('vote_position', position_id=next_position.id)
-    else:
-        return redirect('completed')
+    if remaining.exists():
+        return redirect('vote_category', category_id=remaining.first().id)
+    return redirect('completed')
 
 
-
-def vote_view(request):
-    if request.method == 'POST':
-        form = VoteForm(request.POST)
-        if form.is_valid():
-            # Extracting the contestant directly from the cleaned data
-            contestant_id = form.cleaned_data.get('contestant') or request.POST.get('selected_contestant')
-            position = form.cleaned_data['position']
-
-            reg_number = form.cleaned_data['reg_number']
-            student = Student.objects.filter(reg_number=reg_number).first()
-
-            if student and not Vote.objects.filter(student=student, position=position).exists():
-                Vote.objects.create(
-                    student=student,
-                    position=position,
-                    contestant_id=contestant_id  # Use the contestant ID directly
-                )
-                messages.success(request, 'Vote cast successfully!')
-                return redirect('vote_success')
-            else:
-                messages.error(request, 'Invalid registration number or you have already voted.')
-                return redirect('vote')
-    else:
-        form = VoteForm()
-    return render(request, 'voting/vote.html', {'form': form})
-
-
-
-
-
-
+# ─── Admin Dashboard ───────────────────────────────────────────────────────────
 
 @login_required
 @staff_member_required
-@custom_auth_required
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect('login')
 
     total_votes = Vote.objects.count()
-    total_students = Student.objects.count()
-    total_positions = Position.objects.count()
+    total_voters = Voter.objects.count()
+    total_categories = Category.objects.count()
+    total_nominees = Nominee.objects.count()
 
     context = {
         'total_votes': total_votes,
-        'total_students': total_students,
-        'total_positions': total_positions,
+        'total_voters': total_voters,
+        'total_categories': total_categories,
+        'total_nominees': total_nominees,
     }
-
     return render(request, 'voting/admin_dashboard.html', context)
 
 
+# ─── Completed & Site Map ──────────────────────────────────────────────────────
+
 class CompletedView(TemplateView):
     template_name = 'voting/completed.html'
+
+
+def site_map(request):
+    return render(request, 'voting/site_map.html')         

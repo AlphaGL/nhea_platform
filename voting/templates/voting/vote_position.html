@@ -1,356 +1,506 @@
-{% extends "voting/main.html" %}
-{% block title %}Vote for Position{% endblock %}
-{% block header %}Vote for {{ position.name }}{% endblock %}
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Vote: {{ position.name }}{% endblock %}
+{% block header %}Cast Your Vote{% endblock %}
+
 {% block body %}
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
 <style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        min-height: 100vh;
-    }
-    
-    .main-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border: 1px solid #e2e8f0;
-        transition: all 0.3s ease;
-    }
-    
-    .main-card:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        transform: translateY(-2px);
-    }
-    
-    .header-card {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        color: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        text-align: center;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 12px 24px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
-    
-    .btn-success {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 12px 24px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .btn-success:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-    }
-    
-    .form-select {
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 12px 16px;
-        font-size: 16px;
-        transition: all 0.3s ease;
-        background: white;
-    }
-    
-    .form-select:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .contestant-card {
-        background: #f8fafc;
-        border: 2px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 2rem;
-        text-align: center;
-        margin-top: 1.5rem;
-        transition: all 0.3s ease;
-    }
-    
-    .contestant-image {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        margin: 0 auto 1rem auto;
-    }
-    
-    .submit-section {
-        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-        border: 2px solid #a7f3d0;
-        border-radius: 16px;
-        padding: 2rem;
-        text-align: center;
-        margin-top: 1.5rem;
-    }
-    
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        background: #dcfce7;
-        color: #166534;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 500;
-    }
-    
-    .error-alert {
-        background: #fef2f2;
-        border: 2px solid #fca5a5;
-        color: #dc2626;
-        padding: 16px;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-    }
-    
-    .icon-circle {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem auto;
-    }
-    
-    .pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: .5;
-        }
-    }
-    
-    @media (max-width: 640px) {
-        .main-card {
-            margin: 1rem;
-        }
-        
-        .header-card {
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .contestant-card, .submit-section {
-            padding: 1.5rem;
-        }
-    }
+/* ── Progress Bar ── */
+.vote-progress-wrap {
+    background: #e8f5f0;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--nhea-border);
+    position: sticky;
+    top: 70px;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+.vote-progress-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+.progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--nhea-green);
+}
+.progress-bar-track {
+    height: 8px;
+    background: rgba(10,79,60,0.12);
+    border-radius: 99px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: var(--gradient-gold);
+    border-radius: 99px;
+    transition: width 0.6s ease;
+    position: relative;
+}
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 24px;
+    background: rgba(255,255,255,0.45);
+    border-radius: 99px;
+    animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+    0%   { opacity: 0; }
+    50%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ── Page Layout ── */
+.vote-section {
+    background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
+    min-height: calc(100vh - 280px);
+    padding: 3rem 0 5rem;
+}
+.vote-container { max-width: 860px; margin: 0 auto; }
+
+/* ── Category Header ── */
+.cat-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+.cat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gradient-hero);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.4rem 1.1rem;
+    border-radius: 99px;
+    margin-bottom: 1rem;
+}
+.cat-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    color: var(--nhea-text);
+    margin-bottom: 0.5rem;
+}
+.cat-desc {
+    color: var(--nhea-muted);
+    font-size: 0.92rem;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* ── Nominee Cards Grid ── */
+.nominees-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.nominee-card {
+    background: #fff;
+    border: 2px solid var(--nhea-border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(10,79,60,0.05);
+}
+.nominee-card:hover {
+    border-color: var(--nhea-green);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(10,79,60,0.13);
+}
+.nominee-card.selected {
+    border-color: var(--nhea-green);
+    box-shadow: 0 0 0 4px rgba(10,79,60,0.15), 0 12px 36px rgba(10,79,60,0.15);
+}
+
+/* Selection tick */
+.nominee-card .select-tick {
+    position: absolute;
+    top: 0.75rem; right: 0.75rem;
+    width: 28px; height: 28px;
+    background: var(--nhea-green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 0.85rem;
+    opacity: 0;
+    transform: scale(0.4);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 3;
+}
+.nominee-card.selected .select-tick {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Card image */
+.nominee-img {
+    height: 175px;
+    object-fit: cover;
+    width: 100%;
+    display: block;
+}
+.nominee-img-placeholder {
+    height: 175px;
+    background: var(--gradient-hero);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: rgba(255,255,255,0.45);
+}
+
+/* Card body */
+.nominee-body {
+    padding: 1.1rem 1.25rem 1.25rem;
+}
+.nominee-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--nhea-text);
+    margin-bottom: 0.2rem;
+    line-height: 1.3;
+}
+.nominee-org {
+    font-size: 0.8rem;
+    color: var(--nhea-muted);
+}
+
+/* Radio hidden */
+.nominee-radio { display: none; }
+
+/* ── Confirmation strip ── */
+.confirm-strip {
+    background: #fff;
+    border: 2px solid var(--nhea-border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    transition: all 0.3s;
+    opacity: 0.4;
+    pointer-events: none;
+}
+.confirm-strip.active {
+    border-color: var(--nhea-green);
+    background: #f0faf5;
+    opacity: 1;
+    pointer-events: auto;
+}
+.confirm-choice {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.confirm-avatar {
+    width: 44px; height: 44px;
+    background: var(--gradient-hero);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 1rem;
+    flex-shrink: 0;
+}
+.confirm-name-label {
+    font-size: 0.75rem;
+    color: var(--nhea-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.confirm-name-val {
+    font-weight: 700;
+    color: var(--nhea-text);
+    font-size: 1rem;
+}
+
+.btn-cast-vote {
+    padding: 0.9rem 2.2rem;
+    background: var(--gradient-hero);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 6px 20px rgba(10,79,60,0.25);
+    white-space: nowrap;
+}
+.btn-cast-vote:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(10,79,60,0.35);
+}
+.btn-cast-vote:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── Modal Overlay ── */
+.vote-modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10,30,24,0.7);
+    z-index: 9990;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+.vote-modal-overlay.open { display: flex; }
+.vote-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+}
+@keyframes modalPop {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+.modal-nominee-thumb {
+    width: 80px; height: 80px;
+    background: var(--gradient-hero);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: rgba(255,255,255,0.6);
+    margin: 0 auto 1.25rem;
+    border: 3px solid rgba(201,168,76,0.5);
+}
+.modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    color: var(--nhea-text);
+    margin-bottom: 0.5rem;
+}
+.modal-subtitle {
+    color: var(--nhea-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+    line-height: 1.6;
+}
+.modal-selected-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--nhea-green);
+    background: #f0faf5;
+    border: 1px solid #b6e0cc;
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+}
+.modal-actions { display: flex; gap: 0.75rem; justify-content: center; }
+.btn-modal-cancel {
+    padding: 0.8rem 1.5rem;
+    background: #f3f4f6;
+    color: var(--nhea-text);
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-modal-cancel:hover { background: #e5e7eb; }
+.btn-modal-confirm {
+    padding: 0.8rem 1.75rem;
+    background: var(--gradient-hero);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(10,79,60,0.25);
+}
+.btn-modal-confirm:hover { transform: translateY(-1px); }
+
+@media (max-width: 640px) {
+    .nominees-grid { grid-template-columns: 1fr 1fr; }
+    .confirm-strip { flex-direction: column; align-items: stretch; }
+    .btn-cast-vote { width: 100%; justify-content: center; }
+}
+@media (max-width: 420px) {
+    .nominees-grid { grid-template-columns: 1fr; }
+}
 </style>
 
-<div class="min-h-screen py-8 px-4">
-    <div class="max-w-2xl mx-auto">
-        <!-- Header Section -->
-        <div class="header-card">
-            <div class="icon-circle bg-white bg-opacity-20 mb-4">
-                <i class="fas fa-vote-yea text-2xl"></i>
-            </div>
-            <h1 class="text-3xl font-bold mb-2">{{ position.name }}</h1>
-            <p class="text-blue-100 text-lg mb-4">Cast your vote and make your voice heard</p>
-            <div class="status-badge">
-                <div class="w-2 h-2 bg-green-500 rounded-full mr-2 pulse"></div>
-                Voting Active
-            </div>
+<!-- Progress Bar (sticky) -->
+<div class="vote-progress-wrap">
+    <div class="vote-progress-inner">
+        <div class="progress-meta">
+            <span><i class="fas fa-check-circle me-1"></i>{{ voted_count }} of {{ total_categories }} categories voted</span>
+            <span>{{ progress_pct }}% complete</span>
         </div>
+        <div class="progress-bar-track">
+            <div class="progress-bar-fill" style="width: {{ progress_pct }}%;"></div>
+        </div>
+    </div>
+</div>
 
-        <!-- Main Voting Card -->
-        <div class="main-card p-8">
-            <form method="POST" id="voteForm">
-                {% csrf_token %}
-                
-                {% if error_message %}
-                    <div class="error-alert">
-                        <div class="flex items-center">
-                            <i class="fas fa-exclamation-triangle mr-3"></i>
-                            <span class="font-medium">{{ error_message }}</span>
-                        </div>
-                    </div>
+<section class="vote-section">
+<div class="container">
+<div class="vote-container">
+
+    <!-- Category Header -->
+    <div class="cat-header" data-aos="fade-up">
+        <div class="cat-badge">
+            <i class="fas fa-trophy"></i>
+            Category {{ voted_count|add:1 }} of {{ total_categories }}
+        </div>
+        <h2 class="cat-title">{{ position.name }}</h2>
+        {% if position.description %}
+        <p class="cat-desc">{{ position.description }}</p>
+        {% else %}
+        <p class="cat-desc">Select the nominee you wish to vote for in this category. Your choice is final.</p>
+        {% endif %}
+    </div>
+
+    <!-- Voting Form -->
+    <form method="post" id="voteForm">
+        {% csrf_token %}
+
+        <!-- Nominee Cards -->
+        <div class="nominees-grid" id="nomineesGrid">
+            {% for contestant in contestants %}
+            <label class="nominee-card" for="nom_{{ contestant.id }}" data-name="{{ contestant.name }}" data-id="{{ contestant.id }}">
+                <div class="select-tick"><i class="fas fa-check"></i></div>
+                <input type="radio" name="nominee" id="nom_{{ contestant.id }}" value="{{ contestant.id }}" class="nominee-radio" required>
+                {% if contestant.image %}
+                    <img src="{{ contestant.image.url }}" alt="{{ contestant.name }}" class="nominee-img">
+                {% else %}
+                    <div class="nominee-img-placeholder"><i class="fas fa-user-tie"></i></div>
                 {% endif %}
-
-                <!-- Step 1: Select Contestant -->
-                <div class="mb-6">
-                    <label for="contestant" class="block text-gray-700 text-lg font-semibold mb-3">
-                        <i class="fas fa-users mr-2 text-blue-500"></i>
-                        Step 1: Choose Your Candidate
-                    </label>
-                    <select name="contestant" id="contestant" 
-                            class="form-select w-full" 
-                            required onchange="showContestantDetails()">
-                        <option value="" disabled selected>Select a contestant...</option>
-                        {% for contestant in contestants %}
-                            <option value="{{ contestant.id }}" 
-                                data-image-url="{% if contestant.image %}{{ contestant.image.url }}{% else %}/static/img/default-contestant.jpg{% endif %}"
-                                data-name="{{ contestant.name }}">
-                                {{ contestant.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                <div class="nominee-body">
+                    <div class="nominee-name">{{ contestant.name }}</div>
+                    <div class="nominee-org">{{ contestant.organization|default:"—" }}</div>
                 </div>
-                
-                <!-- Step 2: Confirm Selection -->
-                <div id="contestantDetails" class="hidden">
-                    <div class="contestant-card">
-                        <h3 class="text-gray-700 text-lg font-semibold mb-4">
-                            <i class="fas fa-user-check mr-2 text-green-500"></i>
-                            Step 2: Confirm Your Selection
-                        </h3>
-                        
-                        <img id="contestantImage" 
-                             src="" 
-                             alt="Contestant Image" 
-                             class="contestant-image" />
-                        
-                        <h4 id="contestantName" class="text-xl font-bold text-gray-800 mb-4"></h4>
-                        
-                        <button type="button" 
-                                id="confirmSelection" 
-                                class="btn-success text-lg px-8 py-3" 
-                                onclick="confirmContestantSelection()">
-                            <i class="fas fa-check-circle mr-2"></i>
-                            Confirm This Candidate
-                        </button>
-                    </div>
-                </div>
-
-                <input type="hidden" name="contestant" id="selectedContestantInput" />
-
-                <!-- Step 3: Submit Vote -->
-                <div class="hidden" id="submitVoteDiv">
-                    <div class="submit-section">
-                        <div class="icon-circle bg-green-500 text-white mb-4">
-                            <i class="fas fa-ballot-check text-xl"></i>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Step 3: Submit Your Vote</h3>
-                        <p class="text-gray-600 mb-6">Your selection has been confirmed. Click below to cast your vote.</p>
-                        
-                        <div class="bg-white p-4 rounded-lg border-2 border-green-200 mb-6">
-                            <p class="text-sm text-gray-600 mb-2">
-                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                                <strong>Important:</strong> Once submitted, your vote cannot be changed.
-                            </p>
-                        </div>
-                        
-                        <button type="submit" 
-                                class="btn-primary text-xl px-12 py-4">
-                            <i class="fas fa-paper-plane mr-3"></i>
-                            Submit My Vote
-                        </button>
-                    </div>
-                </div>
-            </form>
+            </label>
+            {% empty %}
+            <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--nhea-muted);">
+                <i class="fas fa-user-slash" style="font-size:2.5rem; display:block; margin-bottom:1rem;"></i>
+                No nominees have been added to this category yet.
+            </div>
+            {% endfor %}
         </div>
 
-        <!-- Security Notice -->
-        <div class="text-center mt-6">
-            <p class="text-gray-500 text-sm">
-                <i class="fas fa-shield-alt mr-2"></i>
-                Your vote is secure, anonymous, and encrypted
-            </p>
+        <!-- Confirmation Strip -->
+        <div class="confirm-strip" id="confirmStrip" data-aos="fade-up">
+            <div class="confirm-choice">
+                <div class="confirm-avatar"><i class="fas fa-user-tie"></i></div>
+                <div>
+                    <div class="confirm-name-label">Your selection</div>
+                    <div class="confirm-name-val" id="selectedName">—</div>
+                </div>
+            </div>
+            <button type="button" class="btn-cast-vote" id="castBtn" disabled onclick="openModal()">
+                <i class="fas fa-paper-plane"></i>
+                Cast My Vote
+            </button>
+        </div>
+    </form>
+
+</div>
+</div>
+</section>
+
+<!-- Confirmation Modal -->
+<div class="vote-modal-overlay" id="voteModalOverlay">
+    <div class="vote-modal">
+        <div class="modal-nominee-thumb" id="modalThumb"><i class="fas fa-user-tie"></i></div>
+        <h3 class="modal-title">Confirm Your Vote</h3>
+        <p class="modal-subtitle">You are about to cast your vote for this category. <strong>This cannot be undone.</strong></p>
+        <div class="modal-selected-name" id="modalSelectedName">—</div>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeModal()">
+                <i class="fas fa-arrow-left me-1"></i>Go Back
+            </button>
+            <button class="btn-modal-confirm" onclick="submitVote()">
+                <i class="fas fa-check me-1"></i>Confirm Vote
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-    function showContestantDetails() {
-        const contestantSelect = document.getElementById('contestant');
-        const selectedOption = contestantSelect.options[contestantSelect.selectedIndex];
-        
-        const contestantImageUrl = selectedOption.getAttribute('data-image-url');
-        const contestantName = selectedOption.getAttribute('data-name');
-        
-        if (contestantImageUrl && contestantName) {
-            document.getElementById('contestantImage').src = contestantImageUrl;
-            document.getElementById('contestantName').textContent = contestantName;
-            
-            // Reset previous states
-            document.getElementById('submitVoteDiv').classList.add('hidden');
-            document.getElementById('selectedContestantInput').value = '';
-            document.getElementById('confirmSelection').disabled = false;
-            document.getElementById('confirmSelection').innerHTML = '<i class="fas fa-check-circle mr-2"></i>Confirm This Candidate';
-            document.getElementById('confirmSelection').className = 'btn-success text-lg px-8 py-3';
-            contestantSelect.disabled = false;
-            
-            // Show contestant details
-            document.getElementById('contestantDetails').classList.remove('hidden');
-            
-            // Smooth scroll to the contestant details
-            document.getElementById('contestantDetails').scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'nearest' 
-            });
-        }
-    }
-    
-    function confirmContestantSelection() {
-        const contestantSelect = document.getElementById('contestant');
-        const selectedContestantId = contestantSelect.value;
-        
-        if (selectedContestantId) {
-            document.getElementById('selectedContestantInput').value = selectedContestantId;
-            
-            // Update confirm button to show confirmed state
-            const confirmBtn = document.getElementById('confirmSelection');
-            confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Selection Confirmed';
-            confirmBtn.className = 'text-lg px-8 py-3 bg-gray-400 text-white rounded-lg cursor-not-allowed';
-            confirmBtn.disabled = true;
-            
-            // Disable contestant selection
-            contestantSelect.disabled = true;
-            
-            // Show submit section
-            document.getElementById('submitVoteDiv').classList.remove('hidden');
-            
-            // Smooth scroll to submit section
-            setTimeout(() => {
-                document.getElementById('submitVoteDiv').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'nearest' 
-                });
-            }, 300);
-        }
-    }
-    
-    // Handle form submission feedback
-    document.getElementById('voteForm').addEventListener('submit', function(e) {
-        const submitBtn = this.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting Vote...';
-        submitBtn.disabled = true;
-        submitBtn.className = 'text-xl px-12 py-4 bg-gray-400 text-white rounded-lg cursor-not-allowed';
-    });
-</script>
+const cards = document.querySelectorAll('.nominee-card');
+const confirmStrip = document.getElementById('confirmStrip');
+const selectedNameEl = document.getElementById('selectedName');
+const castBtn = document.getElementById('castBtn');
+const modalNameEl = document.getElementById('modalSelectedName');
+const overlay = document.getElementById('voteModalOverlay');
 
+let selectedCard = null;
+
+cards.forEach(card => {
+    card.addEventListener('click', () => {
+        // Deselect previous
+        if (selectedCard) selectedCard.classList.remove('selected');
+
+        // Select new
+        card.classList.add('selected');
+        selectedCard = card;
+
+        const radio = card.querySelector('.nominee-radio');
+        if (radio) radio.checked = true;
+
+        const name = card.dataset.name;
+        selectedNameEl.textContent = name;
+        modalNameEl.textContent = name;
+
+        confirmStrip.classList.add('active');
+        castBtn.disabled = false;
+    });
+});
+
+function openModal() {
+    if (!selectedCard) return;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+}
+function submitVote() {
+    const btn = document.querySelector('.btn-modal-confirm');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Submitting…';
+    btn.disabled = true;
+    document.getElementById('voteForm').submit();
+}
+
+// Close on overlay click
+overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal();
+});
+// Close on Escape
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+});
+</script>
 {% endblock %}

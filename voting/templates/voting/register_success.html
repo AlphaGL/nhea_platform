@@ -1,0 +1,204 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Registration Successful{% endblock %}
+{% block header %}Registration Complete{% endblock %}
+
+{% block body %}
+<style>
+.success-section {
+    background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
+    min-height: calc(100vh - 220px);
+    display: flex;
+    align-items: center;
+    padding: 3rem 1rem;
+}
+.success-card {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 16px 60px rgba(10,79,60,0.12);
+    border: 1px solid var(--nhea-border);
+    max-width: 560px;
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    text-align: center;
+}
+.success-top {
+    background: var(--gradient-hero);
+    padding: 3rem 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.success-top::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 180px; height: 180px;
+    background: rgba(201,168,76,0.1);
+    border-radius: 50%;
+}
+.success-check {
+    width: 88px; height: 88px;
+    background: rgba(255,255,255,0.15);
+    border: 2.5px solid rgba(201,168,76,0.6);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.2rem;
+    color: var(--nhea-gold-light);
+    position: relative; z-index: 2;
+    animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes scaleIn {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+.success-top h3 {
+    color: #fff;
+    font-size: 1.8rem;
+    position: relative; z-index: 2;
+    margin-bottom: 0.35rem;
+}
+.success-top p {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.9rem;
+    position: relative; z-index: 2;
+    margin: 0;
+}
+
+.success-body { padding: 2.5rem 2rem; }
+
+/* Voter ID Display */
+.voter-id-box {
+    background: #f0faf5;
+    border: 2px dashed var(--nhea-green);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.75rem;
+}
+.voter-id-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--nhea-muted);
+    margin-bottom: 0.75rem;
+}
+.voter-id-value {
+    font-family: 'Courier New', monospace;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--nhea-green);
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    word-break: break-all;
+}
+.btn-copy-id {
+    background: #fff;
+    border: 1.5px solid var(--nhea-border);
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--nhea-green);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-copy-id:hover { background: #f0faf5; border-color: var(--nhea-green); }
+.btn-copy-id.copied {
+    background: var(--nhea-green);
+    color: #fff;
+    border-color: var(--nhea-green);
+}
+
+/* Warning */
+.id-warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.85rem;
+    color: #92400e;
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    line-height: 1.6;
+}
+.id-warning i { flex-shrink: 0; margin-top: 0.1rem; color: #d97706; }
+
+.btn-login-now {
+    width: 100%;
+    padding: 1rem;
+    background: var(--gradient-hero);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    box-shadow: 0 6px 20px rgba(10,79,60,0.25);
+}
+.btn-login-now:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(10,79,60,0.35);
+    color: #fff;
+}
+</style>
+
+<section class="success-section">
+<div class="container">
+<div class="success-card" data-aos="fade-up">
+    <div class="success-top">
+        <div class="success-check"><i class="fas fa-check"></i></div>
+        <h3>You're Registered!</h3>
+        <p>Welcome to the NHEA {% now "Y" %} voting platform</p>
+    </div>
+    <div class="success-body">
+
+        <div class="voter-id-box">
+            <div class="voter-id-label"><i class="fas fa-id-card me-1"></i>Your Voter ID</div>
+            <div class="voter-id-value" id="voterIdDisplay">{{ voter_id }}</div>
+            <button class="btn-copy-id" id="copyBtn" onclick="copyId()">
+                <i class="fas fa-copy"></i><span>Copy ID</span>
+            </button>
+        </div>
+
+        <div class="id-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span><strong>Save this Voter ID now.</strong> You will need it every time you log in. This screen will not show your ID again — write it down or copy it before proceeding.</span>
+        </div>
+
+        <a href="{% url 'login' %}" class="btn-login-now">
+            <i class="fas fa-sign-in-alt"></i>Proceed to Login
+        </a>
+    </div>
+</div>
+</div>
+</section>
+
+<script>
+function copyId() {
+    const id = document.getElementById('voterIdDisplay').textContent.trim();
+    navigator.clipboard.writeText(id).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.classList.add('copied');
+        btn.innerHTML = '<i class="fas fa-check"></i><span>Copied!</span>';
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<i class="fas fa-copy"></i><span>Copy ID</span>';
+        }, 2500);
+    });
+}
+</script>
+{% endblock %}

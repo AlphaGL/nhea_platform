@@ -1,4 +1,4 @@
-acorn==0.0.15
+acorn==0.2.1
 aiohappyeyeballs==2.6.1
 aiosignal==1.3.2
 amqp==5.3.1

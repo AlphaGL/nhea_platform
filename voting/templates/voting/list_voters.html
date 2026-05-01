@@ -1,0 +1,97 @@
+{% extends 'voting/main.html' %}
+{% load custom_filters %}
+{% block title %}NHEA – Registered Voters{% endblock %}
+{% block header %}Registered Voters{% endblock %}
+{% block body %}
+<style>
+.lv-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.lv-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem;margin-bottom:2rem;}
+.lv-stat{background:#fff;border-radius:14px;padding:1.5rem;border:1px solid var(--nhea-border);box-shadow:0 4px 16px rgba(10,79,60,0.06);text-align:center;}
+.lv-stat-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:var(--nhea-green);line-height:1;}
+.lv-stat-label{font-size:0.78rem;font-weight:600;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:0.35rem;}
+.org-section{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);overflow:hidden;margin-bottom:1.5rem;}
+.org-header{background:var(--gradient-hero);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.org-header-title{color:#fff;font-weight:600;font-size:1rem;display:flex;align-items:center;gap:0.6rem;}
+.org-badge{background:rgba(201,168,76,0.3);border:1px solid rgba(201,168,76,0.5);color:var(--nhea-gold-light);padding:0.2rem 0.7rem;border-radius:20px;font-size:0.78rem;font-weight:600;}
+.voter-table{width:100%;border-collapse:collapse;}
+.voter-table th{background:#f8fdf9;padding:0.85rem 1.25rem;text-align:left;font-size:0.8rem;font-weight:700;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--nhea-border);}
+.voter-table td{padding:0.85rem 1.25rem;border-bottom:1px solid var(--nhea-border);font-size:0.9rem;color:var(--nhea-text);}
+.voter-table tr:last-child td{border-bottom:none;}
+.voter-table tr:hover td{background:#f8fdf9;}
+.voter-avatar{width:34px;height:34px;background:var(--gradient-hero);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:700;margin-right:0.6rem;}
+.btn-del-voter{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-del-voter:hover{background:#dc2626;color:#fff;}
+@media(max-width:640px){.voter-table th:nth-child(3),.voter-table td:nth-child(3){display:none;}}
+</style>
+<section class="lv-section">
+<div class="container">
+
+  <div class="lv-summary" data-aos="fade-up">
+    <div class="lv-stat">
+      <div class="lv-stat-num">{{ total_voters }}</div>
+      <div class="lv-stat-label">Total Voters</div>
+    </div>
+    <div class="lv-stat">
+      <div class="lv-stat-num">{{ voters_by_org|length }}</div>
+      <div class="lv-stat-label">Organisations</div>
+    </div>
+    <div class="lv-stat">
+      <div class="lv-stat-num">{{ largest_group }}</div>
+      <div class="lv-stat-label">Largest Group</div>
+    </div>
+  </div>
+
+  {% for org, voters in voters_by_org.items %}
+  <div class="org-section" data-aos="fade-up">
+    <div class="org-header">
+      <div class="org-header-title">
+        <i class="fas fa-building"></i>
+        {{ org }}
+      </div>
+      <span class="org-badge">{{ count_by_org|get_item:org }} voters</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="voter-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Voter ID</th>
+            <th>Organisation</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for voter in voters %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <span class="voter-avatar">{{ voter.full_name|first }}</span>
+              {{ voter.full_name }}
+            </td>
+            <td><code style="background:#f0f7f4;padding:0.2rem 0.5rem;border-radius:4px;color:var(--nhea-green);font-size:0.85rem;">{{ voter.voter_id }}</code></td>
+            <td>{{ voter.organization|default:"–" }}</td>
+            <td>
+              <form method="post" style="display:inline;" onsubmit="return confirm('Remove {{ voter.full_name }}?')">
+                {% csrf_token %}
+                <input type="hidden" name="delete_voter_id" value="{{ voter.id }}">
+                <button type="submit" class="btn-del-voter"><i class="fas fa-trash-alt me-1"></i>Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% empty %}
+  <div class="nhea-card nhea-card-body text-center" style="padding:3rem;">
+    <i class="fas fa-users-slash" style="font-size:3rem;color:var(--nhea-muted);margin-bottom:1rem;display:block;"></i>
+    <p style="color:var(--nhea-muted);">No voters registered yet.</p>
+    <a href="{% url 'register_voter' %}" class="btn-nhea-primary mt-2"><i class="fas fa-user-plus"></i>Register First Voter</a>
+  </div>
+  {% endfor %}
+
+</div>
+</section>
+{% endblock %}

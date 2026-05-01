@@ -3,542 +3,276 @@
 {% load static %}
 <head>
     <meta charset="UTF-8">
-    
-    <!-- Primary Meta Tags - FUTO Official Style -->
-    <title>{% block title %}BME Department Voting System | Federal University of Technology, Owerri{% endblock %}</title>
-    <meta name="title" content="BME Department Voting System | Federal University of Technology, Owerri">
-    <meta name="description" content="Official Biomedical Engineering Department Voting System - Federal University of Technology Owerri (FUTO). Secure digital voting platform for BME students, elections, and departmental governance. World-class university technology.">
-    <meta name="keywords" content="Federal University of Technology Owerri, FUTO, university owerri, uni owerri, owerri, FUTO university, futo, world class university, top ranking university, excellent university, world leading university, BME FUTO, Biomedical Engineering FUTO, FUTO BME, FUTO departments, FUTO student portal, FUTO voting system, FUTO elections, Federal University of Technology staff, futo staffs, FUTO Staff, BME department, biomedical engineering voting, student democracy FUTO, FUTO digital services">
-    <meta name="author" content="Federal University of Technology, Owerri - BME Department">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="3 days">
-    <meta name="distribution" content="web">
-    <meta name="rating" content="general">
-    <meta name="copyright" content="Federal University of Technology, Owerri">
-    
-    <!-- Viewport and Mobile Optimization -->
+    <title>{% block title %}NHEA – Nigerian Healthcare Excellence Awards{% endblock %}</title>
+    <meta name="description" content="Official voting platform for the Nigerian Healthcare Excellence Awards (NHEA) – celebrating outstanding achievement in Nigeria's healthcare sector.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="FUTO BME Voting">
-    
-    <!-- FUTO Branding Colors -->
-    <meta name="theme-color" content="#1e40af">
-    <meta name="msapplication-TileColor" content="#1e40af">
-    <meta name="msapplication-navbutton-color" content="#1e40af">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#1e40af">
-    
-    <!-- Open Graph / Facebook Meta Tags - FUTO Official -->
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Federal University of Technology, Owerri - BME Department">
-    <meta property="og:title" content="BME Department Voting System | Federal University of Technology, Owerri">
-    <meta property="og:description" content="Official Biomedical Engineering Department digital voting platform at FUTO. Secure, transparent elections for world-class university students. Excellence in educational technology.">
-    <meta property="og:image" content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s">
-    <meta property="og:image:alt" content="Federal University of Technology Owerri - BME Department Logo">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://nabes-bme-election.onrender.com{{ request.get_full_path }}">
-    <meta property="og:locale" content="en_NG">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="BME Voting System | Federal University of Technology, Owerri">
-    <meta name="twitter:description" content="Official FUTO BME Department voting platform. World-class university technology for secure student elections and democratic governance.">
-    <meta name="twitter:image" content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s">
-    <meta name="twitter:image:alt" content="FUTO BME Department Logo">
-    <meta name="twitter:site" content="@FUTO_Official">
-    <meta name="twitter:creator" content="@FUTO_Official">
-    
-    <!-- LinkedIn Meta Tags -->
-    <meta property="linkedin:owner" content="Federal University of Technology, Owerri">
-    
-    <!-- Geo Location Meta Tags - FUTO Campus -->
-    <meta name="geo.region" content="NG-IM">
-    <meta name="geo.placename" content="Federal University of Technology, Owerri, Imo State">
-    <meta name="geo.position" content="5.3947;7.0470">
-    <meta name="ICBM" content="5.3947, 7.0470">
-    
-    <!-- Educational Institution Schema - FUTO Official -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "CollegeOrUniversity",
-        "name": "Federal University of Technology, Owerri",
-        "alternateName": ["FUTO", "Federal University of Technology Owerri"],
-        "description": "World-class Federal University of Technology offering excellent education and innovative research. Official BME Department voting system for student governance.",
-        "url": "https://nabes-bme-election.onrender.com",
-        "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s",
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Federal University of Technology",
-            "addressLocality": "Owerri",
-            "addressRegion": "Imo State",
-            "addressCountry": "Nigeria",
-            "postalCode": "460114"
-        },
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "customer service",
-            "areaServed": "NG"
-        },
-        "department": {
-            "@type": "EducationalOrganization",
-            "name": "Department of Biomedical Engineering",
-            "parentOrganization": "Federal University of Technology, Owerri",
-            "description": "Excellence in biomedical engineering education with innovative digital voting systems"
-        },
-        "sameAs": [
-            "https://futo.edu.ng",
-            "https://www.facebook.com/FUTOwerri",
-            "https://twitter.com/FUTO_Official"
-        ]
-    }
-    </script>
-    
-    <!-- University Ranking Schema -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "FUTO BME Department Voting System",
-        "description": "Official voting platform for Federal University of Technology Owerri, Biomedical Engineering Department",
-        "publisher": {
-            "@type": "EducationalOrganization",
-            "name": "Federal University of Technology, Owerri",
-            "description": "World-class university, top ranking university, excellent university, world leading university"
-        },
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://nabes-bme-election.onrender.com/search?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
-    }
-    </script>
-    
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-    
-    <!-- Favicons - FUTO Style -->
-    <link rel="icon" type="image/png" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s">
-    <link rel="shortcut icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCpNfjQUvY9sE0pIx1Vf5ZvURaVtsWLbusNw&s">
-    
-    <!-- Canonical URL - Updated for Render Domain -->
-    <link rel="canonical" href="https://nabes-bme-election.onrender.com{{ request.get_full_path }}">
-    
-    <!-- FUTO Official Connections -->
-    <link rel="related" href="https://futo.edu.ng">
-    
-    <!-- DNS Prefetch for Performance -->
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
-    
-    <!-- Preconnect for Critical Resources - Matching FUTO Style -->
+    <meta name="theme-color" content="#0a4f3c">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Google Fonts - Inter (Same as FUTO Official) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    
-    <!-- Additional Fonts for Compatibility -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap 5.3 CSS -->
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- AOS Animation Library -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
-    
-    <!-- Critical CSS for FUTO Branding -->
+
     <style>
         :root {
-            --futo-primary: #1e40af;
-            --futo-secondary: #0f172a;
-            --futo-accent: #3b82f6;
-            --futo-gold: #fbbf24;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: white;
-            line-height: 1.6;
-        }
-        
-        .futo-brand {
-            color: var(--futo-primary);
-        }
-        
-        .futo-accent {
-            color: var(--futo-accent);
-        }
-        
-        .bg-futo-primary {
-            background-color: var(--futo-primary);
-        }
-        
-        .text-futo-primary {
-            color: var(--futo-primary);
-        }
-        
-        /* Loading performance optimization */
-        .font-display-swap {
-            font-display: swap;
-        }
-        
-        /* FUTO Official Colors for Components */
-        .btn-futo {
-            background-color: var(--futo-primary);
-            border-color: var(--futo-primary);
-            color: white;
-        }
-        
-        .btn-futo:hover {
-            background-color: var(--futo-secondary);
-            border-color: var(--futo-secondary);
-        }
-    </style>
-    <style>
-        :root {
-            --futo-primary: #1e40af;
-            --futo-secondary: #0f172a;
-            --futo-accent: #3b82f6;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: white;
-        }
-        
-        .futo-brand {
-            color: var(--futo-primary);
-        }
-    </style>
-    
-    <!-- Additional FUTO-specific meta tags -->
-    <meta name="institution" content="Federal University of Technology, Owerri">
-    <meta name="department" content="Biomedical Engineering">
-    <meta name="university-type" content="Federal Technology University">
-    <meta name="location" content="Owerri, Imo State, Nigeria">
-    <meta name="established" content="1980">
-    <meta name="university-ranking" content="Top Nigerian Technology University">
-    
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #3b82f6;
-            --secondary-color: #64748b;
-            --accent-color: #f59e0b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --dark-color: #1e293b;
-            --light-color: #f8fafc;
-            --border-color: #e2e8f0;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --nhea-green:       #0a4f3c;
+            --nhea-green-light: #0d6b52;
+            --nhea-gold:        #c9a84c;
+            --nhea-gold-light:  #e8c96a;
+            --nhea-cream:       #fdf8f0;
+            --nhea-dark:        #0d1f1a;
+            --nhea-text:        #1a2e28;
+            --nhea-muted:       #5a7a72;
+            --nhea-border:      #d4e6df;
+            --gradient-hero:    linear-gradient(135deg, #0a4f3c 0%, #0d6b52 50%, #1a8a6a 100%);
+            --gradient-gold:    linear-gradient(135deg, #c9a84c 0%, #e8c96a 100%);
+            --shadow-card:      0 8px 32px rgba(10,79,60,0.12);
+            --shadow-hover:     0 20px 60px rgba(10,79,60,0.2);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background: #ffffff;
+            font-family: 'DM Sans', sans-serif;
+            background: #fff;
+            color: var(--nhea-text);
+            line-height: 1.7;
             overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', sans-serif;
+        h1, h2, h3, h4, h5 {
+            font-family: 'Cormorant Garamond', serif;
             font-weight: 600;
             line-height: 1.2;
         }
 
-        /* Modern Loading Spinner */
-        #spinner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 9999;
-        }
+        ::selection { background: var(--nhea-gold); color: var(--nhea-dark); }
 
-        .spinner-border {
-            width: 3rem !important;
-            height: 3rem !important;
-            border-width: 0.3em;
-            border-color: #ffffff;
-            border-right-color: transparent;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Modern Navbar */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95) !important;
+        /* ── Navbar ── */
+        .nhea-navbar {
+            background: rgba(10, 79, 60, 0.97) !important;
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid rgba(201,168,76,0.3);
+            padding: 0.75rem 0;
             transition: all 0.3s ease;
-            padding: 0.5rem 0;
         }
 
-        .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98) !important;
-            box-shadow: var(--shadow-md);
+        .nhea-navbar.scrolled {
+            background: rgba(10, 79, 60, 1) !important;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
         }
 
-        .navbar-brand {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color) !important;
-            text-decoration: none;
+        .navbar-brand-nhea {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
-        .navbar-brand:hover {
-            transform: translateY(-2px);
-            color: var(--primary-dark) !important;
+        .brand-emblem {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--nhea-dark);
+            flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(201,168,76,0.4);
         }
 
-        .navbar-brand img {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-            box-shadow: var(--shadow-sm);
+        .brand-text-main {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+            line-height: 1;
         }
 
-        .navbar-nav .nav-link {
+        .brand-text-sub {
+            font-size: 0.65rem;
+            color: var(--nhea-gold-light);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             font-weight: 500;
-            color: var(--text-primary) !important;
-            margin: 0 0.5rem;
+            line-height: 1;
+            margin-top: 2px;
+        }
+
+        .nhea-navbar .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            font-size: 0.9rem;
             padding: 0.5rem 1rem !important;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .nhea-navbar .nav-link:hover {
+            color: var(--nhea-gold-light) !important;
+            background: rgba(201,168,76,0.12);
+        }
+
+        .btn-nhea-nav {
+            background: var(--gradient-gold);
+            color: var(--nhea-dark) !important;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem !important;
+            border-radius: 50px;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 0.88rem;
+            box-shadow: 0 2px 12px rgba(201,168,76,0.35);
+        }
+
+        .btn-nhea-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201,168,76,0.5);
+            color: var(--nhea-dark) !important;
+        }
+
+        /* ── Page Header ── */
+        .nhea-page-header {
+            background: var(--gradient-hero);
+            padding: 5rem 0 3.5rem;
             position: relative;
+            overflow: hidden;
         }
 
-        .navbar-nav .nav-link:hover,
-        .navbar-nav .nav-link.active {
-            color: var(--primary-color) !important;
-            background: rgba(37, 99, 235, 0.05);
-            transform: translateY(-1px);
+        .nhea-page-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.06'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            opacity: 0.6;
         }
 
-        .navbar-nav .nav-link::after {
+        .nhea-page-header::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--primary-color);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-
-        .navbar-nav .nav-link:hover::after,
-        .navbar-nav .nav-link.active::after {
-            width: 80%;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            border: none;
-            border-radius: 12px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-transform: none;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Modern Header */
-        .page-header {
-            background: var(--gradient-primary);
-            position: relative;
-            padding: 6rem 0 4rem;
-            overflow: hidden;
-        }
-
-        .page-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.05)"><polygon points="0,0 1000,0 1000,80 0,100"/></svg>');
-            background-size: cover;
+            height: 60px;
+            background: white;
+            clip-path: ellipse(55% 100% at 50% 100%);
         }
 
-        .page-header::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: -50px;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
+        .header-gold-line {
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-gold);
+            margin: 1rem auto;
+            border-radius: 2px;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-
-        .page-header h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 1rem;
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .nhea-page-header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.2);
             position: relative;
             z-index: 2;
         }
 
-        /* Modern Footer */
-        .footer {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            color: #e2e8f0;
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(201,168,76,0.2);
+            border: 1px solid rgba(201,168,76,0.4);
+            color: var(--nhea-gold-light);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ── Footer ── */
+        .nhea-footer {
+            background: var(--nhea-dark);
+            color: rgba(255,255,255,0.75);
             position: relative;
             overflow: hidden;
         }
 
-        .footer::before {
+        .nhea-footer::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        }
-
-        .footer h4 {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .footer h4::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 40px;
+            top: 0; left: 0; right: 0;
             height: 3px;
-            background: var(--accent-color);
-            border-radius: 2px;
+            background: var(--gradient-gold);
         }
 
-        .btn-link {
-            color: #cbd5e1 !important;
+        .footer-brand-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .footer-divider {
+            border-color: rgba(255,255,255,0.08);
+            margin: 2rem 0 1.5rem;
+        }
+
+        .footer-link {
+            color: rgba(255,255,255,0.6);
             text-decoration: none;
-            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            transition: color 0.3s;
             display: block;
-            transition: all 0.3s ease;
-            border: none;
-            background: none;
-            text-align: left;
+            padding: 0.2rem 0;
         }
 
-        .btn-link:hover {
-            color: white !important;
-            padding-left: 10px;
-            transform: translateX(5px);
+        .footer-link:hover { color: var(--nhea-gold-light); }
+
+        .footer-gold-text { color: var(--nhea-gold-light); }
+
+        .footer-copyright {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 1.5rem;
+            font-size: 0.85rem;
         }
 
-        .copyright {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 2rem 0;
-            margin-top: 2rem;
-        }
-
-        .border-bottom {
-            border-bottom: 2px solid var(--accent-color) !important;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .border-bottom:hover {
-            color: var(--accent-color) !important;
-            border-bottom-color: white !important;
-        }
-
-        /* Back to Top Button */
+        /* ── Back to Top ── */
         .back-to-top {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--gradient-primary);
-            color: white;
+            bottom: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-gold);
+            color: var(--nhea-dark);
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 1.2rem;
-            box-shadow: var(--shadow-lg);
+            font-size: 1.1rem;
+            box-shadow: 0 4px 16px rgba(201,168,76,0.4);
             transition: all 0.3s ease;
-            z-index: 1000;
+            z-index: 999;
             opacity: 0;
             visibility: hidden;
             transform: translateY(20px);
+            cursor: pointer;
         }
 
         .back-to-top.show {
@@ -548,373 +282,351 @@
         }
 
         .back-to-top:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-xl);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(201,168,76,0.5);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 1.3rem;
-            }
-            
-            .navbar-brand img {
-                width: 35px;
-                height: 35px;
-            }
-
-            .page-header h1 {
-                font-size: 2.5rem;
-            }
-
-            .btn-primary {
-                padding: 0.65rem 1.5rem;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .page-header {
-                padding: 4rem 0 2rem;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-        }
-
-        /* Smooth Scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Selection Color */
-        ::selection {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        /* Focus States */
-        .btn:focus,
-        .nav-link:focus {
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        /* ── Global Form Styles ── */
+        .nhea-input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid var(--nhea-border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            background: var(--nhea-cream);
+            color: var(--nhea-text);
+            transition: all 0.3s ease;
             outline: none;
+        }
+
+        .nhea-input:focus {
+            border-color: var(--nhea-green);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(10,79,60,0.08);
+        }
+
+        .nhea-label {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--nhea-text);
+            margin-bottom: 0.4rem;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Buttons ── */
+        .btn-nhea-primary {
+            background: var(--gradient-hero);
+            color: #fff;
+            border: none;
+            padding: 0.85rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(10,79,60,0.25);
+        }
+
+        .btn-nhea-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(10,79,60,0.35);
+            color: #fff;
+        }
+
+        .btn-nhea-gold {
+            background: var(--gradient-gold);
+            color: var(--nhea-dark);
+            border: none;
+            padding: 0.85rem 2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(201,168,76,0.3);
+        }
+
+        .btn-nhea-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(201,168,76,0.45);
+            color: var(--nhea-dark);
+        }
+
+        .btn-nhea-danger {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: #fff;
+            border: none;
+            padding: 0.85rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(192,57,43,0.25);
+        }
+
+        .btn-nhea-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(192,57,43,0.35);
+            color: #fff;
+        }
+
+        /* ── Card ── */
+        .nhea-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--nhea-border);
+            overflow: hidden;
+            transition: all 0.35s ease;
+        }
+
+        .nhea-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-4px);
+        }
+
+        .nhea-card-header {
+            background: var(--gradient-hero);
+            padding: 1.75rem 2rem;
+            color: #fff;
+        }
+
+        .nhea-card-body { padding: 2rem; }
+
+        /* ── Alert Messages ── */
+        .nhea-alert {
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nhea-alert-success {
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+        }
+
+        .nhea-alert-error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #7f1d1d;
+        }
+
+        .nhea-alert-info {
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            color: #1e3a8a;
+        }
+
+        /* ── Messages (Django) ── */
+        .messages-wrapper {
+            position: fixed;
+            top: 80px;
+            right: 1.5rem;
+            z-index: 9999;
+            width: 340px;
+            max-width: calc(100vw - 2rem);
+        }
+
+        .msg-toast {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInRight 0.4s ease;
+            border-left: 4px solid;
+        }
+
+        .msg-toast.success { border-left-color: #10b981; }
+        .msg-toast.error   { border-left-color: #ef4444; }
+        .msg-toast.warning { border-left-color: #f59e0b; }
+        .msg-toast.info    { border-left-color: #3b82f6; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .nhea-page-header { padding: 3.5rem 0 2.5rem; }
+            .nhea-card-body { padding: 1.5rem; }
         }
     </style>
 </head>
 
 <body>
-
-    <!-- Modern Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <!-- Navbar -->
+    <nav class="nhea-navbar navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a href="https://bmefuto.vercel.app/" target="_blank" class="navbar-brand">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr0OVIl6P8fVot-jbR5zA8-i1_BS1LqqXFkA&s" alt="BME FUTO Logo">
-                <span>BME FUTO</span>
+            <a href="/" class="navbar-brand-nhea">
+                <div class="brand-emblem">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div>
+                    <div class="brand-text-main">NHEA</div>
+                    <div class="brand-text-sub">Healthcare Excellence Awards</div>
+                </div>
             </a>
-            
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span style="color:#fff; font-size:1.4rem;"><i class="bi bi-list"></i></span>
             </button>
-            
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-1">
                     <li class="nav-item">
-                        <a class="nav-link" href="https://bmefuto.vercel.app/" target="_blank">
-                            <i class="bi bi-house me-1"></i>Home
-                        </a>
+                        <a class="nav-link" href="/"><i class="bi bi-house me-1"></i>Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="https://bmefuto.vercel.app/about.html" target="_blank">
-                            <i class="bi bi-info-circle me-1"></i>About
-                        </a>
+                        <a class="nav-link" href="/"><i class="bi bi-ballot me-1"></i>Vote</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="https://futo.edu.ng/department-of-biomedical-technology/" target="_blank">
-                            <i class="bi bi-book me-1"></i>Courses
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://bmefuto.vercel.app/courses.html" target="_blank">
-                            <i class="bi bi-journal-text me-1"></i>Past Questions
-                        </a>
+                        <a class="nav-link" href="/reset_password/"><i class="bi bi-key me-1"></i>Reset Password</a>
                     </li>
                 </ul>
-                
-                <div class="d-flex ms-lg-3">
-                    <a href="https://wa.me/2348138582078/" target="_blank" class="btn btn-primary">
-                        <i class="bi bi-envelope me-2"></i>Contact
-                        <i class="bi bi-arrow-right ms-2"></i>
+                <div class="ms-lg-3 mt-2 mt-lg-0">
+                    <a href="/admin/" class="nav-link btn-nhea-nav">
+                        <i class="fas fa-user-shield me-1"></i>Admin
                     </a>
                 </div>
             </div>
         </div>
     </nav>
-    
-    <!-- Navbar End -->
 
-    <!-- Modern Header -->
-    <div class="page-header" data-aos="fade-down">
-        <div class="container">
-            <div class="row justify-content-center text-center">
-                <div class="col-lg-8">
-                    <h1 data-aos="fade-up" data-aos-delay="100">
-                        {% block header %}Welcome to BME FUTO{% endblock %}
-                    </h1>
-                    <div class="mt-4" data-aos="fade-up" data-aos-delay="200">
-                        <div class="d-inline-block px-4 py-2 bg-white bg-opacity-10 rounded-pill">
-                            <small class="text-white-50">
-                                <i class="bi bi-geo-alt me-2"></i>Federal University of Technology, Owerri
-                            </small>
-                        </div>
-                    </div>
-                </div>
+    <!-- Page Header -->
+    <div class="nhea-page-header text-center">
+        <div class="container position-relative" style="z-index:2;">
+            <div class="header-badge mb-3">
+                <i class="fas fa-star"></i>
+                Nigerian Healthcare Excellence Awards
             </div>
+            <h1 data-aos="fade-up">{% block header %}Welcome to NHEA{% endblock %}</h1>
+            <span class="header-gold-line"></span>
+            <p class="text-white-50 mt-1 mb-0" style="font-size:0.9rem;">
+                <i class="bi bi-geo-alt me-1"></i>Nigeria · {% now "Y" %}
+            </p>
         </div>
     </div>
-    <!-- Header End -->
+
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages-wrapper">
+        {% for message in messages %}
+        <div class="msg-toast {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}">
+            <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Main Content -->
     <main>
-        {% block body %}
-        <!-- Your page content will go here -->
-        {% endblock %}
+        {% block body %}{% endblock %}
     </main>
 
-    <!-- Modern Footer -->
-    <footer class="footer pt-5 mt-5" data-aos="fade-up">
-        <div class="container py-5">
-            <div class="row g-5">
-                <!-- <div class="col-lg-4 col-md-6">
-                    <div class="footer-section">
-                        <h4><i class="bi bi-link-45deg me-2"></i>Quick Links</h4>
-                        <div class="d-flex flex-column">
-                            <a class="btn-link" href="https://bmefuto.vercel.app/" target="_blank">
-                                <i class="bi bi-house me-2"></i>Home
-                            </a>
-                            <a class="btn-link" href="https://bmefuto.vercel.app/about.html" target="_blank">
-                                <i class="bi bi-info-circle me-2"></i>About Us
-                            </a>
-                            <a class="btn-link" href="https://bmefuto.vercel.app/courses.html" target="_blank">
-                                <i class="bi bi-journal-text me-2"></i>Past Questions
-                            </a>
-                            <a class="btn-link" href="https://wa.me/2348138582078" target="_blank">
-                                <i class="bi bi-envelope me-2"></i>Contact
-                            </a>
-                        </div>
-                    </div>
-                </div> -->
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-section">
-                        <h4><i class="bi bi-geo-alt me-2"></i>Location</h4>
-                        <div class="d-flex align-items-start mb-3">
-                            <i class="bi bi-building me-3 mt-1 text-warning"></i>
-                            <div>
-                                <p class="mb-2">Department of Biomedical Engineering</p>
-                                <p class="mb-0">Federal University of Technology Owerri</p>
-                                <p class="mb-0">Imo State, Nigeria</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Google Map Container -->
-                        <div class="map-container mb-3" style="position: relative; height: 200px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d26150.45675073363!2d6.9588662108398545!3d5.383201700000018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x10425d58f4ce0c75%3A0x1a6fe471ace29bf7!2sDepartment%20Of%20Biomedical%20Engineering%20Annex%20Building!5e1!3m2!1sen!2sng!4v1754555533202!5m2!1sen!2sng" 
-                                width="600" 
-                                height="450" 
-                                style="border:0;" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade"
-                                title="FUTO Campus Location">
-                            </iframe>
-                        </div>
-                        
-                        <!-- Quick Directions Link -->
-                        <div class="d-flex align-items-center justify-content-between">
-                            <a href="https://goo.gl/maps/FUTO-Owerri-Location" 
-                            target="_blank" 
-                            class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-map me-1"></i>Get Directions
-                            </a>
-                            <small>
-                                <i class="bi bi-clock me-1"></i>Campus Hours: 24/7
-                            </small>
-                        </div>
-                        
-                        
-                        <!-- Additional Location Info -->
-                        <div class="mt-3 p-2 bg-light rounded">
-                            <small style='color:#000;'>
-                                <i class="bi bi-info-circle me-1"></i>
-                                Located in the heart of Owerri, easily accessible by public transport
-                            </small>
-                        </div>
+    <!-- Footer -->
+    <footer class="nhea-footer pt-5 mt-5">
+        <div class="container py-4">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand-title mb-2">NHEA</div>
+                    <p style="font-size:0.88rem; color:rgba(255,255,255,0.55); margin-bottom:1rem;">
+                        Nigerian Healthcare Excellence Awards — celebrating outstanding achievement and innovation across Nigeria's healthcare sector.
+                    </p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" style="color:var(--nhea-gold-light); font-size:1.2rem;"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" style="color:var(--nhea-gold-light); font-size:1.2rem;"><i class="bi bi-facebook"></i></a>
+                        <a href="#" style="color:var(--nhea-gold-light); font-size:1.2rem;"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" style="color:var(--nhea-gold-light); font-size:1.2rem;"><i class="bi bi-instagram"></i></a>
                     </div>
                 </div>
-
-                <!-- Additional CSS for better map styling -->
-                <style>
-                .map-container {
-                    transition: transform 0.3s ease;
-                }
-
-                .map-container:hover {
-                    transform: scale(1.02);
-                }
-
-                .footer-section .btn-outline-primary {
-                    border-color: #1e40af;
-                    color: #1e40af;
-                }
-
-                .footer-section .btn-outline-primary:hover {
-                    background-color: #1e40af;
-                    border-color: #1e40af;
-                }
-
-                .bg-light {
-                    background-color: #f8f9fa !important;
-                }
-
-                @media (max-width: 768px) {
-                    .map-container {
-                        height: 150px;
-                    }
-                    
-                    .d-flex.justify-content-between {
-                        flex-direction: column;
-                        gap: 10px;
-                    }
-                }
-                </style>
-                
-                <div class="col-lg-4 col-md-12">
-                    <div class="footer-section">
-                        <h4><i class="bi bi-mortarboard me-2"></i>Department</h4>
-                        <p>Advancing healthcare through innovative biomedical technology education and research.</p>
-                        <div class="social-links mt-3">
-                            <div class="d-flex gap-2">
-                                <div class="bg-primary bg-opacity-10 rounded-circle p-2">
-                                    <a href="https://wa.me/2348138582078" target="_blank"><i class="bi bi-whatsapp text-primary"></i></a>
-                                </div>
-                                <div class="bg-primary bg-opacity-10 rounded-circle p-2">
-                                    <a href=" https://www.instagram.com/ibeawuchicn/" target="_blank"><i class="bi bi-instagram text-primary"></i></a>
-                                </div>
-                                <div class="bg-primary bg-opacity-10 rounded-circle p-2">
-                                    <a href="https://www.linkedin.com/in/ibeawuchi-c-n-a09b11304/?originalSubdomain=ng" target="_blank"><i class="bi bi-linkedin text-primary"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-lg-4 col-md-6">
+                    <p class="footer-gold-text fw-600 mb-3" style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase; font-weight:600;">Quick Links</p>
+                    <a href="/" class="footer-link"><i class="bi bi-chevron-right me-1"></i>Home</a>
+                    <a href="/vote/" class="footer-link"><i class="bi bi-chevron-right me-1"></i>Cast Your Vote</a>
+                    <a href="/reset_password/" class="footer-link"><i class="bi bi-chevron-right me-1"></i>Reset Password</a>
+                    <a href="/live_vote_count/" class="footer-link"><i class="bi bi-chevron-right me-1"></i>Live Results</a>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <p class="footer-gold-text fw-600 mb-3" style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase; font-weight:600;">Contact</p>
+                    <p style="font-size:0.88rem; color:rgba(255,255,255,0.6);">
+                        <i class="bi bi-envelope me-2"></i>info@nhea.ng
+                    </p>
+                    <p style="font-size:0.88rem; color:rgba(255,255,255,0.6);">
+                        <i class="bi bi-telephone me-2"></i>+234 800 000 0000
+                    </p>
+                    <p style="font-size:0.88rem; color:rgba(255,255,255,0.6);">
+                        <i class="bi bi-geo-alt me-2"></i>Lagos, Nigeria
+                    </p>
                 </div>
             </div>
-        </div>
-        
-        <div class="copyright">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                        <p class="mb-0">
-                            &copy; <a class="border-bottom" href="https://bmefuto.vercel.app/" target="_blank">BME FUTO</a> 2024. All Rights Reserved.
-                        </p>
-                        <small style="color: #fff;">
-                            With <i class="bi bi-heart-fill text-danger mx-1"></i> Powered by: 
-                            <a class="border-bottom" href="https://ibeawuchicn.vercel.app/" target="_blank">Ibeawuchi CN</a>
-                        </small>
-                    </div>
-                    <div class="col-md-6 text-center text-md-end">
-                    </div>
-                </div>
+            <hr class="footer-divider">
+            <div class="footer-copyright d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <p class="mb-0">&copy; {% now "Y" %} Nigerian Healthcare Excellence Awards. All rights reserved.</p>
+                <p class="mb-0" style="font-size:0.8rem; color:rgba(255,255,255,0.4);">
+                    Secure Voting Platform
+                </p>
             </div>
         </div>
     </footer>
-    <!-- Footer End -->
 
     <!-- Back to Top -->
     <button class="back-to-top" id="backToTop">
         <i class="bi bi-arrow-up"></i>
     </button>
 
-    <!-- JavaScript Libraries -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-
-    <!-- Custom JavaScript -->
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-in-out',
-            once: true,
-            mirror: false
+        AOS.init({ duration: 800, easing: 'ease-in-out', once: true });
+
+        // Navbar scroll
+        const navbar = document.querySelector('.nhea-navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
         });
 
-        // Spinner
-        window.addEventListener('load', function() {
-            const spinner = document.getElementById('spinner');
-            if (spinner) {
-                spinner.classList.remove('show');
-                setTimeout(() => {
-                    spinner.style.display = 'none';
-                }, 300);
-            }
-        });
+        // Back to top
+        const btt = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => btt.classList.toggle('show', window.scrollY > 300));
+        btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Back to top button
-        const backToTopBtn = document.getElementById('backToTop');
-        
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 300) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
-        });
-
-        backToTopBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+        // Auto-dismiss toasts
+        setTimeout(() => {
+            document.querySelectorAll('.msg-toast').forEach(t => {
+                t.style.transition = 'opacity 0.5s';
+                t.style.opacity = '0';
+                setTimeout(() => t.remove(), 500);
             });
-        });
-
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Add subtle animations to nav items
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-2px)';
-            });
-            
-            link.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
+        }, 4000);
     </script>
 </body>
 </html>

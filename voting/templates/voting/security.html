@@ -1,329 +1,182 @@
 {% extends 'voting/main.html' %}
-{% block title %}Access Code{% endblock %}
-{% block header %}Access Code{% endblock %}
+{% block title %}NHEA – Secure Access{% endblock %}
+{% block header %}Secure Access{% endblock %}
 
 {% block body %}
-<div class="min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-    <!-- Animated Background Elements -->
-    <div class="position-absolute w-100 h-100">
-        <div class="position-absolute" style="width: 120px; height: 120px; top: 15%; right: 20%; opacity: 0.1; animation: float 5s ease-in-out infinite;">
-            <i class="fas fa-lock text-white" style="font-size: 7rem;"></i>
-        </div>
-        <div class="position-absolute" style="width: 100px; height: 100px; bottom: 25%; left: 15%; opacity: 0.08; animation: float 7s ease-in-out infinite reverse;">
-            <i class="fas fa-key text-white" style="font-size: 6rem;"></i>
-        </div>
-        <div class="position-absolute rounded-circle bg-white" style="width: 250px; height: 250px; top: -125px; right: -125px; opacity: 0.05; animation: pulse 6s ease-in-out infinite;"></div>
-        <div class="position-absolute rounded-circle bg-white" style="width: 200px; height: 200px; bottom: -100px; left: -100px; opacity: 0.03; animation: pulse 8s ease-in-out infinite reverse;"></div>
-    </div>
-
-    <div class="container py-5 position-relative">
-        <div class="row justify-content-center">
-            <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
-                <!-- Main Card -->
-                <div class="card border-0 shadow-lg" style="backdrop-filter: blur(20px); background: rgba(255, 255, 255, 0.95); border-radius: 20px; animation: slideUp 0.8s ease-out;">
-                    
-                    <!-- Header Section -->
-                    <div class="card-header border-0 text-center py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px 20px 0 0;">
-                        <div class="mb-3">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm" style="width: 80px; height: 80px;">
-                                <i class="fas fa-shield-alt text-primary" style="font-size: 2rem; animation: glow 3s ease-in-out infinite;"></i>
-                            </div>
-                        </div>
-                        <h2 class="fw-bold text-white mb-1" style="font-size: 1.6rem; letter-spacing: 0.5px;">Secure Access</h2>
-                        <p class="text-white-50 mb-0">Enter your access code to continue</p>
-                    </div>
-
-                    <!-- Security Badge -->
-                    <div class="px-4 pt-3">
-                        <div class="alert alert-info border-0 mb-0" style="border-radius: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-info-circle text-primary me-3" style="font-size: 1.2rem;"></i>
-                                <div>
-                                    <h6 class="fw-semibold text-primary mb-1">Authentication Required</h6>
-                                    <p class="text-primary-emphasis mb-0 small">Please provide your authorized access code to proceed.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Form Body -->
-                    <div class="card-body p-4">
-                        <form method="post" class="needs-validation" novalidate>
-                            {% csrf_token %}
-                            
-                            <!-- Django Form Fields -->
-                            <div class="form-fields-container mb-4">
-                                {{ form.as_p }}
-                            </div>
-
-                            <!-- Messages Display -->
-                            {% if messages %}
-                                <div class="messages-container mb-4">
-                                    {% for message in messages %}
-                                        <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %} border-0 mb-2" 
-                                             style="border-radius: 12px; animation: slideDown 0.5s ease-out;">
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
-                                                {{ message }}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-
-                            <!-- Submit Button -->
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-lg text-white fw-semibold position-relative overflow-hidden" 
-                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                               border: none; 
-                                               border-radius: 12px; 
-                                               padding: 14px; 
-                                               transition: all 0.3s ease; 
-                                               box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);"
-                                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'"
-                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">
-                                    <i class="fas fa-unlock me-2"></i>
-                                    Verify Access
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Footer Links -->
-                    <div class="card-footer border-0 text-center py-4" style="background: transparent;">
-                        <div class="d-flex justify-content-center gap-4 flex-wrap">
-                            <a href="#" class="text-decoration-none text-muted fw-medium" style="font-size: 0.9rem; transition: color 0.3s ease;" 
-                               onmouseover="this.style.color='#667eea'" 
-                               onmouseout="this.style.color=''">
-                                <i class="fas fa-arrow-left me-1"></i>Back to Home
-                            </a>
-                            <a href="#" class="text-decoration-none text-muted fw-medium" style="font-size: 0.9rem; transition: color 0.3s ease;" 
-                               onmouseover="this.style.color='#667eea'" 
-                               onmouseout="this.style.color=''">
-                                <i class="fas fa-question-circle me-1"></i>Need Help?
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Security Notice -->
-                <div class="text-center mt-4">
-                    <div class="d-inline-flex align-items-center bg-white rounded-pill px-4 py-2 shadow-sm" style="backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9);">
-                        <i class="fas fa-lock text-success me-2"></i>
-                        <span class="text-dark fw-medium small">Secured Connection</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Custom CSS for animations and additional styling -->
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    body {
-        font-family: 'Inter', sans-serif;
+    .access-section {
+        min-height: calc(100vh - 220px);
+        background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
+        display: flex;
+        align-items: center;
+        padding: 3rem 1rem;
     }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-15px) rotate(5deg); }
+
+    .access-card {
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 12px 50px rgba(10,79,60,0.12);
+        border: 1px solid var(--nhea-border);
+        max-width: 480px;
+        width: 100%;
+        margin: 0 auto;
     }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.05; }
-        50% { transform: scale(1.1); opacity: 0.08; }
+
+    .access-card-top {
+        background: var(--gradient-hero);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
     }
-    
-    @keyframes glow {
-        0%, 100% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
-        50% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 30px rgba(102, 126, 234, 0.4); }
+
+    .access-card-top::before {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 120px; height: 120px;
+        background: rgba(201,168,76,0.12);
+        border-radius: 50%;
     }
-    
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+
+    .shield-icon {
+        width: 76px; height: 76px;
+        background: rgba(255,255,255,0.12);
+        border: 2px solid rgba(201,168,76,0.5);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1.25rem;
+        font-size: 2rem;
+        color: var(--nhea-gold-light);
+        position: relative; z-index: 2;
     }
-    
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+
+    .access-card-top h3 {
+        color: #fff;
+        font-size: 1.6rem;
+        position: relative; z-index: 2;
+        margin-bottom: 0.35rem;
     }
-    
-    /* Style Django form fields */
-    .form-fields-container p {
+
+    .access-card-top p {
+        color: rgba(255,255,255,0.65);
+        font-size: 0.88rem;
+        position: relative; z-index: 2;
+        margin: 0;
+    }
+
+    .access-card-body { padding: 2rem; }
+
+    .access-info-box {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        border-radius: 10px;
+        padding: 0.9rem 1.1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
         margin-bottom: 1.5rem;
     }
-    
+
+    .access-info-box i { color: #2563eb; margin-top: 0.15rem; flex-shrink: 0; }
+
+    .access-info-text {
+        font-size: 0.85rem;
+        color: #1e3a8a;
+    }
+
+    .form-fields-container p { margin-bottom: 1.25rem; }
+
     .form-fields-container label {
         font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
+        color: var(--nhea-text);
+        margin-bottom: 0.4rem;
         display: block;
     }
-    
-    .form-fields-container input,
-    .form-fields-container select,
-    .form-fields-container textarea {
+
+    .form-fields-container input {
         width: 100%;
-        padding: 14px 20px;
-        border: none;
-        background-color: #f8fafc;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 0.9rem 1.2rem;
+        border: 2px solid var(--nhea-border);
+        border-radius: 10px;
+        background: var(--nhea-cream);
+        font-family: 'DM Sans', sans-serif;
         font-size: 1rem;
-        position: relative;
-    }
-    
-    .form-fields-container input:focus,
-    .form-fields-container select:focus,
-    .form-fields-container textarea:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 15px rgba(0,0,0,0.15);
-        background-color: #fff;
-        transform: translateY(-2px);
-    }
-    
-    .form-fields-container input:hover,
-    .form-fields-container select:hover,
-    .form-fields-container textarea:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    }
-    
-    /* Special styling for access code input */
-    .form-fields-container input[type="text"],
-    .form-fields-container input[type="password"] {
-        font-family: 'Courier New', monospace;
-        font-size: 1.1rem;
         letter-spacing: 2px;
         text-align: center;
         font-weight: 600;
+        transition: all 0.3s;
+        outline: none;
     }
-    
-    /* Style error messages */
+
+    .form-fields-container input:focus {
+        border-color: var(--nhea-green);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(10,79,60,0.08);
+    }
+
     .form-fields-container .errorlist {
         list-style: none;
         padding: 0;
-        margin: 0.5rem 0 0 0;
+        margin: 0.4rem 0 0;
     }
-    
+
     .form-fields-container .errorlist li {
-        color: #dc3545;
-        font-size: 0.85rem;
-        display: flex;
-        align-items: center;
-        background: #f8d7da;
-        padding: 0.5rem 0.75rem;
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        color: #7f1d1d;
         border-radius: 8px;
-        margin-top: 0.5rem;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.83rem;
     }
-    
-    .form-fields-container .errorlist li::before {
-        content: "\f071";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
-        margin-right: 0.5rem;
+
+    .btn-verify {
+        width: 100%;
+        padding: 1rem;
+        background: var(--gradient-hero);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 6px 20px rgba(10,79,60,0.25);
     }
-    
-    /* Help text styling */
-    .form-fields-container .helptext {
-        color: #6b7280;
-        font-size: 0.8rem;
-        margin-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        background: #f0f9ff;
-        padding: 0.5rem 0.75rem;
-        border-radius: 8px;
-    }
-    
-    .form-fields-container .helptext::before {
-        content: "\f05a";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
-        margin-right: 0.5rem;
-        color: #3b82f6;
-    }
-    
-    /* Messages styling */
-    .messages-container .alert {
-        border-left: 4px solid;
-    }
-    
-    .alert-danger {
-        border-left-color: #dc3545 !important;
-        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%) !important;
-    }
-    
-    .alert-success {
-        border-left-color: #28a745 !important;
-        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%) !important;
-    }
-    
-    .alert-warning {
-        border-left-color: #ffc107 !important;
-        background: linear-gradient(135deg, #fffbf0 0%, #fef3c7 100%) !important;
-    }
-    
-    .alert-info {
-        border-left-color: #17a2b8 !important;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .card {
-            margin: 1rem;
-            border-radius: 15px !important;
-        }
-        
-        .card-header {
-            border-radius: 15px 15px 0 0 !important;
-            padding: 1.5rem 1rem !important;
-        }
-        
-        .card-header h2 {
-            font-size: 1.4rem !important;
-        }
-        
-        .card-body {
-            padding: 1.5rem 1rem !important;
-        }
-        
-        .alert {
-            margin: 1rem !important;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .card-footer .d-flex {
-            flex-direction: column !important;
-            gap: 0.5rem !important;
-        }
-        
-        .form-fields-container input {
-            font-size: 1rem !important;
-            letter-spacing: 1px !important;
-        }
-    }
+
+    .btn-verify:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(10,79,60,0.35); }
 </style>
 
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<section class="access-section">
+    <div class="container">
+        <div class="access-card" data-aos="fade-up">
+            <div class="access-card-top">
+                <div class="shield-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Secure Access</h3>
+                <p>Enter your authorised access code to continue</p>
+            </div>
+            <div class="access-card-body">
+                <div class="access-info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="access-info-text">
+                        <strong>Authentication Required.</strong> This area is restricted to authorised NHEA personnel only.
+                    </div>
+                </div>
 
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-fields-container">
+                        {{ form.as_p }}
+                    </div>
+                    <button type="submit" class="btn-verify">
+                        <i class="fas fa-unlock me-2"></i>Verify Access
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

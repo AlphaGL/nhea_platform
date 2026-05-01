@@ -1,402 +1,286 @@
 {% extends 'voting/main.html' %}
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}NHEA – Admin Dashboard{% endblock %}
 {% block header %}Admin Dashboard{% endblock %}
 
 {% block body %}
 <style>
-    /* Modern Admin Dashboard Styles */
-    :root {
-        --primary-blue: #2563eb;
-        --primary-dark: #1e40af;
-        --secondary-purple: #7c3aed;
-        --accent-orange: #f59e0b;
-        --success-green: #10b981;
-        --danger-red: #ef4444;
-        --neutral-100: #f8fafc;
-        --neutral-200: #e2e8f0;
-        --neutral-800: #1e293b;
-        --neutral-900: #0f172a;
-        --glass-bg: rgba(255, 255, 255, 0.1);
-        --glass-border: rgba(255, 255, 255, 0.2);
+    .dashboard-section {
+        background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
+        min-height: calc(100vh - 220px);
+        padding: 3rem 0 5rem;
     }
 
-    .dashboard-hero {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
+    .dash-hero {
+        background: var(--gradient-hero);
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        color: #fff;
+        margin-bottom: 2.5rem;
         position: relative;
         overflow: hidden;
-        min-height: 300px;
-        display: flex;
-        align-items: center;
-        margin-bottom: 3rem;
+        box-shadow: 0 12px 40px rgba(10,79,60,0.2);
     }
 
-    .dashboard-hero::before {
+    .dash-hero::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-        opacity: 0.3;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a84c' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/svg%3E") repeat;
     }
 
-    .hero-content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        color: white;
+    .dash-hero-title {
+        font-size: 2.5rem;
+        color: #fff;
+        position: relative; z-index: 2;
+        margin-bottom: 0.5rem;
     }
 
-    .hero-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        margin-bottom: 1rem;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        letter-spacing: -0.02em;
-    }
-
-    .hero-subtitle {
-        font-size: 1.25rem;
-        opacity: 0.9;
-        font-weight: 300;
-        letter-spacing: 0.5px;
+    .dash-hero-sub {
+        color: rgba(255,255,255,0.7);
+        position: relative; z-index: 2;
+        font-size: 0.95rem;
     }
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        margin-bottom: 3rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
     }
 
     .stat-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--neutral-200);
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.75rem;
+        border: 1px solid var(--nhea-border);
+        box-shadow: 0 4px 20px rgba(10,79,60,0.06);
         position: relative;
         overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.35s ease;
     }
 
     .stat-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        transform: translateY(-6px);
+        box-shadow: 0 16px 50px rgba(10,79,60,0.12);
     }
 
     .stat-card::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: 4px;
-        background: linear-gradient(90deg, var(--primary-blue), var(--secondary-purple));
+        background: var(--gradient-gold);
     }
 
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1.5rem;
-        font-size: 1.5rem;
-        color: white;
-        position: relative;
-        overflow: hidden;
+    .stat-icon-box {
+        width: 52px; height: 52px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 1.25rem;
+        font-size: 1.3rem;
+        color: #fff;
+        background: var(--gradient-hero);
     }
 
-    .stat-icon::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
-        opacity: 0.9;
-    }
-
-    .stat-icon i {
-        position: relative;
-        z-index: 2;
-    }
-
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--neutral-900);
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.02em;
+    .stat-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: var(--nhea-text);
+        line-height: 1;
+        margin-bottom: 0.35rem;
     }
 
     .stat-label {
-        color: var(--neutral-600);
-        font-weight: 500;
-        font-size: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--nhea-muted);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
     }
 
-    .actions-section {
-        background: white;
-        border-radius: 20px;
-        padding: 3rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--neutral-200);
+    /* Quick links */
+    .quick-links-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .quick-link-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.5rem;
+        border: 1px solid var(--nhea-border);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 2px 10px rgba(10,79,60,0.05);
+    }
+
+    .quick-link-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(10,79,60,0.12);
+        border-color: var(--nhea-green);
+        text-decoration: none;
+    }
+
+    .quick-link-icon {
+        width: 44px; height: 44px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .quick-link-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--nhea-text);
+        line-height: 1.3;
+    }
+
+    .quick-link-sub {
+        font-size: 0.78rem;
+        color: var(--nhea-muted);
+    }
+
+    /* Actions card */
+    .actions-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        border: 1px solid var(--nhea-border);
+        box-shadow: 0 4px 20px rgba(10,79,60,0.06);
         text-align: center;
     }
 
-    .section-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--neutral-900);
-        margin-bottom: 1rem;
-        position: relative;
-        display: inline-block;
+    .actions-card-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.8rem;
+        color: var(--nhea-text);
+        margin-bottom: 0.5rem;
     }
 
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary-blue), var(--secondary-purple));
-        border-radius: 2px;
-    }
-
-    .section-subtitle {
-        color: var(--neutral-600);
-        margin-bottom: 2.5rem;
-        font-size: 1.1rem;
-        max-width: 500px;
+    .actions-card-subtitle {
+        color: var(--nhea-muted);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        max-width: 450px;
         margin-left: auto;
         margin-right: auto;
     }
-
-    .danger-action {
-        background: linear-gradient(135deg, var(--danger-red) 0%, #dc2626 100%);
-        color: white;
-        border: none;
-        padding: 1rem 3rem;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .danger-action:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-
-    .danger-action:active {
-        transform: translateY(0);
-    }
-
-    .floating-shapes {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        pointer-events: none;
-        overflow: hidden;
-    }
-
-    .floating-shape {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        animation: float 6s ease-in-out infinite;
-    }
-
-    .floating-shape:nth-child(1) {
-        width: 80px;
-        height: 80px;
-        top: 20%;
-        left: 10%;
-        animation-delay: 0s;
-    }
-
-    .floating-shape:nth-child(2) {
-        width: 120px;
-        height: 120px;
-        top: 60%;
-        right: 10%;
-        animation-delay: 2s;
-    }
-
-    .floating-shape:nth-child(3) {
-        width: 60px;
-        height: 60px;
-        bottom: 20%;
-        left: 20%;
-        animation-delay: 4s;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
-    }
-
-    .pulse-animation {
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-
-    /* Mobile Responsiveness */
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2.5rem;
-        }
-        
-        .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-        
-        .stat-card {
-            padding: 1.5rem;
-        }
-        
-        .actions-section {
-            padding: 2rem;
-        }
-        
-        .danger-action {
-            padding: 0.875rem 2rem;
-            font-size: 1rem;
-        }
-    }
-
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-        .stat-card, .actions-section {
-            background: var(--neutral-800);
-            color: white;
-            border-color: var(--neutral-700);
-        }
-        
-        .stat-label {
-            color: var(--neutral-400);
-        }
-        
-        .section-title {
-            color: white;
-        }
-        
-        .section-subtitle {
-            color: var(--neutral-400);
-        }
-    }
 </style>
 
-<!-- Dashboard Hero Section -->
-<div class="dashboard-hero">
-    <div class="floating-shapes">
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-    </div>
+<section class="dashboard-section">
     <div class="container">
-        <div class="hero-content">
-            <h1 class="hero-title">Admin Dashboard</h1>
-            <p class="hero-subtitle">Manage your school voting system with precision and control</p>
-        </div>
-    </div>
-</div>
 
-<!-- Main Dashboard Content -->
-<div class="container py-5">
-    <!-- Statistics Grid -->
-    <div class="stats-grid">
-        <div class="stat-card pulse-animation">
-            <div class="stat-icon">
-                <i class="fas fa-vote-yea"></i>
+        <!-- Hero -->
+        <div class="dash-hero" data-aos="fade-up">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="dash-hero-title">
+                        <i class="fas fa-chart-line me-2" style="color:var(--nhea-gold-light);"></i>
+                        NHEA Control Center
+                    </h2>
+                    <p class="dash-hero-sub">Manage voting, nominees, categories and system operations from here.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <span style="background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.4);color:var(--nhea-gold-light);padding:0.5rem 1.25rem;border-radius:50px;font-size:0.82rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">
+                        <i class="fas fa-circle me-1" style="font-size:0.5rem;vertical-align:middle;color:#4ade80;"></i>
+                        System Online
+                    </span>
+                </div>
             </div>
-            <div class="stat-number">{{ total_votes }}</div>
-            <div class="stat-label">Total Votes</div>
         </div>
-        
-        <div class="stat-card pulse-animation" style="animation-delay: 0.2s;">
-            <div class="stat-icon">
-                <i class="fas fa-user-graduate"></i>
-            </div>
-            <div class="stat-number">{{ total_students }}</div>
-            <div class="stat-label">Total Students</div>
-        </div>
-        
-        <div class="stat-card pulse-animation" style="animation-delay: 0.4s;">
-            <div class="stat-icon">
-                <i class="fas fa-users-cog"></i>
-            </div>
-            <div class="stat-number">{{ total_positions }}</div>
-            <div class="stat-label">Total Positions</div>
-        </div>
-        
-        <div class="stat-card pulse-animation" style="animation-delay: 0.6s;">
-            <div class="stat-icon">
-                <i class="fas fa-user-tie"></i>
-            </div>
-            <div class="stat-number">{{ total_contestants }}</div>
-            <div class="stat-label">Total Contestants</div>
-        </div>
-    </div>
 
-    <!-- Actions Section -->
-    <div class="actions-section">
-        <h2 class="section-title">System Actions</h2>
-        <p class="section-subtitle">
-            Manage critical system operations with care. These actions cannot be undone.
-        </p>
-        
-        <a href="{% url 'reset_votes' %}" class="danger-action" 
-           onclick="return confirm('Are you sure you want to reset all votes? This action cannot be undone!')">
-            <i class="fas fa-exclamation-triangle"></i>
-            Reset All Votes
-        </a>
-    </div>
-</div>
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="50">
+                <div class="stat-icon-box"><i class="fas fa-vote-yea"></i></div>
+                <div class="stat-value">{{ total_votes }}</div>
+                <div class="stat-label">Total Votes Cast</div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-icon-box"><i class="fas fa-users"></i></div>
+                <div class="stat-value">{{ total_voters }}</div>
+                <div class="stat-label">Registered Voters</div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="150">
+                <div class="stat-icon-box"><i class="fas fa-trophy"></i></div>
+                <div class="stat-value">{{ total_categories }}</div>
+                <div class="stat-label">Award Categories</div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-icon-box"><i class="fas fa-user-tie"></i></div>
+                <div class="stat-value">{{ total_nominees }}</div>
+                <div class="stat-label">Total Nominees</div>
+            </div>
+        </div>
 
-<!-- Font Awesome for icons (add to your base template if not already included) -->
-<script>
-    // Add subtle entrance animations
-    document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.stat-card');
-        cards.forEach((card, index) => {
-            setTimeout(() => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'all 0.6s ease';
-                
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 100);
-            }, index * 150);
-        });
-    });
-</script>
+        <!-- Quick Links -->
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--nhea-text);margin-bottom:1rem;" data-aos="fade-up">Quick Actions</h5>
+        <div class="quick-links-grid">
+            <a href="{% url 'list_voters' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="50">
+                <div class="quick-link-icon" style="background:var(--gradient-hero);"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="quick-link-label">Manage Voters</div>
+                    <div class="quick-link-sub">View & delete voter accounts</div>
+                </div>
+            </a>
+            <a href="{% url 'list_nominees' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#c9a84c,#e8c96a); color:#0a2a1e;"><i class="fas fa-user-tie"></i></div>
+                <div>
+                    <div class="quick-link-label">Manage Nominees</div>
+                    <div class="quick-link-sub">Add or remove nominees</div>
+                </div>
+            </a>
+            <a href="{% url 'manage_categories' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="150">
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-list"></i></div>
+                <div>
+                    <div class="quick-link-label">Award Categories</div>
+                    <div class="quick-link-sub">Create & manage categories</div>
+                </div>
+            </a>
+            <a href="{% url 'live_vote_count' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><i class="fas fa-chart-bar"></i></div>
+                <div>
+                    <div class="quick-link-label">Live Results</div>
+                    <div class="quick-link-sub">Real-time vote tallies</div>
+                </div>
+            </a>
+            <a href="{% url 'register_voter' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="250">
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-user-plus"></i></div>
+                <div>
+                    <div class="quick-link-label">Register Voter</div>
+                    <div class="quick-link-sub">Add a new delegate</div>
+                </div>
+            </a>
+            <a href="{% url 'add_nominee' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="quick-link-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><i class="fas fa-plus-circle"></i></div>
+                <div>
+                    <div class="quick-link-label">Add Nominee</div>
+                    <div class="quick-link-sub">Register a new nominee</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Reset Action -->
+        <div class="actions-card" data-aos="fade-up">
+            <h4 class="actions-card-title">⚠ System Actions</h4>
+            <p class="actions-card-subtitle">
+                Perform critical system operations with extreme care. These actions cannot be undone.
+            </p>
+            <a href="{% url 'reset_all' %}" class="btn-nhea-danger"
+               onclick="return confirm('Are you absolutely sure you want to reset ALL votes? This is irreversible.')">
+                <i class="fas fa-exclamation-triangle"></i>
+                Reset All Votes
+            </a>
+        </div>
+
+    </div>
+</section>
 {% endblock %}

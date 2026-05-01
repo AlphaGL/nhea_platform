@@ -1,869 +1,111 @@
 {% extends 'voting/main.html' %}
-{% block title %}Live Vote Count{% endblock %}
+{% block title %}NHEA – Live Results{% endblock %}
 {% block header %}Live Vote Count{% endblock %}
-
 {% block body %}
 <style>
-    /* Modern Live Vote Count Dashboard Styles */
-    :root {
-        --primary-blue: #2563eb;
-        --secondary-purple: #7c3aed;
-        --accent-gold: #f59e0b;
-        --success-green: #10b981;
-        --danger-red: #ef4444;
-        --warning-orange: #f97316;
-        --neutral-100: #f8fafc;
-        --neutral-200: #e2e8f0;
-        --neutral-700: #374151;
-        --neutral-800: #1e293b;
-        --neutral-900: #0f172a;
-        --gradient-primary: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
-        --gradient-success: linear-gradient(135deg, var(--success-green), #059669);
-        --gradient-live: linear-gradient(135deg, #ef4444, #f97316);
-    }
-
-    body {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #374151 100%);
-        min-height: 100vh;
-        position: relative;
-        overflow-x: hidden;
-    }
-
-    /* Animated live background */
-    .live-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 1;
-    }
-
-    .pulse-circle {
-        position: absolute;
-        border: 2px solid rgba(239, 68, 68, 0.3);
-        border-radius: 50%;
-        animation: pulse-expand 4s infinite ease-out;
-    }
-
-    .pulse-circle:nth-child(1) {
-        width: 100px;
-        height: 100px;
-        top: 20%;
-        left: 10%;
-        animation-delay: 0s;
-    }
-
-    .pulse-circle:nth-child(2) {
-        width: 150px;
-        height: 150px;
-        top: 60%;
-        right: 15%;
-        animation-delay: 2s;
-    }
-
-    .pulse-circle:nth-child(3) {
-        width: 80px;
-        height: 80px;
-        bottom: 30%;
-        left: 60%;
-        animation-delay: 1s;
-    }
-
-    @keyframes pulse-expand {
-        0% {
-            transform: scale(0.8);
-            opacity: 1;
-        }
-        100% {
-            transform: scale(2);
-            opacity: 0;
-        }
-    }
-
-    .dashboard-container {
-        min-height: 100vh;
-        padding: 2rem 0;
-        position: relative;
-        z-index: 2;
-    }
-
-    .page-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        color: white;
-    }
-
-    .live-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: var(--gradient-live);
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 50px;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
-        animation: live-pulse 2s infinite;
-    }
-
-    .live-indicator::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        background: white;
-        border-radius: 50%;
-        animation: blink 1s infinite;
-    }
-
-    @keyframes live-pulse {
-        0%, 100% { box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); }
-        50% { box-shadow: 0 15px 40px rgba(239, 68, 68, 0.5); }
-    }
-
-    @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.3; }
-    }
-
-    .page-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        margin-bottom: 1rem;
-        background: linear-gradient(135deg, #ffffff, #e2e8f0);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        letter-spacing: -0.02em;
-    }
-
-    .page-subtitle {
-        font-size: 1.25rem;
-        opacity: 0.9;
-        font-weight: 300;
-        letter-spacing: 0.5px;
-    }
-
-    .dashboard-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
-        box-shadow: 
-            0 25px 50px rgba(0, 0, 0, 0.15),
-            0 0 0 1px rgba(255, 255, 255, 0.1);
-        overflow: hidden;
-        position: relative;
-        animation: slideInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes slideInUp {
-        0% {
-            transform: translateY(50px);
-            opacity: 0;
-        }
-        100% {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    /* Access Code Form Styles */
-    .access-form {
-        padding: 3rem;
-        text-align: center;
-        background: white;
-    }
-
-    .lock-icon {
-        width: 120px;
-        height: 120px;
-        background: var(--gradient-primary);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 2rem;
-        animation: gentle-bounce 3s infinite;
-    }
-
-    .lock-icon i {
-        font-size: 3rem;
-        color: white;
-    }
-
-    @keyframes gentle-bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-    }
-
-    .access-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--neutral-900);
-        margin-bottom: 1rem;
-    }
-
-    .access-description {
-        color: #64748b;
-        margin-bottom: 2rem;
-        font-size: 1.1rem;
-        line-height: 1.6;
-    }
-
-    .form-group {
-        margin-bottom: 2rem;
-        text-align: left;
-    }
-
-    .form-label {
-        display: block;
-        font-weight: 600;
-        color: var(--neutral-800);
-        margin-bottom: 0.75rem;
-        font-size: 1.1rem;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 1rem 1.5rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-        background: white;
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        transform: translateY(-2px);
-    }
-
-    .btn-access {
-        background: var(--gradient-primary);
-        color: white;
-        border: none;
-        padding: 1rem 3rem;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .btn-access:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(37, 99, 235, 0.4);
-    }
-
-    .warning-message {
-        background: linear-gradient(135deg, #fef3c7, #fde68a);
-        color: #92400e;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        margin-top: 1.5rem;
-        border-left: 4px solid var(--warning-orange);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .warning-message i {
-        font-size: 1.2rem;
-    }
-
-    /* Vote Dashboard Styles */
-    .vote-dashboard {
-        padding: 2rem;
-    }
-
-    .dashboard-header {
-        background: var(--gradient-primary);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .dashboard-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20c0 11.046-8.954 20-20 20s-20-8.954-20-20 8.954-20 20-20 20 8.954 20 20zm-30 0c0 5.523 4.477 10 10 10s10-4.477 10-10-4.477-10-10-10-10 4.477-10 10z'/%3E%3C/g%3E%3C/svg%3E") repeat;
-        animation: pattern-flow 20s linear infinite;
-    }
-
-    @keyframes pattern-flow {
-        0% { transform: translate(0, 0); }
-        100% { transform: translate(40px, 40px); }
-    }
-
-    .dashboard-title {
-        font-size: 2.2rem;
-        font-weight: 700;
-        margin: 0;
-        position: relative;
-        z-index: 2;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .voter-stats {
-        background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
-        padding: 1.5rem;
-        text-align: center;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .voter-count {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--primary-blue);
-        margin-bottom: 0.5rem;
-    }
-
-    .voter-label {
-        color: var(--neutral-700);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .positions-grid {
-        display: grid;
-        gap: 2rem;
-        padding: 2rem 0;
-    }
-
-    .position-card {
-        background: white;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        animation: fadeInUp 0.6s ease-out both;
-    }
-
-    .position-card:nth-child(1) { animation-delay: 0.1s; }
-    .position-card:nth-child(2) { animation-delay: 0.2s; }
-    .position-card:nth-child(3) { animation-delay: 0.3s; }
-    .position-card:nth-child(4) { animation-delay: 0.4s; }
-
-    @keyframes fadeInUp {
-        0% {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .position-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .position-header {
-        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-        padding: 1.5rem;
-        border-bottom: 3px solid var(--primary-blue);
-    }
-
-    .position-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--neutral-900);
-        margin: 0 0 0.5rem 0;
-    }
-
-    .position-importance {
-        background: var(--gradient-primary);
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .contestants-list {
-        padding: 1.5rem;
-    }
-
-    .contestant-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-radius: 12px;
-        border-left: 4px solid var(--primary-blue);
-        transition: all 0.3s ease;
-    }
-
-    .contestant-item:hover {
-        transform: translateX(8px);
-        background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
-    }
-
-    .contestant-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .contestant-name {
-        font-weight: 600;
-        color: var(--neutral-900);
-        font-size: 1.1rem;
-    }
-
-    .vote-badge {
-        background: var(--gradient-success);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 700;
-        font-size: 1rem;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        animation: vote-pulse 3s infinite;
-    }
-
-    @keyframes vote-pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-    }
-
-    .refresh-indicator {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        background: var(--gradient-live);
-        color: white;
-        padding: 1rem;
-        border-radius: 50%;
-        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
-        animation: refresh-spin 30s linear infinite;
-        z-index: 1000;
-    }
-
-    .refresh-indicator i {
-        font-size: 1.5rem;
-    }
-
-    @keyframes refresh-spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .auto-refresh-notice {
-        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-        color: var(--primary-blue);
-        padding: 1rem 1.5rem;
-        text-align: center;
-        font-weight: 600;
-        border-bottom: 1px solid #e2e8f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .page-title {
-            font-size: 2.5rem;
-        }
-        
-        .dashboard-card {
-            margin: 1rem;
-        }
-        
-        .access-form {
-            padding: 2rem;
-        }
-        
-        .positions-grid {
-            gap: 1rem;
-        }
-        
-        .contestant-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-        
-        .vote-badge {
-            align-self: flex-end;
-        }
-
-        .refresh-indicator {
-            bottom: 1rem;
-            right: 1rem;
-            padding: 0.75rem;
-        }
-    }
-
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-        .dashboard-card {
-            background: rgba(30, 41, 59, 0.95);
-        }
-        
-        .position-card {
-            background: var(--neutral-800);
-            border-color: #475569;
-        }
-        
-        .contestant-item {
-            background: linear-gradient(135deg, #334155, #475569);
-        }
-        
-        .contestant-name {
-            color: white;
-        }
-    }
-
-    /* Accessibility */
-    @media (prefers-reduced-motion: reduce) {
-        .dashboard-card,
-        .position-card,
-        .pulse-circle,
-        .live-indicator,
-        .refresh-indicator {
-            animation: none;
-        }
-    }
+.lvc-section{background:linear-gradient(160deg,#0d1f1a 0%,#0a4f3c 50%,#0d6b52 100%);min-height:calc(100vh - 220px);padding:3rem 0 5rem;}
+.live-indicator{display:inline-flex;align-items:center;gap:0.6rem;background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.4);color:var(--nhea-gold-light);padding:0.5rem 1.25rem;border-radius:50px;font-size:0.82rem;font-weight:600;letter-spacing:0.5px;margin-bottom:2rem;}
+.live-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:livePulse 1.2s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+/* Access form */
+.access-form-card{background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);border:1px solid rgba(201,168,76,0.25);border-radius:20px;padding:2.5rem;max-width:440px;margin:0 auto;text-align:center;}
+.access-form-card h4{color:#fff;font-size:1.6rem;margin-bottom:0.5rem;}
+.access-form-card p{color:rgba(255,255,255,0.6);font-size:0.88rem;margin-bottom:1.75rem;}
+.access-form-card input{width:100%;padding:0.9rem 1.2rem;border:2px solid rgba(201,168,76,0.4);border-radius:10px;background:rgba(255,255,255,0.08);color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;letter-spacing:2px;text-align:center;font-weight:600;outline:none;transition:all 0.3s;margin-bottom:1rem;}
+.access-form-card input::placeholder{color:rgba(255,255,255,0.35);}
+.access-form-card input:focus{border-color:var(--nhea-gold-light);background:rgba(255,255,255,0.12);}
+.btn-access-lvc{width:100%;padding:1rem;background:var(--gradient-gold);color:var(--nhea-dark);border:none;border-radius:12px;font-size:1rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.3s;}
+.btn-access-lvc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,0.4);}
+/* Results */
+.total-voters-card{background:rgba(255,255,255,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:16px;padding:1.5rem 2rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.total-voters-num{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;color:var(--nhea-gold-light);line-height:1;}
+.total-voters-label{color:rgba(255,255,255,0.65);font-size:0.9rem;margin-top:0.25rem;}
+.cat-results-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.75rem;margin-bottom:1.5rem;}
+.cat-results-title{color:#fff;font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;gap:0.5rem;}
+.nominee-result-row{margin-bottom:1rem;}
+.nominee-result-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;}
+.nominee-result-name{color:rgba(255,255,255,0.9);font-weight:600;font-size:0.9rem;}
+.nominee-result-count{color:var(--nhea-gold-light);font-weight:700;font-size:0.9rem;}
+.result-bar-bg{height:10px;background:rgba(255,255,255,0.1);border-radius:5px;overflow:hidden;}
+.result-bar-fill{height:100%;background:var(--gradient-gold);border-radius:5px;transition:width 1s ease;}
+.winner-badge{background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.5);color:var(--nhea-gold-light);padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:700;margin-left:0.5rem;}
 </style>
+<section class="lvc-section">
+<div class="container">
 
-<!-- Live background animation -->
-<div class="live-bg">
-    <div class="pulse-circle"></div>
-    <div class="pulse-circle"></div>
-    <div class="pulse-circle"></div>
-</div>
-
-<!-- Main dashboard content -->
-<div class="dashboard-container">
-    <div class="container">
-        <!-- Page header -->
-        <div class="page-header">
-            <div class="live-indicator">
-                <span>LIVE</span>
-            </div>
-            <h1 class="page-title">Vote Count Dashboard</h1>
-            <p class="page-subtitle">Real-time election results and statistics</p>
-        </div>
-
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="dashboard-card">
-                    {% if not vote_data %}
-                        <!-- Access Code Form -->
-                        <div class="access-form">
-                            <div class="lock-icon">
-                                <i class="fas fa-lock"></i>
-                            </div>
-                            <h2 class="access-title">Secure Access Required</h2>
-                            <p class="access-description">
-                                This dashboard contains sensitive election data. Please enter the authorized access code to view live vote counts.
-                            </p>
-                            
-                            <form method="POST">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label for="access_code" class="form-label">
-                                        <i class="fas fa-key"></i>
-                                        Access Code
-                                    </label>
-                                    <input type="password" 
-                                           id="access_code" 
-                                           name="access_code" 
-                                           class="form-input"
-                                           placeholder="Enter your access code" 
-                                           required
-                                           autocomplete="current-password">
-                                </div>
-                                <button type="submit" class="btn-access">
-                                    <i class="fas fa-unlock"></i>
-                                    Access Dashboard
-                                </button>
-                            </form>
-                            
-                            {% if messages %}
-                                <div class="warning-message">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <div>
-                                        {% for message in messages %}
-                                            <p>{{ message }}</p>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <!-- Vote Dashboard -->
-                        <div class="dashboard-header">
-                            <h2 class="dashboard-title">Live Election Results</h2>
-                        </div>
-                        
-                        <div class="auto-refresh-notice">
-                            <i class="fas fa-sync-alt"></i>
-                            <span>Dashboard auto-refreshes every 30 seconds</span>
-                        </div>
-                        
-                        <div class="voter-stats">
-                            <div class="voter-count">{{ total_voters }}</div>
-                            <div class="voter-label">Students Have Voted</div>
-                        </div>
-                        
-                        <div class="vote-dashboard">
-                            <div class="positions-grid">
-                                {% for position, contestants in vote_data.items %}
-                                    <div class="position-card">
-                                        <div class="position-header">
-                                            <h3 class="position-title">
-                                                <i class="fas fa-medal"></i>
-                                                {{ position.name }}
-                                            </h3>
-                                            <span class="position-importance">{{ position.importance }}</span>
-                                        </div>
-                                        <div class="contestants-list">
-                                            {% for contestant in contestants %}
-                                                <div class="contestant-item">
-                                                    <div class="contestant-name">
-                                                        <i class="fas fa-user-tie"></i>
-                                                        {{ contestant.name }}
-                                                    </div>
-                                                    <div class="vote-badge">
-                                                        {{ contestant.vote_count }} vote{{ contestant.vote_count|pluralize }}
-                                                    </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+  {% if not vote_data %}
+  <!-- Access Form -->
+  <div data-aos="fade-up">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div class="live-indicator"><div class="live-dot"></div>LIVE RESULTS</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#fff;margin-bottom:0.5rem;">Real-Time Vote Count</h3>
+      <p style="color:rgba(255,255,255,0.55);font-size:0.9rem;">Enter your admin access code to view live results</p>
     </div>
-</div>
-
-<!-- Refresh indicator -->
-{% if vote_data %}
-    <div class="refresh-indicator" title="Auto-refresh active">
-        <i class="fas fa-sync-alt"></i>
+    <div class="access-form-card">
+      <h4><i class="fas fa-chart-bar me-2" style="color:var(--nhea-gold-light);"></i>Access Results</h4>
+      <p>Enter the system access code to unlock live vote tallies</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="password" name="access_code" placeholder="ACCESS CODE" required>
+        <button type="submit" class="btn-access-lvc">
+          <i class="fas fa-chart-line me-2"></i>View Live Results
+        </button>
+      </form>
     </div>
-{% endif %}
+  </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Enhanced auto-refresh with visual feedback - FIXED VERSION
-        {% if vote_data %}
-            let refreshTimer = 30;
-            let countdownInterval = null;
-            let hasRefreshed = false; // Flag to prevent multiple refreshes
-            const refreshIndicator = document.querySelector('.refresh-indicator');
-            
-            // Clear any existing intervals first (safety measure)
-            if (window.dashboardRefreshInterval) {
-                clearInterval(window.dashboardRefreshInterval);
-            }
-            
-            // Start the countdown
-            countdownInterval = setInterval(function() {
-                if (hasRefreshed) {
-                    clearInterval(countdownInterval);
-                    return;
-                }
-                
-                refreshTimer--;
-                if (refreshIndicator) {
-                    refreshIndicator.title = `Auto-refresh in ${refreshTimer} seconds`;
-                }
-                
-                if (refreshTimer <= 0) {
-                    hasRefreshed = true; // Prevent multiple executions
-                    clearInterval(countdownInterval); // Clear the interval FIRST
-                    
-                    // Show loading state
-                    document.body.style.opacity = '0.8';
-                    document.body.style.pointerEvents = 'none';
-                    
-                    // Add loading overlay
-                    const loadingOverlay = document.createElement('div');
-                    loadingOverlay.innerHTML = `
-                        <div style="
-                            position: fixed;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            background: rgba(37, 99, 235, 0.9);
-                            color: white;
-                            padding: 2rem 3rem;
-                            border-radius: 16px;
-                            backdrop-filter: blur(10px);
-                            z-index: 9999;
-                            text-align: center;
-                            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-                        ">
-                            <i class="fas fa-sync-alt fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                            <div style="font-weight: 600; font-size: 1.2rem;">Updating Results...</div>
-                        </div>
-                    `;
-                    document.body.appendChild(loadingOverlay);
-                    
-                    // Store the interval reference globally for cleanup
-                    window.dashboardRefreshInterval = countdownInterval;
-                    
-                    // Reload page after a short delay
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                }
-            }, 1000);
-            
-            // Store the interval reference globally for cleanup
-            window.dashboardRefreshInterval = countdownInterval;
-            
-            // Clean up on page unload
-            window.addEventListener('beforeunload', function() {
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                }
-            });
-        {% endif %}
-        
-        // Enhanced access code form
-        const accessForm = document.querySelector('form');
-        if (accessForm) {
-            const accessInput = document.querySelector('#access_code');
-            
-            accessForm.addEventListener('submit', function(e) {
-                const submitBtn = this.querySelector('.btn-access');
-                const originalText = submitBtn.innerHTML;
-                
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-                submitBtn.disabled = true;
-                
-                // Re-enable if there's an error (page doesn't redirect)
-                setTimeout(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }, 3000);
-            });
-            
-            // Add keyboard shortcut
-            accessInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    accessForm.submit();
-                }
-            });
-        }
-        
-        // Add smooth scroll behavior
-        document.documentElement.style.scrollBehavior = 'smooth';
-        
-        // Add keyboard shortcuts for accessibility
-        document.addEventListener('keydown', function(e) {
-            // R key to manually refresh
-            if (e.key === 'r' && e.ctrlKey) {
-                e.preventDefault();
-                window.location.reload();
-            }
-        });
-        
-        // Add visual feedback for position cards
-        const positionCards = document.querySelectorAll('.position-card');
-        positionCards.forEach((card, index) => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px) scale(1.02)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(-4px) scale(1)';
-            });
-        });
-        
-        // Enhance vote badges with click animation
-        const voteBadges = document.querySelectorAll('.vote-badge');
-        voteBadges.forEach(badge => {
-            badge.addEventListener('click', function() {
-                this.style.animation = 'none';
-                setTimeout(() => {
-                    this.style.animation = 'vote-pulse 3s infinite';
-                }, 10);
-            });
-        });
-    });
-    
-    // Add notification for successful access
-    {% if vote_data %}
-        // Show success notification on first load
-        if (!sessionStorage.getItem('dashboardAccessed')) {
-            sessionStorage.setItem('dashboardAccessed', 'true');
-            
-            const notification = document.createElement('div');
-            notification.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: linear-gradient(135deg, #10b981, #059669);
-                    color: white;
-                    padding: 1rem 1.5rem;
-                    border-radius: 12px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                    z-index: 9999;
-                    animation: slideInRight 0.5s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    font-weight: 600;
-                ">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Dashboard access granted!</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.5s ease forwards';
-                setTimeout(() => notification.remove(), 500);
-            }, 3000);
-        }
-    {% endif %}
-    
-    // Add slide animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-</script>
+  {% else %}
+  <!-- Results Dashboard -->
+  <div data-aos="fade-up">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div class="live-indicator"><div class="live-dot"></div>LIVE RESULTS</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:#fff;">NHEA {% now "Y" %} Vote Tally</h3>
+    </div>
 
-<!-- Font Awesome for icons (ensure this is included in your base template) -->
+    <div class="total-voters-card">
+      <div>
+        <div class="total-voters-num">{{ total_voters }}</div>
+        <div class="total-voters-label">Unique delegates who have voted</div>
+      </div>
+      <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:right;">
+        <i class="fas fa-sync-alt me-1"></i>
+        Updated in real-time
+      </div>
+    </div>
+
+    {% for category, nominees in vote_data.items %}
+    {% with max_votes=nominees|first %}
+    <div class="cat-results-card" data-aos="fade-up">
+      <div class="cat-results-title">
+        <i class="fas fa-trophy" style="color:var(--nhea-gold-light);"></i>
+        {{ category.name }}
+      </div>
+      {% for nominee in nominees %}
+      {% with total=nominees|length %}
+      <div class="nominee-result-row">
+        <div class="nominee-result-head">
+          <span class="nominee-result-name">
+            {{ nominee.name }}
+            {% if forloop.first and nominee.vote_count > 0 %}
+            <span class="winner-badge">🏆 Leading</span>
+            {% endif %}
+          </span>
+          <span class="nominee-result-count">{{ nominee.vote_count }} vote{{ nominee.vote_count|pluralize }}</span>
+        </div>
+        <div class="result-bar-bg">
+          <div class="result-bar-fill" style="width:{% if max_votes.vote_count > 0 %}{% widthratio nominee.vote_count max_votes.vote_count 100 %}{% else %}0{% endif %}%;"></div>
+        </div>
+      </div>
+      {% endwith %}
+      {% empty %}
+      <p style="color:rgba(255,255,255,0.45);font-size:0.88rem;">No nominees in this category.</p>
+      {% endfor %}
+    </div>
+    {% endwith %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+</section>
 {% endblock %}
