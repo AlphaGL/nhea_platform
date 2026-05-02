@@ -12,11 +12,18 @@
 .admin-table tr:last-child td{border-bottom:none;}
 .admin-table tr:hover td{background:#f8fdf9;}
 .avatar{width:36px;height:36px;background:var(--gradient-hero);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:0.9rem;font-weight:700;margin-right:0.5rem;}
+.avatar-super{background:linear-gradient(135deg,#b45309,#f59e0b);}
 .badge-must-change{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:600;}
 .badge-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:600;}
+.badge-role{background:#eff6ff;border:1px solid #93c5fd;color:#1d4ed8;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:600;}
 .btn-del{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:0.35rem 0.75rem;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .btn-del:hover{background:#dc2626;color:#fff;}
+.btn-promote{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:6px;padding:0.35rem 0.75rem;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.btn-promote:hover{background:#f59e0b;color:#fff;border-color:#f59e0b;}
+.action-group{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
 .empty-state{text-align:center;padding:3.5rem 2rem;}
+.info-box{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.85rem;color:#92400e;display:flex;align-items:flex-start;gap:0.65rem;line-height:1.6;}
+.info-box i{flex-shrink:0;margin-top:0.1rem;color:#d97706;}
 </style>
 
 <section class="ma-section">
@@ -34,11 +41,16 @@
 
     {% if messages %}
     {% for m in messages %}
-    <div style="background:{% if 'error' in m.tags %}#fef2f2;border:1px solid #fca5a5;color:#7f1d1d{% else %}#ecfdf5;border:1px solid #a7f3d0;color:#065f46{% endif %};border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.5rem;font-size:0.88rem;" data-aos="fade-up">
-        {{ m }}
+    <div style="background:{% if 'error' in m.tags %}#fef2f2;border:1px solid #fca5a5;color:#7f1d1d{% else %}#ecfdf5;border:1px solid #a7f3d0;color:#065f46{% endif %};border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.5rem;font-size:0.88rem;display:flex;align-items:center;gap:0.6rem;" data-aos="fade-up">
+        <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% else %}check-circle{% endif %}"></i>{{ m }}
     </div>
     {% endfor %}
     {% endif %}
+
+    <div class="info-box" data-aos="fade-up">
+        <i class="fas fa-crown"></i>
+        <span><strong>Promote to Superadmin:</strong> You can elevate any admin to Superadmin — giving them full, unrestricted platform control including creating other admins. Use this power carefully; it cannot be undone here (you must use the Django admin panel to demote).</span>
+    </div>
 
     <div class="admin-table-card" data-aos="fade-up">
         {% if admins %}
@@ -50,10 +62,10 @@
                         <th>Admin</th>
                         <th>Voter ID</th>
                         <th>Email</th>
-                        <th>Organization</th>
+                        <th>Role</th>
                         <th>Password Status</th>
                         <th>Created By</th>
-                        <th>Action</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,11 +74,20 @@
                         <td>{{ forloop.counter }}</td>
                         <td>
                             <span class="avatar">{{ admin.full_name|first }}</span>
-                            {{ admin.full_name }}
+                            <span style="font-weight:600;">{{ admin.full_name }}</span>
+                            {% if admin.organization %}
+                            <div style="font-size:0.78rem;color:var(--nhea-muted);margin-left:44px;">{{ admin.organization }}</div>
+                            {% endif %}
                         </td>
                         <td><code style="background:#f0f7f4;padding:0.2rem 0.5rem;border-radius:4px;color:var(--nhea-green);font-size:0.82rem;">{{ admin.voter_id }}</code></td>
                         <td>{{ admin.email|default:"—" }}</td>
-                        <td>{{ admin.organization|default:"—" }}</td>
+                        <td>
+                            {% if admin.admin_role %}
+                            <span class="badge-role"><i class="fas fa-key me-1"></i>{{ admin.get_admin_role_display }}</span>
+                            {% else %}
+                            <span style="color:var(--nhea-muted);font-size:0.82rem;">—</span>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if admin.must_change_password %}
                             <span class="badge-must-change"><i class="fas fa-exclamation-circle me-1"></i>Must Change</span>
@@ -76,11 +97,21 @@
                         </td>
                         <td>{{ admin.created_by.full_name|default:"System" }}</td>
                         <td>
-                            <form method="post" style="display:inline;" onsubmit="return confirm('Remove admin {{ admin.full_name }}?')">
-                                {% csrf_token %}
-                                <input type="hidden" name="delete_admin_id" value="{{ admin.id }}">
-                                <button type="submit" class="btn-del"><i class="fas fa-trash-alt me-1"></i>Remove</button>
-                            </form>
+                            <div class="action-group">
+                                <!-- Promote to Superadmin -->
+                                <a href="{% url 'promote_to_superadmin' admin.id %}"
+                                   class="btn-promote"
+                                   title="Promote {{ admin.full_name }} to Superadmin">
+                                    <i class="fas fa-crown me-1"></i>Promote
+                                </a>
+                                <!-- Remove Admin -->
+                                <form method="post" style="display:inline;"
+                                      onsubmit="return confirm('Remove admin {{ admin.full_name }}? This cannot be undone.')">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="delete_admin_id" value="{{ admin.id }}">
+                                    <button type="submit" class="btn-del"><i class="fas fa-trash-alt me-1"></i>Remove</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -97,8 +128,8 @@
     </div>
 
     <div class="text-center mt-4" data-aos="fade-up">
-        <a href="{% url 'list_voters' %}" style="color:var(--nhea-green);font-weight:600;font-size:0.9rem;text-decoration:none;">
-            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        <a href="{% url 'superadmin_dashboard' %}" style="color:var(--nhea-green);font-weight:600;font-size:0.9rem;text-decoration:none;">
+            <i class="fas fa-arrow-left me-1"></i>Back to Superadmin Dashboard
         </a>
     </div>
 </div>

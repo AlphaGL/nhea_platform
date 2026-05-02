@@ -4,7 +4,7 @@
 {% block body %}
 <style>
 .ca-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);display:flex;align-items:center;padding:3rem 1rem;}
-.ca-card{background:#fff;border-radius:20px;box-shadow:0 12px 50px rgba(10,79,60,0.12);border:1px solid var(--nhea-border);max-width:560px;width:100%;margin:0 auto;overflow:hidden;}
+.ca-card{background:#fff;border-radius:20px;box-shadow:0 12px 50px rgba(10,79,60,0.12);border:1px solid var(--nhea-border);max-width:620px;width:100%;margin:0 auto;overflow:hidden;}
 .ca-card-top{background:var(--gradient-hero);padding:2.5rem 2rem;text-align:center;}
 .ca-icon{width:72px;height:72px;background:rgba(255,255,255,0.15);border:2px solid rgba(201,168,76,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:1.8rem;color:var(--nhea-gold-light);}
 .ca-card-top h3{color:#fff;font-size:1.7rem;margin-bottom:0.25rem;}
@@ -12,7 +12,7 @@
 .ca-card-body{padding:2rem;}
 .field-group{margin-bottom:1.35rem;}
 .field-group label{font-weight:600;font-size:0.88rem;color:var(--nhea-text);margin-bottom:0.4rem;display:block;}
-.field-group input{width:100%;padding:0.9rem 1.2rem;border:2px solid var(--nhea-border);border-radius:10px;background:var(--nhea-cream);font-family:'DM Sans',sans-serif;font-size:0.95rem;transition:all 0.3s;outline:none;}
+.field-group input[type=text],.field-group input[type=email],.field-group input[type=password]{width:100%;padding:0.9rem 1.2rem;border:2px solid var(--nhea-border);border-radius:10px;background:var(--nhea-cream);font-family:'DM Sans',sans-serif;font-size:0.95rem;transition:all 0.3s;outline:none;}
 .field-group input:focus{border-color:var(--nhea-green);background:#fff;box-shadow:0 0 0 4px rgba(10,79,60,0.08);}
 .field-group .errorlist{list-style:none;padding:0;margin:0.35rem 0 0;}
 .field-group .errorlist li{background:#fef2f2;border:1px solid #fca5a5;color:#7f1d1d;border-radius:8px;padding:0.4rem 0.75rem;font-size:0.82rem;}
@@ -22,6 +22,29 @@
 .btn-create-admin:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(10,79,60,0.35);}
 .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
 @media(max-width:560px){.form-row-2{grid-template-columns:1fr;}}
+
+/* ── Role selector ───────────────────────────────────────── */
+.role-section{margin-bottom:1.5rem;}
+.role-section > label{font-weight:700;font-size:0.88rem;color:var(--nhea-text);margin-bottom:0.75rem;display:block;}
+.role-options{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+@media(max-width:480px){.role-options{grid-template-columns:1fr;}}
+.role-option{position:relative;}
+.role-option input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
+.role-label{display:flex;flex-direction:column;gap:0.25rem;padding:1rem 1.1rem;border:2px solid var(--nhea-border);border-radius:12px;cursor:pointer;transition:all 0.25s;background:var(--nhea-cream);}
+.role-option input[type=radio]:checked + .role-label{border-color:var(--nhea-green);background:#ecfdf5;box-shadow:0 0 0 3px rgba(10,79,60,0.08);}
+.role-label:hover{border-color:var(--nhea-green-light);background:#f0faf5;}
+.role-label-head{display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.9rem;color:var(--nhea-text);}
+.role-label-head i{color:var(--nhea-green);font-size:0.95rem;}
+.role-option input[type=radio]:checked + .role-label .role-label-head{color:var(--nhea-green);}
+.role-label-desc{font-size:0.78rem;color:var(--nhea-muted);line-height:1.5;}
+.role-perm-tags{display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.4rem;}
+.role-perm-tag{background:rgba(10,79,60,0.08);color:var(--nhea-green);padding:0.1rem 0.45rem;border-radius:6px;font-size:0.7rem;font-weight:600;}
+.role-option input[type=radio]:checked + .role-label .role-perm-tag{background:rgba(10,79,60,0.15);}
+
+/* Full admin highlight */
+.role-option input[type=radio]:checked + .role-label.full-admin-label{border-color:var(--nhea-gold);background:#fffbeb;}
+.role-option input[type=radio]:checked + .role-label.full-admin-label .role-label-head{color:#92400e;}
+.role-option input[type=radio]:checked + .role-label.full-admin-label .role-perm-tag{background:rgba(201,168,76,0.2);color:#92400e;}
 </style>
 
 <section class="ca-section">
@@ -35,7 +58,7 @@
     <div class="ca-card-body">
         <div class="info-note">
             <i class="fas fa-exclamation-triangle"></i>
-            <span><strong>Superadmin Only.</strong> This creates a staff-level admin. The temporary password you set must be changed by the admin on first login. Their Voter ID is auto-generated.</span>
+            <span><strong>Superadmin Only.</strong> Assign a role to control what this admin can access. Their Voter ID is auto-generated and the temporary password must be changed on first login.</span>
         </div>
 
         {% if messages %}
@@ -48,6 +71,7 @@
 
         <form method="post">
             {% csrf_token %}
+
             <div class="field-group">
                 <label><i class="fas fa-user me-1" style="color:var(--nhea-green);"></i>Full Name</label>
                 {{ form.full_name }}
@@ -70,6 +94,66 @@
                     {% if form.phone_number.errors %}<ul class="errorlist">{% for e in form.phone_number.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
                 </div>
             </div>
+
+            <!-- ── Role Selection ────────────────────────────────── -->
+            <div class="role-section">
+                <label><i class="fas fa-key me-1" style="color:var(--nhea-green);"></i>Admin Role & Permissions</label>
+                {% if form.admin_role.errors %}<ul class="errorlist" style="margin-bottom:0.75rem;">{% for e in form.admin_role.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                <div class="role-options">
+                    <div class="role-option">
+                        <input type="radio" name="admin_role" id="role_voter_manager" value="voter_manager"
+                               {% if form.admin_role.value == 'voter_manager' %}checked{% endif %}>
+                        <label for="role_voter_manager" class="role-label">
+                            <div class="role-label-head"><i class="fas fa-users"></i>Voter Manager</div>
+                            <div class="role-label-desc">Can register and delete voter accounts.</div>
+                            <div class="role-perm-tags">
+                                <span class="role-perm-tag">Voters</span>
+                                <span class="role-perm-tag">Register</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="role-option">
+                        <input type="radio" name="admin_role" id="role_nominee_manager" value="nominee_manager"
+                               {% if form.admin_role.value == 'nominee_manager' %}checked{% endif %}>
+                        <label for="role_nominee_manager" class="role-label">
+                            <div class="role-label-head"><i class="fas fa-user-tie"></i>Nominee Manager</div>
+                            <div class="role-label-desc">Can add/remove nominees and manage award categories.</div>
+                            <div class="role-perm-tags">
+                                <span class="role-perm-tag">Nominees</span>
+                                <span class="role-perm-tag">Categories</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="role-option">
+                        <input type="radio" name="admin_role" id="role_results_viewer" value="results_viewer"
+                               {% if form.admin_role.value == 'results_viewer' %}checked{% endif %}>
+                        <label for="role_results_viewer" class="role-label">
+                            <div class="role-label-head"><i class="fas fa-chart-bar"></i>Results Viewer</div>
+                            <div class="role-label-desc">Read-only access to live results and analytics.</div>
+                            <div class="role-perm-tags">
+                                <span class="role-perm-tag">Live Results</span>
+                                <span class="role-perm-tag">Analytics</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="role-option">
+                        <input type="radio" name="admin_role" id="role_full_admin" value="full_admin"
+                               {% if form.admin_role.value == 'full_admin' %}checked{% endif %}>
+                        <label for="role_full_admin" class="role-label full-admin-label">
+                            <div class="role-label-head"><i class="fas fa-crown"></i>Full Admin</div>
+                            <div class="role-label-desc">All permissions except creating admins or resetting system.</div>
+                            <div class="role-perm-tags">
+                                <span class="role-perm-tag">Voters</span>
+                                <span class="role-perm-tag">Nominees</span>
+                                <span class="role-perm-tag">Results</span>
+                                <span class="role-perm-tag">Reset Votes</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Passwords -->
             <div class="form-row-2">
                 <div class="field-group">
                     <label><i class="fas fa-lock me-1" style="color:#d97706;"></i>Initial Password</label>

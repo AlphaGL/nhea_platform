@@ -1,0 +1,292 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Admin Sign In{% endblock %}
+{% block header %}Admin Portal{% endblock %}
+{% block body %}
+<style>
+/* ── Layout ──────────────────────────────────────────────────────── */
+.al-section {
+  background: linear-gradient(160deg, #eff6ff 0%, #f0f7f4 60%, #fdf8f0 100%);
+  min-height: calc(100vh - 220px);
+  display: flex;
+  align-items: center;
+  padding: 3.5rem 1rem;
+}
+
+/* ── Card ────────────────────────────────────────────────────────── */
+.al-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 16px 64px rgba(29,78,216,0.1), 0 4px 20px rgba(10,79,60,0.06);
+  border: 1px solid #dbeafe;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* ── Header band ─────────────────────────────────────────────────── */
+.al-header {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+  padding: 2.5rem 2rem 2.25rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.al-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+}
+.al-icon {
+  width: 72px;
+  height: 72px;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.2rem;
+  font-size: 1.8rem;
+  color: #fff;
+  position: relative;
+}
+.al-header h3 {
+  color: #fff;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  margin-bottom: 0.2rem;
+  position: relative;
+}
+.al-header p {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.85rem;
+  margin: 0;
+  position: relative;
+}
+
+/* ── Role Badge ──────────────────────────────────────────────────── */
+.al-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  border-radius: 50px;
+  padding: 0.35rem 1rem;
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: -1rem auto 1.5rem;
+  width: fit-content;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Body ────────────────────────────────────────────────────────── */
+.al-body { padding: 0.5rem 2rem 2.25rem; }
+
+/* ── Fields ──────────────────────────────────────────────────────── */
+.field-group { margin-bottom: 1.3rem; }
+.field-group label {
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--nhea-text);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.field-group input {
+  width: 100%;
+  padding: 0.95rem 1.2rem;
+  border: 2px solid #dbeafe;
+  border-radius: 11px;
+  background: #f8faff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.94rem;
+  transition: all 0.3s;
+  outline: none;
+  color: var(--nhea-text);
+}
+.field-group input:focus {
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+}
+.field-group .errorlist {
+  list-style: none;
+  padding: 0;
+  margin: 0.35rem 0 0;
+}
+.field-group .errorlist li {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* ── Submit Button ───────────────────────────────────────────────── */
+.btn-admin-login {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(29,78,216,0.28);
+  margin-top: 0.5rem;
+  letter-spacing: 0.3px;
+}
+.btn-admin-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(29,78,216,0.38);
+}
+.btn-admin-login:active { transform: translateY(0); }
+
+/* ── Info Box ────────────────────────────────────────────────────── */
+.al-info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+  line-height: 1.55;
+}
+.al-info i { flex-shrink: 0; margin-top: 0.1rem; color: #2563eb; }
+
+/* ── Footer Links ────────────────────────────────────────────────── */
+.al-footer-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.al-footer-links a {
+  color: var(--nhea-green);
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.al-footer-links a:hover { text-decoration: underline; }
+.al-sep { color: var(--nhea-border); font-size: 0.75rem; }
+
+/* ── Non-field errors ────────────────────────────────────────────── */
+.al-error-box {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-size: 0.87rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+</style>
+
+<section class="al-section">
+  <div class="container">
+    <div class="al-card" data-aos="fade-up">
+
+      <!-- Header -->
+      <div class="al-header">
+        <div class="al-icon"><i class="fas fa-user-shield"></i></div>
+        <h3>Admin Sign In</h3>
+        <p>Restricted to authorised NHEA platform administrators</p>
+      </div>
+
+      <!-- Role badge -->
+      <div style="text-align:center;">
+        <span class="al-role-badge"><i class="fas fa-key"></i>Admin Access</span>
+      </div>
+
+      <!-- Body -->
+      <div class="al-body">
+
+        <div class="al-info">
+          <i class="fas fa-info-circle"></i>
+          <span>This portal is for <strong>admin accounts only</strong>. Regular delegates should use the
+            <a href="{% url 'login' %}" style="color:#1d4ed8;font-weight:700;">Voter Sign In</a> instead.</span>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="al-error-box">
+          <i class="fas fa-exclamation-circle"></i>
+          {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+        </div>
+        {% endif %}
+
+        {% if messages %}
+        {% for m in messages %}
+        <div class="al-error-box" style="{% if 'success' in m.tags %}background:#ecfdf5;border-color:#a7f3d0;color:#065f46;{% endif %}">
+          <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% else %}check-circle{% endif %}"></i>{{ m }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="field-group">
+            <label><i class="fas fa-id-badge me-1" style="color:#2563eb;"></i>Admin Voter ID</label>
+            <input type="text" name="username"
+                   placeholder="e.g. NHEA-2026-AB3XY"
+                   autocomplete="username"
+                   value="{{ form.username.value|default:'' }}"
+                   {% if form.username.errors %}style="border-color:#ef4444;"{% endif %}>
+            {% if form.username.errors %}
+            <ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+
+          <div class="field-group">
+            <label><i class="fas fa-lock me-1" style="color:#2563eb;"></i>Password</label>
+            <input type="password" name="password"
+                   placeholder="Your admin password"
+                   autocomplete="current-password"
+                   {% if form.password.errors %}style="border-color:#ef4444;"{% endif %}>
+            {% if form.password.errors %}
+            <ul class="errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+
+          {% csrf_token %}
+          <button type="submit" class="btn-admin-login">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In as Admin
+          </button>
+        </form>
+
+        <div class="al-footer-links">
+          <span class="al-sep">|</span>
+          <a href="{% url 'superadmin_login' %}"><i class="fas fa-crown me-1"></i>Superadmin?</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Security note -->
+    <div style="text-align:center;margin-top:2rem;font-size:0.77rem;color:var(--nhea-muted);" data-aos="fade-up" data-aos-delay="100">
+      <i class="fas fa-lock me-1" style="color:var(--nhea-green);"></i>
+      Secure, encrypted session · NHEA Voting Platform © {% now "Y" %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

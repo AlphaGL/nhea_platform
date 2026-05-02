@@ -43,18 +43,41 @@ def superadmin_required(view_func):
 
 
 def admin_required(view_func):
-    """Allows both superadmin and admin (is_staff) users."""
+    """Allows both superadmin and staff (admin) users."""
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
         if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
-            # Force password change if flag is set
-            if request.user.must_change_password and request.path != '/admin/change-password/':
+            if request.user.must_change_password and request.path != '/panel/change-password/':
                 messages.warning(request, 'You must change your password before continuing.')
                 return redirect('admin_change_password')
             return view_func(request, *args, **kwargs)
-        messages.error(request, 'Admin access required.')
+        messages.error(request, 'Admin access required. Please log in.')
         return redirect('login')
     return _wrapped
+
+
+def role_required(permission_method):
+    """
+    Decorator factory — checks a named permission method on the Voter model.
+    Usage: @role_required('can_manage_voters')
+    """
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped(request, *args, **kwargs):
+            if not (request.user.is_authenticated and
+                    (request.user.is_staff or request.user.is_superuser)):
+                messages.error(request, 'Admin access required.')
+                return redirect('login')
+            if request.user.must_change_password and request.path != '/panel/change-password/':
+                messages.warning(request, 'You must change your password before continuing.')
+                return redirect('admin_change_password')
+            checker = getattr(request.user, permission_method, None)
+            if checker and checker():
+                return view_func(request, *args, **kwargs)
+            messages.error(request, 'You do not have permission to access this section.')
+            return redirect('admin_dashboard')
+        return _wrapped
+    return decorator
 
 
 def custom_auth_required(view_func):
@@ -99,7 +122,15 @@ def admin_change_password(request):
     if not request.user.is_authenticated:
         return redirect('login')
     voter = request.user
+
+    # Only staff/superadmin accounts should hit this view
+    if not (voter.is_staff or voter.is_superuser):
+        return redirect('voting_dashboard')
+
+    # If they don't actually need to change, send them home
     if not voter.must_change_password:
+        if voter.is_superuser:
+            return redirect('superadmin_dashboard')
         return redirect('admin_dashboard')
 
     if request.method == 'POST':
@@ -109,14 +140,22 @@ def admin_change_password(request):
             voter.must_change_password = False
             voter.save()
             log_action(request, 'PASSWORD_CHANGE',
-                       description='Admin changed temporary password',
+                       description='Admin changed temporary password on first login',
                        actor=voter)
             messages.success(request, 'Password updated successfully. Welcome!')
+            # Re-authenticate with the new password so the session stays valid
             auth_login(request, voter)
+            # Redirect based on role
+            if voter.is_superuser:
+                return redirect('superadmin_dashboard')
             return redirect('admin_dashboard')
     else:
         form = AdminPasswordChangeForm(user=voter)
-    return render(request, 'voting/admin_change_password.html', {'form': form})
+
+    return render(request, 'voting/admin_change_password.html', {
+        'form': form,
+        'user_role': 'Superadmin' if voter.is_superuser else voter.get_role_display_name(),
+    })
 
 
 # ─── Self-Registration ─────────────────────────────────────────────────────────
@@ -256,7 +295,7 @@ def verify_email(request):
 
 # ─── Category Management ───────────────────────────────────────────────────────
 
-@admin_required
+@role_required('can_manage_nominees')
 def manage_categories(request):
     if request.method == 'POST':
         delete_id = request.POST.get('delete_category_id')
@@ -284,7 +323,7 @@ def manage_categories(request):
 
 # ─── Nominee Management ────────────────────────────────────────────────────────
 
-@admin_required
+@role_required('can_manage_nominees')
 def add_nominee(request):
     if request.method == 'POST':
         form = NomineeForm(request.POST, request.FILES)
@@ -300,7 +339,7 @@ def add_nominee(request):
     return render(request, 'voting/add_nominee.html', {'form': form})
 
 
-@admin_required
+@role_required('can_manage_nominees')
 def delete_nominee(request, nominee_id):
     nominee = get_object_or_404(Nominee, id=nominee_id)
     log_action(request, 'NOMINEE_DELETED',
@@ -311,7 +350,7 @@ def delete_nominee(request, nominee_id):
     return redirect('list_nominees')
 
 
-@admin_required
+@role_required('can_manage_nominees')
 def list_nominees(request):
     nominees = Nominee.objects.select_related('category').all()
     return render(request, 'voting/list_nominees.html', {'nominees': nominees})
@@ -337,10 +376,8 @@ def enter_access_code(request):
     return render(request, 'voting/security.html', {'form': form})
 
 
+@role_required('can_manage_voters')
 def list_voters(request):
-    if not request.session.get('has_access'):
-        return redirect('enter_access_code')
-
     if request.method == 'POST':
         voter_id = request.POST.get('delete_voter_id')
         if voter_id:
@@ -353,7 +390,7 @@ def list_voters(request):
             messages.success(request, 'Voter deleted successfully.')
             return redirect('list_voters')
 
-    voters = Voter.objects.all()
+    voters = Voter.objects.filter(is_staff=False, is_superuser=False)
     voters_by_org = {}
     count_by_org = {}
     for voter in voters:
@@ -386,7 +423,7 @@ def logout_voter(request):
 
 # ─── Vote Reset ────────────────────────────────────────────────────────────────
 
-@admin_required
+@role_required('can_reset_votes')
 def reset_all(request):
     if request.method == 'POST':
         form = ResetAllForm(request.POST)
@@ -411,28 +448,23 @@ def reset_all(request):
 
 # ─── Live Vote Count ───────────────────────────────────────────────────────────
 
+@role_required('can_view_results')
 def live_vote_count(request):
-    if request.method == 'POST':
-        code = request.POST.get('access_code')
-        if code == ACCESS_CODE:
-            vote_data = {}
-            categories = Category.objects.all().order_by('importance')
-            for cat in categories:
-                nominees = Nominee.objects.filter(category=cat).annotate(vote_count=Count('vote'))
-                vote_data[cat] = nominees
-            total_voters = Vote.objects.values('voter').distinct().count()
-            return render(request, 'voting/live_vote_count.html', {
-                'vote_data':    vote_data,
-                'total_voters': total_voters
-            })
-        else:
-            messages.error(request, 'Invalid access code.')
-    return render(request, 'voting/live_vote_count.html')
+    vote_data = {}
+    categories = Category.objects.all().order_by('importance')
+    for cat in categories:
+        nominees = Nominee.objects.filter(category=cat).annotate(vote_count=Count('vote'))
+        vote_data[cat] = nominees
+    total_voters = Vote.objects.values('voter').distinct().count()
+    return render(request, 'voting/live_vote_count.html', {
+        'vote_data':    vote_data,
+        'total_voters': total_voters
+    })
 
 
 # ─── Admin Registration (staff only) ──────────────────────────────────────────
 
-@admin_required
+@role_required('can_manage_voters')
 def register_voter(request):
     if request.method == 'POST':
         form = VoterForm(request.POST)
@@ -460,11 +492,13 @@ def create_admin(request):
         if form.is_valid():
             admin_user = form.save(created_by=request.user)
             log_action(request, 'ADMIN_CREATED',
-                       description=f'Admin account created for {admin_user.full_name} (ID: {admin_user.voter_id})',
+                       description=f'Admin account created for {admin_user.full_name} '
+                                   f'(ID: {admin_user.voter_id}, Role: {admin_user.admin_role})',
                        actor=request.user, target=admin_user)
             messages.success(
                 request,
                 f'Admin created successfully! Voter ID: {admin_user.voter_id}. '
+                f'Role: {admin_user.get_admin_role_display()}. '
                 f'They must change their password on first login.'
             )
             return redirect('manage_admins')
@@ -491,13 +525,45 @@ def manage_admins(request):
     return render(request, 'voting/manage_admins.html', {'admins': admins})
 
 
+@superadmin_required
+def promote_to_superadmin(request, admin_id):
+    """
+    Promote a staff admin to superadmin.
+    Only an existing superadmin can do this.
+    Requires a POST with 'confirm_promote' checkbox for safety.
+    """
+    admin_user = get_object_or_404(Voter, id=admin_id, is_staff=True, is_superuser=False)
+
+    if request.method == 'POST':
+        if request.POST.get('confirm_promote'):
+            admin_user.is_superuser = True
+            admin_user.admin_role   = None        # superadmins don't use role codes
+            admin_user.save(update_fields=['is_superuser', 'admin_role'])
+            log_action(
+                request, 'SYSTEM_UPDATE',
+                description=f'Admin {admin_user.full_name} ({admin_user.voter_id}) promoted to Superadmin',
+                actor=request.user,
+                target=admin_user,
+            )
+            messages.success(
+                request,
+                f'{admin_user.full_name} has been promoted to Superadmin. '
+                f'They will have full platform access on their next login.'
+            )
+        else:
+            messages.error(request, 'You must tick the confirmation box to promote an admin.')
+        return redirect('manage_admins')
+
+    # GET — show a confirmation page
+    return render(request, 'voting/promote_superadmin_confirm.html', {'admin_user': admin_user})
+
+
 # ─── Activity Log ──────────────────────────────────────────────────────────────
 
 @admin_required
 def activity_log_view(request):
     logs = ActivityLog.objects.select_related('actor').all()
 
-    # Filters
     action_filter = request.GET.get('action', '')
     actor_filter  = request.GET.get('actor', '')
     date_from     = request.GET.get('date_from', '')
@@ -517,7 +583,7 @@ def activity_log_view(request):
 
     action_choices = ActivityLog.ACTION_CHOICES
     return render(request, 'voting/activity_log.html', {
-        'logs':           logs[:500],  # limit to latest 500
+        'logs':           logs[:500],
         'action_choices': action_choices,
         'action_filter':  action_filter,
         'actor_filter':   actor_filter,
@@ -528,69 +594,45 @@ def activity_log_view(request):
 
 # ─── Voting Analytics ──────────────────────────────────────────────────────────
 
-@admin_required
+@role_required('can_view_results')
 def voting_analytics(request):
-    """Location & voting analytics dashboard."""
-    # Votes by country
     by_country = (
         Vote.objects
-        .exclude(country__isnull=True)
-        .exclude(country='')
-        .values('country')
-        .annotate(count=Count('id'))
-        .order_by('-count')
+        .exclude(country__isnull=True).exclude(country='')
+        .values('country').annotate(count=Count('id')).order_by('-count')
     )
-
-    # Votes by region (top 10)
     by_region = (
         Vote.objects
-        .exclude(region__isnull=True)
-        .exclude(region='')
-        .values('region', 'country')
-        .annotate(count=Count('id'))
-        .order_by('-count')[:10]
+        .exclude(region__isnull=True).exclude(region='')
+        .values('region', 'country').annotate(count=Count('id')).order_by('-count')[:10]
     )
-
-    # Votes per category
     by_category = (
         Vote.objects
-        .values('category__name')
-        .annotate(count=Count('id'))
-        .order_by('-count')
+        .values('category__name').annotate(count=Count('id')).order_by('-count')
     )
-
-    # Votes per hour (last 24h)
     from django.utils import timezone
     from datetime import timedelta
     cutoff = timezone.now() - timedelta(hours=24)
     by_hour = (
-        Vote.objects
-        .filter(timestamp__gte=cutoff)
+        Vote.objects.filter(timestamp__gte=cutoff)
         .extra(select={'hour': "date_trunc('hour', timestamp)"})
-        .values('hour')
-        .annotate(count=Count('id'))
-        .order_by('hour')
+        .values('hour').annotate(count=Count('id')).order_by('hour')
     )
-
-    # Geo points for heatmap (lat/lon pairs)
     geo_points = list(
-        Vote.objects
-        .exclude(latitude__isnull=True)
-        .values('latitude', 'longitude')
+        Vote.objects.exclude(latitude__isnull=True).values('latitude', 'longitude')
     )
-
-    total_votes  = Vote.objects.count()
-    total_voters = Vote.objects.values('voter').distinct().count()
+    total_votes     = Vote.objects.count()
+    total_voters    = Vote.objects.values('voter').distinct().count()
     total_countries = by_country.count()
 
     return render(request, 'voting/voting_analytics.html', {
-        'by_country':     list(by_country),
-        'by_region':      list(by_region),
-        'by_category':    list(by_category),
-        'by_hour':        list(by_hour),
-        'geo_points':     geo_points,
-        'total_votes':    total_votes,
-        'total_voters':   total_voters,
+        'by_country':      list(by_country),
+        'by_region':       list(by_region),
+        'by_category':     list(by_category),
+        'by_hour':         list(by_hour),
+        'geo_points':      geo_points,
+        'total_votes':     total_votes,
+        'total_voters':    total_voters,
         'total_countries': total_countries,
     })
 
@@ -605,42 +647,118 @@ class NheaLoginView(LoginView):
         voter_id = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
         voter    = authenticate(voter_id=voter_id, password=password)
-        if voter is not None:
-            # ── VERIFICATION GATE ──────────────────────────────────────────
-            if not voter.is_verified and not voter.is_staff:
-                self.request.session['pending_voter_id'] = voter.voter_id
-                self.request.session['new_voter_id']     = voter.voter_id
-                messages.warning(self.request, 'Please verify your identity before voting.')
-                if voter.phone_number:
-                    return redirect('verify_phone')
-                elif voter.email:
-                    send_email_otp(voter.email, voter.full_name)
-                    return redirect('verify_email')
-                else:
-                    messages.error(self.request, 'No contact method on file. Please contact the NHEA secretariat.')
-                    return self.form_invalid(form)
 
-            auth_login(self.request, voter)
-            self.request.session['voter_id'] = voter_id
-            log_action(self.request, 'LOGIN',
-                       description=f'Successful login: {voter.full_name}',
-                       actor=voter)
-
-            # ── Admin / Superadmin redirect ────────────────────────────────
-            if voter.is_superuser or voter.is_staff:
-                if voter.must_change_password:
-                    return redirect('admin_change_password')
-                return redirect('admin_dashboard')
-
-            return redirect(self.get_success_url())
-        else:
+        if voter is None:
             log_action(self.request, 'LOGIN_FAILED',
                        description=f'Failed login attempt for voter_id: {voter_id}')
             form.add_error(None, 'Invalid Voter ID or password.')
             return self.form_invalid(form)
 
+        # ── STAFF / ADMIN ACCOUNTS ─────────────────────────────────────────
+        if voter.is_staff or voter.is_superuser:
+            auth_login(self.request, voter)
+            self.request.session['voter_id'] = voter_id
+            log_action(self.request, 'LOGIN',
+                       description=f'{"Superadmin" if voter.is_superuser else "Admin"} login: {voter.full_name}',
+                       actor=voter)
+
+            # Force password reset on very first login (set by superadmin)
+            if voter.must_change_password:
+                messages.warning(
+                    self.request,
+                    'Welcome! Your account requires a password change before you can continue.'
+                )
+                return redirect('admin_change_password')
+
+            # Route to correct dashboard
+            if voter.is_superuser:
+                return redirect('superadmin_dashboard')
+            return redirect('admin_dashboard')
+
+        # ── REGULAR VOTER ACCOUNTS ─────────────────────────────────────────
+        # Verification gate — unverified voters must complete OTP first
+        if not voter.is_verified:
+            self.request.session['pending_voter_id'] = voter.voter_id
+            self.request.session['new_voter_id']     = voter.voter_id
+            messages.warning(self.request, 'Please verify your identity before voting.')
+            if voter.phone_number:
+                return redirect('verify_phone')
+            elif voter.email:
+                send_email_otp(voter.email, voter.full_name)
+                return redirect('verify_email')
+            else:
+                messages.error(self.request, 'No contact method on file. Contact an administrator.')
+                return self.form_invalid(form)
+
+        auth_login(self.request, voter)
+        self.request.session['voter_id'] = voter_id
+        log_action(self.request, 'LOGIN',
+                   description=f'Voter login: {voter.full_name}',
+                   actor=voter)
+        return redirect(self.get_success_url())
+
     def get_success_url(self):
         return reverse_lazy('voting_dashboard')
+
+
+# ─── Superadmin Dashboard ──────────────────────────────────────────────────────
+
+@superadmin_required
+def superadmin_dashboard(request):
+    """Full-control dashboard exclusively for the superadmin."""
+    total_votes      = Vote.objects.count()
+    total_voters     = Voter.objects.filter(is_staff=False, is_superuser=False).count()
+    total_categories = Category.objects.count()
+    total_nominees   = Nominee.objects.count()
+    total_admins     = Voter.objects.filter(is_staff=True, is_superuser=False).count()
+    recent_logs      = ActivityLog.objects.select_related('actor').all()[:10]
+    admins           = Voter.objects.filter(is_staff=True, is_superuser=False).order_by('full_name')
+
+    # Role distribution
+    from .models import Voter as V
+    role_counts = {}
+    for code, label in V.ROLE_CHOICES:
+        role_counts[label] = Voter.objects.filter(admin_role=code, is_staff=True).count()
+
+    context = {
+        'total_votes':      total_votes,
+        'total_voters':     total_voters,
+        'total_categories': total_categories,
+        'total_nominees':   total_nominees,
+        'total_admins':     total_admins,
+        'recent_logs':      recent_logs,
+        'admins':           admins,
+        'role_counts':      role_counts,
+    }
+    return render(request, 'voting/superadmin_dashboard.html', context)
+
+
+# ─── Admin Dashboard ───────────────────────────────────────────────────────────
+
+@admin_required
+def admin_dashboard(request):
+    """Role-filtered dashboard for staff admins."""
+    user = request.user
+
+    # Redirect superadmin to their own dashboard
+    if user.is_superuser:
+        return redirect('superadmin_dashboard')
+
+    total_votes      = Vote.objects.count()
+    total_voters     = Voter.objects.filter(is_staff=False, is_superuser=False).count()
+    total_categories = Category.objects.count()
+    total_nominees   = Nominee.objects.count()
+    recent_logs      = ActivityLog.objects.select_related('actor').all()[:8]
+
+    context = {
+        'total_votes':      total_votes,
+        'total_voters':     total_voters,
+        'total_categories': total_categories,
+        'total_nominees':   total_nominees,
+        'recent_logs':      recent_logs,
+        'admin':            user,
+    }
+    return render(request, 'voting/admin_dashboard.html', context)
 
 
 # ─── Voting Dashboard ──────────────────────────────────────────────────────────
@@ -730,7 +848,6 @@ def vote_category(request, category_id):
             return redirect('vote_category', category_id=category_id)
         nominee = get_object_or_404(Nominee, id=nominee_id, category=category)
 
-        # Capture geo data for the vote
         ip  = get_client_ip(request)
         geo = get_geo_data(ip)
 
@@ -749,10 +866,10 @@ def vote_category(request, category_id):
         messages.success(request, f'Your vote for "{nominee.name}" has been recorded!')
         return redirect('voting_dashboard')
 
-    nominees         = Nominee.objects.filter(category=category)
-    all_categories   = Category.objects.count()
-    voted_count      = Vote.objects.filter(voter=voter).count()
-    progress_pct     = int((voted_count / all_categories) * 100) if all_categories else 0
+    nominees       = Nominee.objects.filter(category=category)
+    all_categories = Category.objects.count()
+    voted_count    = Vote.objects.filter(voter=voter).count()
+    progress_pct   = int((voted_count / all_categories) * 100) if all_categories else 0
 
     return render(request, 'voting/vote_position.html', {
         'position':         category,
@@ -768,29 +885,6 @@ def next_category(request, category_id):
     return redirect('voting_dashboard')
 
 
-# ─── Admin Dashboard ───────────────────────────────────────────────────────────
-
-@login_required
-@staff_member_required
-def admin_dashboard(request):
-    total_votes      = Vote.objects.count()
-    total_voters     = Voter.objects.filter(is_staff=False, is_superuser=False).count()
-    total_categories = Category.objects.count()
-    total_nominees   = Nominee.objects.count()
-    total_admins     = Voter.objects.filter(is_staff=True, is_superuser=False).count()
-    recent_logs      = ActivityLog.objects.select_related('actor').all()[:10]
-
-    context = {
-        'total_votes':      total_votes,
-        'total_voters':     total_voters,
-        'total_categories': total_categories,
-        'total_nominees':   total_nominees,
-        'total_admins':     total_admins,
-        'recent_logs':      recent_logs,
-    }
-    return render(request, 'voting/admin_dashboard.html', context)
-
-
 # ─── Completed & Site Map ──────────────────────────────────────────────────────
 
 class CompletedView(TemplateView):
@@ -799,3 +893,115 @@ class CompletedView(TemplateView):
 
 def site_map(request):
     return render(request, 'voting/site_map.html')
+
+
+
+
+# ─── Admin Login ───────────────────────────────────────────────────────────────
+ 
+class AdminLoginView(LoginView):
+    """
+    Dedicated login page for admin (staff) accounts.
+    Rejects regular voters and superadmins with a clear error message.
+    """
+    template_name = 'voting/admin_login.html'
+    form_class    = AuthenticationForm
+ 
+    def form_valid(self, form):
+        voter_id = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        voter    = authenticate(voter_id=voter_id, password=password)
+ 
+        if voter is None:
+            log_action(self.request, 'LOGIN_FAILED',
+                       description=f'Admin login failed for voter_id: {voter_id}')
+            form.add_error(None, 'Invalid Voter ID or password.')
+            return self.form_invalid(form)
+ 
+        # Must be a staff admin (not a superuser, not a regular voter)
+        if voter.is_superuser:
+            form.add_error(None,
+                'Superadmin accounts must use the Superadmin Sign In portal.')
+            return self.form_invalid(form)
+ 
+        if not voter.is_staff:
+            form.add_error(None,
+                'This portal is for admin accounts only. '
+                'Please use the Voter Sign In instead.')
+            return self.form_invalid(form)
+ 
+        # Successful admin login
+        auth_login(self.request, voter)
+        self.request.session['voter_id'] = voter_id
+        log_action(self.request, 'LOGIN',
+                   description=f'Admin login: {voter.full_name}',
+                   actor=voter)
+ 
+        if voter.must_change_password:
+            messages.warning(
+                self.request,
+                'Welcome! You must change your password before continuing.'
+            )
+            return redirect('admin_change_password')
+ 
+        return redirect('admin_dashboard')
+ 
+    def get(self, request, *args, **kwargs):
+        # Already logged-in admin → go straight to dashboard
+        if request.user.is_authenticated and request.user.is_staff and not request.user.is_superuser:
+            return redirect('admin_dashboard')
+        return super().get(request, *args, **kwargs)
+ 
+ 
+# ─── Superadmin Login ──────────────────────────────────────────────────────────
+ 
+class SuperadminLoginView(LoginView):
+    """
+    Dedicated login page for superadmin accounts only.
+    Rejects regular voters and staff admins.
+    """
+    template_name = 'voting/superadmin_login.html'
+    form_class    = AuthenticationForm
+ 
+    def form_valid(self, form):
+        voter_id = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        voter    = authenticate(voter_id=voter_id, password=password)
+ 
+        if voter is None:
+            log_action(self.request, 'LOGIN_FAILED',
+                       description=f'Superadmin login failed for voter_id: {voter_id}')
+            form.add_error(None, 'Invalid Voter ID or password.')
+            return self.form_invalid(form)
+ 
+        # Must be a superuser
+        if not voter.is_superuser:
+            if voter.is_staff:
+                form.add_error(None,
+                    'Admin accounts must use the Admin Sign In portal.')
+            else:
+                form.add_error(None,
+                    'This portal is restricted to superadmin accounts only.')
+            return self.form_invalid(form)
+ 
+        # Successful superadmin login
+        auth_login(self.request, voter)
+        self.request.session['voter_id'] = voter_id
+        log_action(self.request, 'LOGIN',
+                   description=f'Superadmin login: {voter.full_name}',
+                   actor=voter)
+ 
+        if voter.must_change_password:
+            messages.warning(
+                self.request,
+                'Welcome! You must change your password before continuing.'
+            )
+            return redirect('admin_change_password')
+ 
+        return redirect('superadmin_dashboard')
+ 
+    def get(self, request, *args, **kwargs):
+        # Already logged-in superadmin → skip login
+        if request.user.is_authenticated and request.user.is_superuser:
+            return redirect('superadmin_dashboard')
+        return super().get(request, *args, **kwargs)

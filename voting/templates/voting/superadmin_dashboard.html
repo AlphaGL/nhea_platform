@@ -1,0 +1,398 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Superadmin Control Center{% endblock %}
+{% block header %}Superadmin Control Center{% endblock %}
+
+{% block body %}
+<style>
+/* ── Layout ─────────────────────────────────────────────── */
+.sa-layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 220px);background:#0d1f1a;}
+.sa-sidebar{background:linear-gradient(180deg,#0a1a15 0%,#0d2b22 100%);border-right:1px solid rgba(201,168,76,0.15);padding:2rem 0;position:sticky;top:80px;height:calc(100vh - 80px);overflow-y:auto;}
+.sa-main{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);padding:2.5rem 2rem 4rem;}
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sa-identity{padding:0 1.5rem 1.75rem;border-bottom:1px solid rgba(201,168,76,0.15);margin-bottom:1.25rem;}
+.sa-crown{width:52px;height:52px;background:var(--gradient-gold);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--nhea-dark);margin-bottom:0.85rem;}
+.sa-identity-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#fff;font-weight:700;line-height:1.2;}
+.sa-identity-badge{display:inline-flex;align-items:center;gap:0.35rem;background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.4);color:var(--nhea-gold-light);padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.35rem;}
+.sa-nav-section{padding:0 1rem;margin-bottom:0.5rem;}
+.sa-nav-label{font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0 0.5rem;margin-bottom:0.4rem;}
+.sa-nav-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.75rem;border-radius:10px;color:rgba(255,255,255,0.65);font-size:0.88rem;font-weight:500;text-decoration:none;transition:all 0.25s;margin-bottom:0.15rem;}
+.sa-nav-link:hover,.sa-nav-link.active{background:rgba(201,168,76,0.12);color:var(--nhea-gold-light);text-decoration:none;}
+.sa-nav-link i{width:18px;text-align:center;font-size:0.85rem;}
+.sa-nav-link .sa-badge{margin-left:auto;background:rgba(201,168,76,0.25);color:var(--nhea-gold-light);padding:0.1rem 0.45rem;border-radius:10px;font-size:0.7rem;font-weight:700;}
+.sa-nav-link.danger-link{color:rgba(248,113,113,0.75);}
+.sa-nav-link.danger-link:hover{background:rgba(220,38,38,0.15);color:#f87171;}
+
+/* ── Top bar ─────────────────────────────────────────────── */
+.sa-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.sa-topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--nhea-text);}
+.sa-topbar-time{font-size:0.82rem;color:var(--nhea-muted);display:flex;align-items:center;gap:0.4rem;}
+.online-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* ── Stat cards ──────────────────────────────────────────── */
+.sa-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1.25rem;margin-bottom:2rem;}
+.sa-stat{background:#fff;border-radius:16px;padding:1.5rem;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);position:relative;overflow:hidden;transition:all 0.3s;}
+.sa-stat:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(10,79,60,0.1);}
+.sa-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.sa-stat.green::before{background:var(--gradient-hero);}
+.sa-stat.gold::before{background:var(--gradient-gold);}
+.sa-stat.purple::before{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+.sa-stat.blue::before{background:linear-gradient(135deg,#0369a1,#0ea5e9);}
+.sa-stat.red::before{background:linear-gradient(135deg,#dc2626,#f87171);}
+.sa-stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;margin-bottom:1rem;}
+.sa-stat.green .sa-stat-icon{background:var(--gradient-hero);}
+.sa-stat.gold .sa-stat-icon{background:var(--gradient-gold);color:var(--nhea-dark);}
+.sa-stat.purple .sa-stat-icon{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+.sa-stat.blue .sa-stat-icon{background:linear-gradient(135deg,#0369a1,#0ea5e9);}
+.sa-stat.red .sa-stat-icon{background:linear-gradient(135deg,#dc2626,#f87171);}
+.sa-stat-val{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:700;color:var(--nhea-text);line-height:1;}
+.sa-stat-lbl{font-size:0.75rem;font-weight:600;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.7px;margin-top:0.3rem;}
+
+/* ── Section title ───────────────────────────────────────── */
+.sa-section-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:var(--nhea-text);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.sa-section-title::after{content:'';flex:1;height:1px;background:var(--nhea-border);}
+
+/* ── Admin table ─────────────────────────────────────────── */
+.sa-table-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);overflow:hidden;margin-bottom:2rem;}
+.sa-table-head{background:#f8fdf9;padding:1rem 1.5rem;border-bottom:1px solid var(--nhea-border);display:flex;justify-content:space-between;align-items:center;}
+.sa-table-head h6{margin:0;font-weight:700;color:var(--nhea-text);font-size:0.95rem;}
+.sa-table{width:100%;border-collapse:collapse;}
+.sa-table th{padding:0.75rem 1.25rem;text-align:left;font-size:0.75rem;font-weight:700;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--nhea-border);}
+.sa-table td{padding:0.9rem 1.25rem;border-bottom:1px solid #f0f7f4;font-size:0.88rem;color:var(--nhea-text);vertical-align:middle;}
+.sa-table tr:last-child td{border-bottom:none;}
+.sa-table tr:hover td{background:#f8fdf9;}
+.avatar-sm{width:34px;height:34px;border-radius:50%;background:var(--gradient-hero);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:700;}
+
+/* ── Role badges ─────────────────────────────────────────── */
+.role-pill{display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.65rem;border-radius:20px;font-size:0.74rem;font-weight:700;}
+.role-full_admin{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+.role-voter_manager{background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
+.role-nominee_manager{background:#fdf4ff;border:1px solid #d8b4fe;color:#6b21a8;}
+.role-results_viewer{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+.badge-must-change{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:0.18rem 0.55rem;border-radius:20px;font-size:0.73rem;font-weight:600;}
+.badge-ok{background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:0.18rem 0.55rem;border-radius:20px;font-size:0.73rem;font-weight:600;}
+.btn-del-sm{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:0.3rem 0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-del-sm:hover{background:#dc2626;color:#fff;}
+
+/* ── Quick action grid ───────────────────────────────────── */
+.sa-action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;}
+.sa-action-card{background:#fff;border:1px solid var(--nhea-border);border-radius:14px;padding:1.35rem;display:flex;align-items:center;gap:0.9rem;text-decoration:none;transition:all 0.3s;box-shadow:0 2px 10px rgba(10,79,60,0.04);}
+.sa-action-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(10,79,60,0.1);border-color:var(--nhea-green);text-decoration:none;}
+.sa-action-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;}
+.sa-action-label{font-weight:600;font-size:0.88rem;color:var(--nhea-text);line-height:1.2;}
+.sa-action-sub{font-size:0.75rem;color:var(--nhea-muted);}
+
+/* ── Role distribution ───────────────────────────────────── */
+.role-dist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.85rem;margin-bottom:2rem;}
+.role-dist-card{background:#fff;border-radius:12px;padding:1.1rem;border:1px solid var(--nhea-border);text-align:center;}
+.role-dist-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--nhea-text);}
+.role-dist-lbl{font-size:0.75rem;color:var(--nhea-muted);font-weight:600;}
+
+/* ── Activity ────────────────────────────────────────────── */
+.sa-activity-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 20px rgba(10,79,60,0.06);overflow:hidden;}
+.sa-activity-head{background:#f8fdf9;padding:1rem 1.5rem;border-bottom:1px solid var(--nhea-border);display:flex;justify-content:space-between;align-items:center;}
+.log-row{display:flex;align-items:flex-start;gap:0.85rem;padding:0.8rem 1.5rem;border-bottom:1px solid #f0f7f4;}
+.log-row:last-child{border-bottom:none;}
+.log-dot{width:7px;height:7px;border-radius:50%;background:var(--nhea-green);flex-shrink:0;margin-top:0.38rem;}
+.log-text{font-size:0.86rem;color:var(--nhea-text);}
+.log-meta{font-size:0.76rem;color:var(--nhea-muted);}
+
+/* ── Danger zone ─────────────────────────────────────────── */
+.danger-zone{background:#fff;border:2px solid #fca5a5;border-radius:16px;padding:1.75rem;margin-top:2rem;}
+.danger-zone-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:#dc2626;margin-bottom:0.35rem;}
+.danger-zone-sub{font-size:0.85rem;color:#7f1d1d;margin-bottom:1.25rem;}
+.btn-danger{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:10px;padding:0.75rem 1.5rem;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.3s;font-family:'DM Sans',sans-serif;}
+.btn-danger:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(192,57,43,0.4);}
+
+@media(max-width:900px){
+  .sa-layout{grid-template-columns:1fr;}
+  .sa-sidebar{position:static;height:auto;}
+}
+</style>
+
+<div class="sa-layout">
+  <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
+  <aside class="sa-sidebar">
+    <div class="sa-identity">
+      <div class="sa-crown"><i class="fas fa-crown"></i></div>
+      <div class="sa-identity-name">{{ request.user.full_name }}</div>
+      <div class="sa-identity-badge"><i class="fas fa-shield-alt"></i>Superadmin</div>
+    </div>
+
+    <div class="sa-nav-section">
+      <div class="sa-nav-label">Overview</div>
+      <a href="{% url 'superadmin_dashboard' %}" class="sa-nav-link active">
+        <i class="fas fa-th-large"></i>Dashboard
+      </a>
+    </div>
+
+    <div class="sa-nav-section">
+      <div class="sa-nav-label">Admin Management</div>
+      <a href="{% url 'manage_admins' %}" class="sa-nav-link">
+        <i class="fas fa-user-shield"></i>All Admins
+        <span class="sa-badge">{{ total_admins }}</span>
+      </a>
+      <a href="{% url 'create_admin' %}" class="sa-nav-link">
+        <i class="fas fa-user-plus"></i>Create Admin
+      </a>
+    </div>
+
+    <div class="sa-nav-section">
+      <div class="sa-nav-label">Election Management</div>
+      <a href="{% url 'list_voters' %}" class="sa-nav-link">
+        <i class="fas fa-users"></i>Manage Voters
+        <span class="sa-badge">{{ total_voters }}</span>
+      </a>
+      <a href="{% url 'list_nominees' %}" class="sa-nav-link">
+        <i class="fas fa-user-tie"></i>Nominees
+        <span class="sa-badge">{{ total_nominees }}</span>
+      </a>
+      <a href="{% url 'manage_categories' %}" class="sa-nav-link">
+        <i class="fas fa-layer-group"></i>Categories
+        <span class="sa-badge">{{ total_categories }}</span>
+      </a>
+    </div>
+
+    <div class="sa-nav-section">
+      <div class="sa-nav-label">Results & Logs</div>
+      <a href="{% url 'live_vote_count' %}" class="sa-nav-link">
+        <i class="fas fa-chart-bar"></i>Live Results
+      </a>
+      <a href="{% url 'voting_analytics' %}" class="sa-nav-link">
+        <i class="fas fa-globe-africa"></i>Analytics
+      </a>
+      <a href="{% url 'activity_log' %}" class="sa-nav-link">
+        <i class="fas fa-clipboard-list"></i>Audit Log
+      </a>
+    </div>
+
+    <div class="sa-nav-section">
+      <div class="sa-nav-label">Danger Zone</div>
+      <a href="{% url 'reset_all' %}" class="sa-nav-link danger-link">
+        <i class="fas fa-exclamation-triangle"></i>Reset All Votes
+      </a>
+    </div>
+
+    <div class="sa-nav-section" style="margin-top:auto;padding-top:1rem;border-top:1px solid rgba(201,168,76,0.1);">
+      <a href="{% url 'logout' %}" class="sa-nav-link">
+        <i class="fas fa-sign-out-alt"></i>Sign Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ─────────────────────────────────────────────────── -->
+  <main class="sa-main">
+
+    {% if messages %}
+    {% for m in messages %}
+    <div style="background:{% if 'error' in m.tags %}#fef2f2;border:1px solid #fca5a5;color:#7f1d1d{% else %}#ecfdf5;border:1px solid #a7f3d0;color:#065f46{% endif %};border-radius:10px;padding:0.85rem 1.1rem;margin-bottom:1.25rem;font-size:0.88rem;display:flex;align-items:center;gap:0.6rem;">
+      <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% else %}check-circle{% endif %}"></i>{{ m }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Top bar -->
+    <div class="sa-topbar" data-aos="fade-up">
+      <div>
+        <div class="sa-topbar-title">
+          <i class="fas fa-crown me-2" style="color:var(--nhea-gold);font-size:1.3rem;"></i>
+          Superadmin Control Center
+        </div>
+        <p style="color:var(--nhea-muted);font-size:0.85rem;margin:0;">Full system authority — NHEA {% now "Y" %}</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <span style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:0.4rem 0.9rem;border-radius:50px;font-size:0.8rem;font-weight:600;">
+          <span class="online-dot" style="display:inline-block;margin-right:0.3rem;"></span>System Online
+        </span>
+        <a href="{% url 'create_admin' %}" class="btn-nhea-gold">
+          <i class="fas fa-user-plus me-1"></i>New Admin
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="sa-stats" data-aos="fade-up">
+      <div class="sa-stat green">
+        <div class="sa-stat-icon"><i class="fas fa-vote-yea"></i></div>
+        <div class="sa-stat-val">{{ total_votes }}</div>
+        <div class="sa-stat-lbl">Votes Cast</div>
+      </div>
+      <div class="sa-stat gold">
+        <div class="sa-stat-icon"><i class="fas fa-users"></i></div>
+        <div class="sa-stat-val">{{ total_voters }}</div>
+        <div class="sa-stat-lbl">Registered Voters</div>
+      </div>
+      <div class="sa-stat purple">
+        <div class="sa-stat-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="sa-stat-val">{{ total_admins }}</div>
+        <div class="sa-stat-lbl">Admin Accounts</div>
+      </div>
+      <div class="sa-stat blue">
+        <div class="sa-stat-icon"><i class="fas fa-trophy"></i></div>
+        <div class="sa-stat-val">{{ total_categories }}</div>
+        <div class="sa-stat-lbl">Categories</div>
+      </div>
+      <div class="sa-stat red">
+        <div class="sa-stat-icon"><i class="fas fa-user-tie"></i></div>
+        <div class="sa-stat-val">{{ total_nominees }}</div>
+        <div class="sa-stat-lbl">Nominees</div>
+      </div>
+    </div>
+
+    <!-- Admin Accounts Table -->
+    <div class="sa-section-title" data-aos="fade-up"><i class="fas fa-user-shield" style="color:var(--nhea-green);"></i>Admin Accounts</div>
+    <div class="sa-table-card" data-aos="fade-up">
+      <div class="sa-table-head">
+        <h6><i class="fas fa-list me-2" style="color:var(--nhea-green);"></i>All Staff Admins</h6>
+        <a href="{% url 'create_admin' %}" class="btn-nhea-gold" style="padding:0.45rem 1rem;font-size:0.82rem;">
+          <i class="fas fa-plus me-1"></i>Create Admin
+        </a>
+      </div>
+      {% if admins %}
+      <div style="overflow-x:auto;">
+        <table class="sa-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Name</th><th>Voter ID</th><th>Role / Permissions</th>
+              <th>Email</th><th>Org</th><th>Password</th><th>Created By</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for admin in admins %}
+            <tr>
+              <td style="color:var(--nhea-muted);">{{ forloop.counter }}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:0.6rem;">
+                  <div class="avatar-sm">{{ admin.full_name|first }}</div>
+                  <span style="font-weight:600;">{{ admin.full_name }}</span>
+                </div>
+              </td>
+              <td><code style="background:#f0f7f4;padding:0.15rem 0.45rem;border-radius:4px;color:var(--nhea-green);font-size:0.8rem;">{{ admin.voter_id }}</code></td>
+              <td>
+                {% if admin.admin_role %}
+                <span class="role-pill role-{{ admin.admin_role }}">
+                  <i class="fas fa-{% if admin.admin_role == 'full_admin' %}crown{% elif admin.admin_role == 'voter_manager' %}users{% elif admin.admin_role == 'nominee_manager' %}user-tie{% else %}chart-bar{% endif %}"></i>
+                  {{ admin.get_admin_role_display }}
+                </span>
+                {% else %}
+                <span style="color:var(--nhea-muted);font-size:0.82rem;">—</span>
+                {% endif %}
+              </td>
+              <td>{{ admin.email|default:"—" }}</td>
+              <td>{{ admin.organization|default:"—" }}</td>
+              <td>
+                {% if admin.must_change_password %}
+                <span class="badge-must-change"><i class="fas fa-exclamation-circle me-1"></i>Must Change</span>
+                {% else %}
+                <span class="badge-ok"><i class="fas fa-check-circle me-1"></i>Set</span>
+                {% endif %}
+              </td>
+              <td>{{ admin.created_by.full_name|default:"System" }}</td>
+              <td>
+                <form method="post" action="{% url 'manage_admins' %}" style="display:inline;"
+                      onsubmit="return confirm('Remove admin {{ admin.full_name }}?')">
+                  {% csrf_token %}
+                  <input type="hidden" name="delete_admin_id" value="{{ admin.id }}">
+                  <button type="submit" class="btn-del-sm"><i class="fas fa-trash-alt"></i></button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:3rem;color:var(--nhea-muted);">
+        <i class="fas fa-user-slash" style="font-size:2.5rem;display:block;margin-bottom:1rem;"></i>
+        No admin accounts yet.
+        <a href="{% url 'create_admin' %}" style="color:var(--nhea-green);font-weight:600;"> Create the first one →</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Role distribution -->
+    <div class="sa-section-title" data-aos="fade-up"><i class="fas fa-sitemap" style="color:var(--nhea-green);"></i>Role Distribution</div>
+    <div class="role-dist-grid" data-aos="fade-up">
+      {% for role_label, count in role_counts.items %}
+      <div class="role-dist-card">
+        <div class="role-dist-num">{{ count }}</div>
+        <div class="role-dist-lbl">{{ role_label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="sa-section-title" data-aos="fade-up"><i class="fas fa-bolt" style="color:var(--nhea-green);"></i>Quick Actions</div>
+    <div class="sa-action-grid" data-aos="fade-up">
+      <a href="{% url 'manage_admins' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-user-shield"></i></div>
+        <div><div class="sa-action-label">Manage Admins</div><div class="sa-action-sub">Create & remove accounts</div></div>
+      </a>
+      <a href="{% url 'list_voters' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:var(--gradient-hero);"><i class="fas fa-users"></i></div>
+        <div><div class="sa-action-label">Voters</div><div class="sa-action-sub">View & manage delegates</div></div>
+      </a>
+      <a href="{% url 'list_nominees' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:var(--gradient-gold);color:var(--nhea-dark);"><i class="fas fa-user-tie"></i></div>
+        <div><div class="sa-action-label">Nominees</div><div class="sa-action-sub">Add or remove</div></div>
+      </a>
+      <a href="{% url 'manage_categories' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><i class="fas fa-layer-group"></i></div>
+        <div><div class="sa-action-label">Categories</div><div class="sa-action-sub">Award categories</div></div>
+      </a>
+      <a href="{% url 'live_vote_count' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-chart-bar"></i></div>
+        <div><div class="sa-action-label">Live Results</div><div class="sa-action-sub">Real-time tallies</div></div>
+      </a>
+      <a href="{% url 'voting_analytics' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:linear-gradient(135deg,#be185d,#ec4899);"><i class="fas fa-globe-africa"></i></div>
+        <div><div class="sa-action-label">Analytics</div><div class="sa-action-sub">Geo & charts</div></div>
+      </a>
+      <a href="{% url 'activity_log' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><i class="fas fa-clipboard-list"></i></div>
+        <div><div class="sa-action-label">Audit Log</div><div class="sa-action-sub">All platform actions</div></div>
+      </a>
+      <a href="{% url 'add_nominee' %}" class="sa-action-card">
+        <div class="sa-action-icon" style="background:linear-gradient(135deg,#0a4f3c,#1a7a5e);"><i class="fas fa-plus-circle"></i></div>
+        <div><div class="sa-action-label">Add Nominee</div><div class="sa-action-sub">Register new nominee</div></div>
+      </a>
+    </div>
+
+    <!-- Recent Activity -->
+    {% if recent_logs %}
+    <div class="sa-section-title" data-aos="fade-up"><i class="fas fa-history" style="color:var(--nhea-green);"></i>Recent Activity</div>
+    <div class="sa-activity-card" data-aos="fade-up">
+      <div class="sa-activity-head">
+        <h6 style="margin:0;font-weight:700;color:var(--nhea-text);"><i class="fas fa-stream me-2" style="color:var(--nhea-green);"></i>Latest Actions</h6>
+        <a href="{% url 'activity_log' %}" style="color:var(--nhea-green);font-size:0.82rem;font-weight:600;text-decoration:none;">View full log →</a>
+      </div>
+      {% for log in recent_logs %}
+      <div class="log-row">
+        <div class="log-dot"></div>
+        <div>
+          <div class="log-text">{{ log.description|default:log.get_action_display }}</div>
+          <div class="log-meta">
+            {% if log.actor %}{{ log.actor.full_name }} · {% endif %}
+            {{ log.timestamp|date:"d M Y H:i" }}
+            {% if log.country %} · {{ log.city }}, {{ log.country }}{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Danger Zone -->
+    <div class="danger-zone" data-aos="fade-up">
+      <div class="danger-zone-title"><i class="fas fa-skull-crossbones me-2"></i>Danger Zone</div>
+      <div class="danger-zone-sub">Critical, irreversible operations. Only proceed if you are absolutely certain.</div>
+      <a href="{% url 'reset_all' %}" class="btn-danger"
+         onclick="return confirm('FINAL WARNING: Reset ALL votes? This is permanent and cannot be undone.')">
+        <i class="fas fa-trash-alt me-2"></i>Reset All Votes
+      </a>
+    </div>
+
+  </main>
+</div>
+{% endblock %}

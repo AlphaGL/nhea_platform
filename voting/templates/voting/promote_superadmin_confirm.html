@@ -1,0 +1,96 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Promote to Superadmin{% endblock %}
+{% block header %}Promote Admin{% endblock %}
+{% block body %}
+<style>
+.ps-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);display:flex;align-items:center;padding:3rem 1rem;}
+.ps-card{background:#fff;border-radius:20px;box-shadow:0 12px 50px rgba(180,83,9,0.15);border:2px solid #fde68a;max-width:520px;width:100%;margin:0 auto;overflow:hidden;}
+.ps-card-top{background:linear-gradient(135deg,#92400e,#f59e0b);padding:2.5rem 2rem;text-align:center;}
+.ps-icon{width:80px;height:80px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:2rem;color:#fff;}
+.ps-card-top h3{color:#fff;font-size:1.7rem;margin-bottom:0.25rem;}
+.ps-card-top p{color:rgba(255,255,255,0.75);font-size:0.9rem;margin:0;}
+.ps-card-body{padding:2rem;}
+.admin-preview{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;}
+.admin-avatar{width:52px;height:52px;background:var(--gradient-hero);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;font-weight:700;flex-shrink:0;}
+.admin-name{font-weight:700;color:var(--nhea-text);font-size:1rem;}
+.admin-meta{font-size:0.82rem;color:var(--nhea-muted);}
+.danger-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.85rem;color:#7f1d1d;line-height:1.7;}
+.danger-box strong{display:block;margin-bottom:0.35rem;font-size:0.9rem;}
+.danger-box ul{margin:0;padding-left:1.25rem;}
+.danger-box li{margin-bottom:0.2rem;}
+.confirm-check{display:flex;align-items:flex-start;gap:0.75rem;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.5rem;cursor:pointer;}
+.confirm-check input[type=checkbox]{width:18px;height:18px;margin-top:2px;accent-color:#d97706;flex-shrink:0;cursor:pointer;}
+.confirm-check label{font-size:0.88rem;color:#92400e;font-weight:600;cursor:pointer;line-height:1.5;}
+.btn-promote-confirm{width:100%;padding:1rem;background:linear-gradient(135deg,#92400e,#f59e0b);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.3s;box-shadow:0 6px 20px rgba(180,83,9,0.3);}
+.btn-promote-confirm:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(180,83,9,0.4);}
+.btn-promote-confirm:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.btn-cancel{display:block;text-align:center;margin-top:1rem;color:var(--nhea-green);font-weight:600;font-size:0.88rem;text-decoration:none;}
+.btn-cancel:hover{text-decoration:underline;}
+</style>
+
+<section class="ps-section">
+<div class="container">
+<div class="ps-card" data-aos="fade-up">
+
+    <div class="ps-card-top">
+        <div class="ps-icon"><i class="fas fa-crown"></i></div>
+        <h3>Promote to Superadmin</h3>
+        <p>This grants unrestricted access to the entire platform</p>
+    </div>
+
+    <div class="ps-card-body">
+
+        <!-- Admin preview -->
+        <div class="admin-preview">
+            <div class="admin-avatar">{{ admin_user.full_name|first }}</div>
+            <div>
+                <div class="admin-name">{{ admin_user.full_name }}</div>
+                <div class="admin-meta">
+                    <code style="background:#f0f7f4;padding:0.15rem 0.4rem;border-radius:4px;color:var(--nhea-green);font-size:0.8rem;">{{ admin_user.voter_id }}</code>
+                    {% if admin_user.organization %}&nbsp;·&nbsp;{{ admin_user.organization }}{% endif %}
+                </div>
+                {% if admin_user.admin_role %}
+                <div class="admin-meta mt-1">
+                    Current role: <strong>{{ admin_user.get_admin_role_display }}</strong>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Danger notice -->
+        <div class="danger-box">
+            <strong><i class="fas fa-exclamation-triangle me-1"></i>What this action does:</strong>
+            <ul>
+                <li>Grants <strong>full, unrestricted</strong> platform control — equal to your own access level</li>
+                <li>Allows this admin to <strong>create, edit, and delete</strong> other admin accounts</li>
+                <li>Allows this admin to <strong>reset all votes</strong> and access all analytics</li>
+                <li>Their existing role restrictions will be <strong>removed</strong></li>
+                <li>This <strong>cannot be reversed</strong> from this interface — only via the Django admin panel</li>
+            </ul>
+        </div>
+
+        <!-- Confirm form -->
+        <form method="post" id="promoteForm">
+            {% csrf_token %}
+            <div class="confirm-check">
+                <input type="checkbox" name="confirm_promote" id="confirmCheck"
+                       onchange="document.getElementById('promoteBtn').disabled = !this.checked;">
+                <label for="confirmCheck">
+                    I understand the implications. I confirm I want to promote
+                    <strong>{{ admin_user.full_name }}</strong> to Superadmin with full platform control.
+                </label>
+            </div>
+
+            <button type="submit" id="promoteBtn" class="btn-promote-confirm" disabled>
+                <i class="fas fa-crown me-2"></i>Yes, Promote to Superadmin
+            </button>
+        </form>
+
+        <a href="{% url 'manage_admins' %}" class="btn-cancel">
+            <i class="fas fa-times me-1"></i>Cancel – Go Back to Admin List
+        </a>
+    </div>
+</div>
+</div>
+</section>
+{% endblock %}

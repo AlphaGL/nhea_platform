@@ -4,251 +4,245 @@
 
 {% block body %}
 <style>
-    .dashboard-section {
-        background: linear-gradient(160deg, #f0f7f4 0%, #fdf8f0 100%);
-        min-height: calc(100vh - 220px);
-        padding: 3rem 0 5rem;
-    }
-    .dash-hero {
-        background: var(--gradient-hero);
-        border-radius: 20px;
-        padding: 2.5rem 2rem;
-        color: #fff;
-        margin-bottom: 2.5rem;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 12px 40px rgba(10,79,60,0.2);
-    }
-    .dash-hero::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a84c' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/svg%3E") repeat;
-    }
-    .dash-hero-title { font-size: 2.5rem; color: #fff; position: relative; z-index: 2; margin-bottom: 0.5rem; }
-    .dash-hero-sub { color: rgba(255,255,255,0.7); position: relative; z-index: 2; font-size: 0.95rem; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-    .stat-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 1.75rem;
-        border: 1px solid var(--nhea-border);
-        box-shadow: 0 4px 20px rgba(10,79,60,0.06);
-        position: relative; overflow: hidden;
-        transition: all 0.35s ease;
-    }
-    .stat-card:hover { transform: translateY(-6px); box-shadow: 0 16px 50px rgba(10,79,60,0.12); }
-    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-gold); }
-    .stat-icon-box { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; font-size: 1.3rem; color: #fff; background: var(--gradient-hero); }
-    .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 700; color: var(--nhea-text); line-height: 1; margin-bottom: 0.35rem; }
-    .stat-label { font-size: 0.8rem; font-weight: 600; color: var(--nhea-muted); text-transform: uppercase; letter-spacing: 0.8px; }
-    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--nhea-text); margin-bottom: 1rem; }
-    .quick-links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
-    .quick-link-card {
-        background: #fff;
-        border-radius: 14px;
-        padding: 1.5rem;
-        border: 1px solid var(--nhea-border);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        transition: all 0.3s;
-        box-shadow: 0 2px 10px rgba(10,79,60,0.05);
-    }
-    .quick-link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(10,79,60,0.12); border-color: var(--nhea-green); text-decoration: none; }
-    .quick-link-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #fff; flex-shrink: 0; }
-    .quick-link-label { font-weight: 600; font-size: 0.9rem; color: var(--nhea-text); line-height: 1.3; }
-    .quick-link-sub { font-size: 0.78rem; color: var(--nhea-muted); }
-    /* Superadmin-only section */
-    .superadmin-section { border: 2px solid rgba(201,168,76,0.4); border-radius: 16px; padding: 1.5rem; margin-bottom: 2.5rem; background: rgba(201,168,76,0.04); }
-    .superadmin-label { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: #92400e; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1rem; }
-    /* Recent activity */
-    .activity-card { background: #fff; border-radius: 16px; border: 1px solid var(--nhea-border); box-shadow: 0 4px 20px rgba(10,79,60,0.06); overflow: hidden; margin-bottom: 2.5rem; }
-    .activity-header { background: #f8fdf9; padding: 1rem 1.5rem; border-bottom: 1px solid var(--nhea-border); display: flex; justify-content: space-between; align-items: center; }
-    .activity-header h6 { margin: 0; font-weight: 700; color: var(--nhea-text); }
-    .log-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 1.5rem; border-bottom: 1px solid #f0f7f4; }
-    .log-row:last-child { border-bottom: none; }
-    .log-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--nhea-green); flex-shrink: 0; margin-top: 0.35rem; }
-    .log-text { font-size: 0.87rem; color: var(--nhea-text); line-height: 1.4; }
-    .log-meta-sm { font-size: 0.77rem; color: var(--nhea-muted); }
-    .actions-card { background: #fff; border-radius: 16px; padding: 2rem; border: 1px solid var(--nhea-border); box-shadow: 0 4px 20px rgba(10,79,60,0.06); text-align: center; }
-    .actions-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--nhea-text); margin-bottom: 0.5rem; }
-    .actions-card-subtitle { color: var(--nhea-muted); font-size: 0.9rem; margin-bottom: 2rem; max-width: 450px; margin-left: auto; margin-right: auto; }
+.ad-section{background:linear-gradient(160deg,#f0f7f4 0%,#fdf8f0 100%);min-height:calc(100vh - 220px);padding:2.5rem 0 5rem;}
+
+/* ── Welcome banner ──────────────────────────────────────── */
+.ad-welcome{background:var(--gradient-hero);border-radius:20px;padding:2rem 2rem;color:#fff;margin-bottom:2rem;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(10,79,60,0.18);}
+.ad-welcome::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a84c' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/svg%3E") repeat;}
+.ad-welcome-inner{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.ad-welcome-name{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:#fff;margin-bottom:0.25rem;}
+.ad-welcome-sub{color:rgba(255,255,255,0.65);font-size:0.88rem;}
+.ad-role-chip{display:inline-flex;align-items:center;gap:0.45rem;background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.45);color:var(--nhea-gold-light);padding:0.4rem 1rem;border-radius:50px;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* ── Stats ───────────────────────────────────────────────── */
+.ad-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:1.25rem;margin-bottom:2rem;}
+.ad-stat{background:#fff;border-radius:16px;padding:1.4rem;border:1px solid var(--nhea-border);box-shadow:0 4px 18px rgba(10,79,60,0.06);position:relative;overflow:hidden;transition:all 0.3s;}
+.ad-stat:hover{transform:translateY(-5px);box-shadow:0 14px 40px rgba(10,79,60,0.1);}
+.ad-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-gold);}
+.ad-stat-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;margin-bottom:0.85rem;background:var(--gradient-hero);}
+.ad-stat-val{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;color:var(--nhea-text);line-height:1;}
+.ad-stat-lbl{font-size:0.74rem;font-weight:600;color:var(--nhea-muted);text-transform:uppercase;letter-spacing:0.6px;margin-top:0.25rem;}
+
+/* ── Permission notice ───────────────────────────────────── */
+.perm-notice{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:2rem;font-size:0.86rem;color:#92400e;line-height:1.6;}
+.perm-notice i{color:#d97706;flex-shrink:0;margin-top:0.1rem;}
+
+/* ── Section title ───────────────────────────────────────── */
+.ad-section-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--nhea-text);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.ad-section-title::after{content:'';flex:1;height:1px;background:var(--nhea-border);}
+
+/* ── Action grid ─────────────────────────────────────────── */
+.ad-action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;}
+.ad-action-card{background:#fff;border:1px solid var(--nhea-border);border-radius:14px;padding:1.35rem;display:flex;align-items:center;gap:0.9rem;text-decoration:none;transition:all 0.3s;box-shadow:0 2px 10px rgba(10,79,60,0.04);}
+.ad-action-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(10,79,60,0.1);border-color:var(--nhea-green);text-decoration:none;}
+.ad-action-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;}
+.ad-action-label{font-weight:600;font-size:0.88rem;color:var(--nhea-text);line-height:1.2;}
+.ad-action-sub{font-size:0.75rem;color:var(--nhea-muted);}
+.ad-action-card.locked{opacity:0.45;pointer-events:none;filter:grayscale(0.6);}
+
+/* ── Activity card ───────────────────────────────────────── */
+.ad-activity-card{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 18px rgba(10,79,60,0.06);overflow:hidden;}
+.ad-activity-head{background:#f8fdf9;padding:1rem 1.5rem;border-bottom:1px solid var(--nhea-border);display:flex;justify-content:space-between;align-items:center;}
+.log-row{display:flex;align-items:flex-start;gap:0.85rem;padding:0.8rem 1.5rem;border-bottom:1px solid #f0f7f4;}
+.log-row:last-child{border-bottom:none;}
+.log-dot{width:7px;height:7px;border-radius:50%;background:var(--nhea-green);flex-shrink:0;margin-top:0.38rem;}
+.log-text{font-size:0.86rem;color:var(--nhea-text);}
+.log-meta{font-size:0.76rem;color:var(--nhea-muted);}
+
+/* ── Permission matrix ───────────────────────────────────── */
+.perm-matrix{background:#fff;border-radius:16px;border:1px solid var(--nhea-border);box-shadow:0 4px 18px rgba(10,79,60,0.06);overflow:hidden;margin-bottom:2rem;}
+.perm-matrix-head{background:#f8fdf9;padding:1rem 1.5rem;border-bottom:1px solid var(--nhea-border);}
+.perm-matrix-head h6{margin:0;font-weight:700;color:var(--nhea-text);}
+.perm-list{padding:1.25rem 1.5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;}
+.perm-item{display:flex;align-items:center;gap:0.6rem;font-size:0.86rem;}
+.perm-item .perm-tick{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;}
+.perm-item .perm-tick.yes{background:#ecfdf5;color:#059669;}
+.perm-item .perm-tick.no{background:#fef2f2;color:#dc2626;}
 </style>
 
-<section class="dashboard-section">
-    <div class="container">
+<section class="ad-section">
+<div class="container">
 
-        <!-- Hero -->
-        <div class="dash-hero" data-aos="fade-up">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2 class="dash-hero-title">
-                        <i class="fas fa-chart-line me-2" style="color:var(--nhea-gold-light);"></i>
-                        NHEA Control Center
-                    </h2>
-                    <p class="dash-hero-sub">Manage voting, nominees, categories and system operations from here.</p>
-                </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <span style="background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.4);color:var(--nhea-gold-light);padding:0.5rem 1.25rem;border-radius:50px;font-size:0.82rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">
-                        <i class="fas fa-circle me-1" style="font-size:0.5rem;vertical-align:middle;color:#4ade80;"></i>
-                        System Online
-                    </span>
-                </div>
-            </div>
+  {% if messages %}
+  {% for m in messages %}
+  <div style="background:{% if 'error' in m.tags %}#fef2f2;border:1px solid #fca5a5;color:#7f1d1d{% else %}#ecfdf5;border:1px solid #a7f3d0;color:#065f46{% endif %};border-radius:10px;padding:0.85rem 1.1rem;margin-bottom:1.25rem;font-size:0.88rem;display:flex;align-items:center;gap:0.6rem;" data-aos="fade-up">
+    <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% else %}check-circle{% endif %}"></i>{{ m }}
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <!-- Welcome banner -->
+  <div class="ad-welcome" data-aos="fade-up">
+    <div class="ad-welcome-inner">
+      <div>
+        <div class="ad-welcome-name">
+          <i class="fas fa-user-shield me-2" style="color:var(--nhea-gold-light);font-size:1.3rem;"></i>
+          Welcome, {{ admin.full_name }}
         </div>
-
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card" data-aos="fade-up" data-aos-delay="50">
-                <div class="stat-icon-box"><i class="fas fa-vote-yea"></i></div>
-                <div class="stat-value">{{ total_votes }}</div>
-                <div class="stat-label">Total Votes Cast</div>
-            </div>
-            <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="stat-icon-box"><i class="fas fa-users"></i></div>
-                <div class="stat-value">{{ total_voters }}</div>
-                <div class="stat-label">Registered Voters</div>
-            </div>
-            <div class="stat-card" data-aos="fade-up" data-aos-delay="150">
-                <div class="stat-icon-box"><i class="fas fa-trophy"></i></div>
-                <div class="stat-value">{{ total_categories }}</div>
-                <div class="stat-label">Award Categories</div>
-            </div>
-            <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
-                <div class="stat-icon-box"><i class="fas fa-user-tie"></i></div>
-                <div class="stat-value">{{ total_nominees }}</div>
-                <div class="stat-label">Total Nominees</div>
-            </div>
-            <div class="stat-card" data-aos="fade-up" data-aos-delay="250">
-                <div class="stat-icon-box" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-user-shield"></i></div>
-                <div class="stat-value">{{ total_admins }}</div>
-                <div class="stat-label">Admin Accounts</div>
-            </div>
-        </div>
-
-        <!-- Superadmin-only section -->
-        {% if request.user.is_superuser %}
-        <div class="superadmin-section" data-aos="fade-up">
-            <div class="superadmin-label"><i class="fas fa-crown"></i>Superadmin Controls</div>
-            <div class="quick-links-grid" style="margin-bottom:0;">
-                <a href="{% url 'manage_admins' %}" class="quick-link-card">
-                    <div class="quick-link-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-user-shield"></i></div>
-                    <div>
-                        <div class="quick-link-label">Manage Admins</div>
-                        <div class="quick-link-sub">Create & remove admin accounts</div>
-                    </div>
-                </a>
-                <a href="{% url 'create_admin' %}" class="quick-link-card">
-                    <div class="quick-link-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><i class="fas fa-user-plus"></i></div>
-                    <div>
-                        <div class="quick-link-label">Create New Admin</div>
-                        <div class="quick-link-sub">Assign admin privileges</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Quick Links -->
-        <h5 class="section-title" data-aos="fade-up">Quick Actions</h5>
-        <div class="quick-links-grid">
-            <a href="{% url 'list_voters' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="50">
-                <div class="quick-link-icon" style="background:var(--gradient-hero);"><i class="fas fa-users"></i></div>
-                <div>
-                    <div class="quick-link-label">Manage Voters</div>
-                    <div class="quick-link-sub">View & delete voter accounts</div>
-                </div>
-            </a>
-            <a href="{% url 'list_nominees' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#0a2a1e;"><i class="fas fa-user-tie"></i></div>
-                <div>
-                    <div class="quick-link-label">Manage Nominees</div>
-                    <div class="quick-link-sub">Add or remove nominees</div>
-                </div>
-            </a>
-            <a href="{% url 'manage_categories' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="150">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-list"></i></div>
-                <div>
-                    <div class="quick-link-label">Award Categories</div>
-                    <div class="quick-link-sub">Create & manage categories</div>
-                </div>
-            </a>
-            <a href="{% url 'live_vote_count' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="200">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><i class="fas fa-chart-bar"></i></div>
-                <div>
-                    <div class="quick-link-label">Live Results</div>
-                    <div class="quick-link-sub">Real-time vote tallies</div>
-                </div>
-            </a>
-            <a href="{% url 'voting_analytics' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="250">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#dc2626,#f87171);"><i class="fas fa-globe-africa"></i></div>
-                <div>
-                    <div class="quick-link-label">Vote Analytics</div>
-                    <div class="quick-link-sub">Charts, maps & location data</div>
-                </div>
-            </a>
-            <a href="{% url 'activity_log' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="300">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-clipboard-list"></i></div>
-                <div>
-                    <div class="quick-link-label">Activity Log</div>
-                    <div class="quick-link-sub">Full platform audit trail</div>
-                </div>
-            </a>
-            <a href="{% url 'self_register' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="350">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-user-plus"></i></div>
-                <div>
-                    <div class="quick-link-label">Register Voter</div>
-                    <div class="quick-link-sub">Add a new delegate</div>
-                </div>
-            </a>
-            <a href="{% url 'add_nominee' %}" class="quick-link-card" data-aos="fade-up" data-aos-delay="400">
-                <div class="quick-link-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><i class="fas fa-plus-circle"></i></div>
-                <div>
-                    <div class="quick-link-label">Add Nominee</div>
-                    <div class="quick-link-sub">Register a new nominee</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Recent Activity -->
-        {% if recent_logs %}
-        <h5 class="section-title" data-aos="fade-up">Recent Activity</h5>
-        <div class="activity-card" data-aos="fade-up">
-            <div class="activity-header">
-                <h6><i class="fas fa-history me-2" style="color:var(--nhea-green);"></i>Latest Platform Actions</h6>
-                <a href="{% url 'activity_log' %}" style="font-size:0.83rem;color:var(--nhea-green);font-weight:600;text-decoration:none;">View Full Log →</a>
-            </div>
-            {% for log in recent_logs %}
-            <div class="log-row">
-                <div class="log-dot"></div>
-                <div style="flex:1;">
-                    <div class="log-text">{{ log.description|default:log.get_action_display }}</div>
-                    <div class="log-meta-sm">
-                        {% if log.actor %}{{ log.actor.full_name }} · {% endif %}
-                        {{ log.timestamp|date:"d M Y H:i" }}
-                        {% if log.country %} · {{ log.city }}, {{ log.country }}{% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <!-- Reset Action -->
-        <div class="actions-card" data-aos="fade-up">
-            <h4 class="actions-card-title">⚠ System Actions</h4>
-            <p class="actions-card-subtitle">
-                Perform critical system operations with extreme care. These actions cannot be undone.
-            </p>
-            <a href="{% url 'reset_all' %}" class="btn-nhea-danger"
-               onclick="return confirm('Are you absolutely sure you want to reset ALL votes? This is irreversible.')">
-                <i class="fas fa-exclamation-triangle"></i>
-                Reset All Votes
-            </a>
-        </div>
-
+        <div class="ad-welcome-sub">{{ admin.organization|default:"NHEA Administrative Panel" }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;">
+        <span class="ad-role-chip">
+          <i class="fas fa-{% if admin.admin_role == 'full_admin' %}crown{% elif admin.admin_role == 'voter_manager' %}users{% elif admin.admin_role == 'nominee_manager' %}user-tie{% else %}chart-bar{% endif %}"></i>
+          {{ admin.get_role_display_name }}
+        </span>
+        <span style="color:rgba(255,255,255,0.5);font-size:0.78rem;"><i class="fas fa-id-badge me-1"></i>{{ admin.voter_id }}</span>
+      </div>
     </div>
+  </div>
+
+  <!-- Permission notice -->
+  <div class="perm-notice" data-aos="fade-up">
+    <i class="fas fa-info-circle fa-lg"></i>
+    <span>
+      Your access is scoped to your assigned role: <strong>{{ admin.get_role_display_name }}</strong>.
+      Sections you cannot access are hidden. Contact the superadmin to adjust your permissions.
+    </span>
+  </div>
+
+  <!-- Stats -->
+  <div class="ad-stats" data-aos="fade-up">
+    <div class="ad-stat">
+      <div class="ad-stat-icon"><i class="fas fa-vote-yea"></i></div>
+      <div class="ad-stat-val">{{ total_votes }}</div>
+      <div class="ad-stat-lbl">Votes Cast</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-icon"><i class="fas fa-users"></i></div>
+      <div class="ad-stat-val">{{ total_voters }}</div>
+      <div class="ad-stat-lbl">Registered Voters</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-icon"><i class="fas fa-trophy"></i></div>
+      <div class="ad-stat-val">{{ total_categories }}</div>
+      <div class="ad-stat-lbl">Categories</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-icon"><i class="fas fa-user-tie"></i></div>
+      <div class="ad-stat-val">{{ total_nominees }}</div>
+      <div class="ad-stat-lbl">Nominees</div>
+    </div>
+  </div>
+
+  <!-- My Permissions -->
+  <div class="ad-section-title" data-aos="fade-up"><i class="fas fa-key" style="color:var(--nhea-green);"></i>My Permissions</div>
+  <div class="perm-matrix" data-aos="fade-up">
+    <div class="perm-matrix-head"><h6><i class="fas fa-shield-alt me-2" style="color:var(--nhea-green);"></i>What you can do</h6></div>
+    <div class="perm-list">
+      <div class="perm-item">
+        <div class="perm-tick {% if admin.can_manage_voters %}yes{% else %}no{% endif %}">
+          <i class="fas fa-{% if admin.can_manage_voters %}check{% else %}times{% endif %}"></i>
+        </div>
+        <span style="color:{% if admin.can_manage_voters %}var(--nhea-text){% else %}var(--nhea-muted){% endif %};">Register / delete voters</span>
+      </div>
+      <div class="perm-item">
+        <div class="perm-tick {% if admin.can_manage_nominees %}yes{% else %}no{% endif %}">
+          <i class="fas fa-{% if admin.can_manage_nominees %}check{% else %}times{% endif %}"></i>
+        </div>
+        <span style="color:{% if admin.can_manage_nominees %}var(--nhea-text){% else %}var(--nhea-muted){% endif %};">Add / remove nominees & categories</span>
+      </div>
+      <div class="perm-item">
+        <div class="perm-tick {% if admin.can_view_results %}yes{% else %}no{% endif %}">
+          <i class="fas fa-{% if admin.can_view_results %}check{% else %}times{% endif %}"></i>
+        </div>
+        <span style="color:{% if admin.can_view_results %}var(--nhea-text){% else %}var(--nhea-muted){% endif %};">View live results & analytics</span>
+      </div>
+      <div class="perm-item">
+        <div class="perm-tick {% if admin.can_reset_votes %}yes{% else %}no{% endif %}">
+          <i class="fas fa-{% if admin.can_reset_votes %}check{% else %}times{% endif %}"></i>
+        </div>
+        <span style="color:{% if admin.can_reset_votes %}var(--nhea-text){% else %}var(--nhea-muted){% endif %};">Reset all votes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Available Actions -->
+  <div class="ad-section-title" data-aos="fade-up"><i class="fas fa-bolt" style="color:var(--nhea-green);"></i>Available Actions</div>
+  <div class="ad-action-grid" data-aos="fade-up">
+
+    {% if admin.can_manage_voters %}
+    <a href="{% url 'list_voters' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:var(--gradient-hero);"><i class="fas fa-users"></i></div>
+      <div><div class="ad-action-label">Manage Voters</div><div class="ad-action-sub">View & delete delegates</div></div>
+    </a>
+    <a href="{% url 'self_register' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-user-plus"></i></div>
+      <div><div class="ad-action-label">Register Voter</div><div class="ad-action-sub">Add a new delegate</div></div>
+    </a>
+    {% endif %}
+
+    {% if admin.can_manage_nominees %}
+    <a href="{% url 'list_nominees' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:var(--gradient-gold);color:var(--nhea-dark);"><i class="fas fa-user-tie"></i></div>
+      <div><div class="ad-action-label">Nominees</div><div class="ad-action-sub">Add or remove nominees</div></div>
+    </a>
+    <a href="{% url 'add_nominee' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b);"><i class="fas fa-plus-circle"></i></div>
+      <div><div class="ad-action-label">Add Nominee</div><div class="ad-action-sub">Register new nominee</div></div>
+    </a>
+    <a href="{% url 'manage_categories' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><i class="fas fa-layer-group"></i></div>
+      <div><div class="ad-action-label">Categories</div><div class="ad-action-sub">Award categories</div></div>
+    </a>
+    {% endif %}
+
+    {% if admin.can_view_results %}
+    <a href="{% url 'live_vote_count' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);"><i class="fas fa-chart-bar"></i></div>
+      <div><div class="ad-action-label">Live Results</div><div class="ad-action-sub">Real-time tallies</div></div>
+    </a>
+    <a href="{% url 'voting_analytics' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:linear-gradient(135deg,#dc2626,#f87171);"><i class="fas fa-globe-africa"></i></div>
+      <div><div class="ad-action-label">Analytics</div><div class="ad-action-sub">Charts & geo data</div></div>
+    </a>
+    {% endif %}
+
+    <!-- Activity log available to all admins -->
+    <a href="{% url 'activity_log' %}" class="ad-action-card">
+      <div class="ad-action-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-clipboard-list"></i></div>
+      <div><div class="ad-action-label">Audit Log</div><div class="ad-action-sub">Platform activity</div></div>
+    </a>
+
+    {% if admin.can_reset_votes %}
+    <a href="{% url 'reset_all' %}" class="ad-action-card" style="border-color:#fca5a5;"
+       onclick="return confirm('Are you sure you want to reset ALL votes?')">
+      <div class="ad-action-icon" style="background:linear-gradient(135deg,#c0392b,#e74c3c);"><i class="fas fa-exclamation-triangle"></i></div>
+      <div><div class="ad-action-label" style="color:#dc2626;">Reset Votes</div><div class="ad-action-sub">Irreversible action</div></div>
+    </a>
+    {% endif %}
+
+  </div>
+
+  <!-- Recent Activity -->
+  {% if recent_logs %}
+  <div class="ad-section-title" data-aos="fade-up"><i class="fas fa-history" style="color:var(--nhea-green);"></i>Recent Activity</div>
+  <div class="ad-activity-card" data-aos="fade-up">
+    <div class="ad-activity-head">
+      <h6 style="margin:0;font-weight:700;color:var(--nhea-text);font-size:0.92rem;"><i class="fas fa-stream me-2" style="color:var(--nhea-green);"></i>Latest Platform Actions</h6>
+      <a href="{% url 'activity_log' %}" style="color:var(--nhea-green);font-size:0.82rem;font-weight:600;text-decoration:none;">View full log →</a>
+    </div>
+    {% for log in recent_logs %}
+    <div class="log-row">
+      <div class="log-dot"></div>
+      <div>
+        <div class="log-text">{{ log.description|default:log.get_action_display }}</div>
+        <div class="log-meta">
+          {% if log.actor %}{{ log.actor.full_name }} · {% endif %}
+          {{ log.timestamp|date:"d M Y H:i" }}
+          {% if log.country %} · {{ log.city }}, {{ log.country }}{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="text-center mt-4" data-aos="fade-up">
+    <a href="{% url 'logout' %}" style="color:var(--nhea-muted);font-size:0.88rem;text-decoration:none;font-weight:600;">
+      <i class="fas fa-sign-out-alt me-1"></i>Sign Out
+    </a>
+  </div>
+
+</div>
 </section>
 {% endblock %}

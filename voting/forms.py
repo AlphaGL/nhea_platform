@@ -192,9 +192,15 @@ class EmailOTPVerifyForm(forms.Form):
 
 class AdminCreationForm(forms.ModelForm):
     """
-    Used by the superadmin to create a new admin account.
+    Used by the superadmin to create a new admin account with a specific role.
     The superadmin sets the initial password; admin must change it on first login.
     """
+    admin_role = forms.ChoiceField(
+        label="Admin Role / Permissions",
+        choices=Voter.ROLE_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'role-radio'}),
+        help_text="Controls which parts of the platform this admin can access.",
+    )
     initial_password = forms.CharField(
         label="Initial Password",
         widget=forms.PasswordInput(attrs={'placeholder': 'Temporary password'}),
@@ -243,6 +249,7 @@ class AdminCreationForm(forms.ModelForm):
         voter.set_password(self.cleaned_data['initial_password'])
         voter.is_admin = True
         voter.is_staff = True
+        voter.admin_role = self.cleaned_data['admin_role']
         voter.must_change_password = True
         voter.is_phone_verified = True   # admin accounts skip OTP verification
         voter.is_email_verified = True

@@ -17,8 +17,6 @@ def generate_voter_id():
             suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
             candidate = f"NHEA-{year}-{suffix}"
     except (OperationalError, ProgrammingError):
-        # Table doesn't exist yet (e.g. during initial makemigrations/migrate).
-        # The uniqueness check will happen once the DB is set up.
         pass
     return candidate
 
@@ -58,6 +56,15 @@ class VoterManager(BaseUserManager):
 
 class Voter(AbstractBaseUser):
     """A registered delegate/voter for the NHEA awards."""
+
+    # ── Admin Permission Roles ───────────────────────────────────────────────
+    ROLE_CHOICES = [
+        ('voter_manager',    'Voter Manager'),       # register/delete voters
+        ('nominee_manager',  'Nominee Manager'),     # add/remove nominees & categories
+        ('results_viewer',   'Results Viewer'),      # view live results & analytics
+        ('full_admin',       'Full Admin'),          # all of the above
+    ]
+
     voter_id = models.CharField(max_length=100, unique=True, default=generate_voter_id)
     full_name = models.CharField(max_length=255)
     organization = models.CharField(max_length=255, blank=True, null=True)
@@ -73,6 +80,10 @@ class Voter(AbstractBaseUser):
 
     # ── Admin role fields ────────────────────────────────────────────────────
     is_admin = models.BooleanField(default=False, help_text="Can manage election operations")
+    admin_role = models.CharField(
+        max_length=30, choices=ROLE_CHOICES, blank=True, null=True,
+        help_text="Specific permission set assigned by superadmin"
+    )
     must_change_password = models.BooleanField(
         default=False,
         help_text="Force password change on next login (set by superadmin)"
@@ -100,6 +111,40 @@ class Voter(AbstractBaseUser):
     def is_verified(self):
         """Voter is considered verified if phone OR email is verified."""
         return self.is_phone_verified or self.is_email_verified
+
+    # ── Role-based permission helpers ────────────────────────────────────────
+
+    def can_manage_voters(self):
+        """Can register/delete voters."""
+        if self.is_superuser:
+            return True
+        return self.admin_role in ('voter_manager', 'full_admin')
+
+    def can_manage_nominees(self):
+        """Can add/remove nominees and categories."""
+        if self.is_superuser:
+            return True
+        return self.admin_role in ('nominee_manager', 'full_admin')
+
+    def can_view_results(self):
+        """Can view live results and analytics."""
+        if self.is_superuser:
+            return True
+        return self.admin_role in ('results_viewer', 'full_admin')
+
+    def can_reset_votes(self):
+        """Only superadmin or full_admin can reset votes."""
+        if self.is_superuser:
+            return True
+        return self.admin_role == 'full_admin'
+
+    def get_role_display_name(self):
+        if self.is_superuser:
+            return 'Superadmin'
+        for code, label in self.ROLE_CHOICES:
+            if code == self.admin_role:
+                return label
+        return 'Admin'
 
     def has_voted_for_category(self, category):
         return Vote.objects.filter(voter=self, category=category).exists()

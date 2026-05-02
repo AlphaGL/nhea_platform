@@ -1,0 +1,289 @@
+{% extends 'voting/main.html' %}
+{% block title %}NHEA – Superadmin Sign In{% endblock %}
+{% block header %}Superadmin Portal{% endblock %}
+{% block body %}
+<style>
+/* ── Layout ──────────────────────────────────────────────────────── */
+.sa-section {
+  background: linear-gradient(160deg, #fffbeb 0%, #fdf8f0 50%, #f0f7f4 100%);
+  min-height: calc(100vh - 220px);
+  display: flex;
+  align-items: center;
+  padding: 3.5rem 1rem;
+}
+
+/* ── Card ────────────────────────────────────────────────────────── */
+.sa-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 16px 64px rgba(180,83,9,0.1), 0 4px 20px rgba(10,79,60,0.06);
+  border: 1px solid #fde68a;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* ── Header band ─────────────────────────────────────────────────── */
+.sa-header {
+  background: linear-gradient(135deg, #92400e 0%, #b45309 50%, #d97706 100%);
+  padding: 2.5rem 2rem 2.25rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.sa-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E") repeat;
+}
+.sa-icon {
+  width: 76px;
+  height: 76px;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.2rem;
+  font-size: 1.9rem;
+  color: #fef3c7;
+  position: relative;
+}
+.sa-header h3 {
+  color: #fff;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  margin-bottom: 0.2rem;
+  position: relative;
+}
+.sa-header p {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.85rem;
+  margin: 0;
+  position: relative;
+}
+
+/* ── Crown badge ─────────────────────────────────────────────────── */
+.sa-crown-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 50px;
+  padding: 0.35rem 1rem;
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: -1rem auto 1.5rem;
+  width: fit-content;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Body ────────────────────────────────────────────────────────── */
+.sa-body { padding: 0.5rem 2rem 2.25rem; }
+
+/* ── Fields ──────────────────────────────────────────────────────── */
+.field-group { margin-bottom: 1.3rem; }
+.field-group label {
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--nhea-text);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.field-group input {
+  width: 100%;
+  padding: 0.95rem 1.2rem;
+  border: 2px solid #fde68a;
+  border-radius: 11px;
+  background: #fffdf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.94rem;
+  transition: all 0.3s;
+  outline: none;
+  color: var(--nhea-text);
+}
+.field-group input:focus {
+  border-color: #d97706;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(217,119,6,0.12);
+}
+.field-group .errorlist {
+  list-style: none;
+  padding: 0;
+  margin: 0.35rem 0 0;
+}
+.field-group .errorlist li {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* ── Submit Button ───────────────────────────────────────────────── */
+.btn-superadmin-login {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #92400e, #d97706);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(180,83,9,0.3);
+  margin-top: 0.5rem;
+  letter-spacing: 0.3px;
+}
+.btn-superadmin-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(180,83,9,0.42);
+}
+.btn-superadmin-login:active { transform: translateY(0); }
+
+/* ── Warning Box ─────────────────────────────────────────────────── */
+.sa-warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: #92400e;
+  margin-bottom: 1.5rem;
+  line-height: 1.55;
+}
+.sa-warning i { flex-shrink: 0; margin-top: 0.1rem; color: #d97706; }
+
+/* ── Non-field errors ────────────────────────────────────────────── */
+.sa-error-box {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-size: 0.87rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ── Footer Links ────────────────────────────────────────────────── */
+.sa-footer-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.sa-footer-links a {
+  color: var(--nhea-green);
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.sa-footer-links a:hover { text-decoration: underline; }
+</style>
+
+<section class="sa-section">
+  <div class="container">
+    <div class="sa-card" data-aos="fade-up">
+
+      <!-- Header -->
+      <div class="sa-header">
+        <div class="sa-icon"><i class="fas fa-crown"></i></div>
+        <h3>Superadmin Sign In</h3>
+        <p>Full platform control · Authorised personnel only</p>
+      </div>
+
+      <!-- Crown badge -->
+      <div style="text-align:center;">
+        <span class="sa-crown-badge"><i class="fas fa-crown"></i>Superadmin Access</span>
+      </div>
+
+      <!-- Body -->
+      <div class="sa-body">
+
+        <div class="sa-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span><strong>Restricted Area.</strong> This portal grants unrestricted access to all platform functions.
+            Only the designated NHEA superadmin should proceed.</span>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="sa-error-box">
+          <i class="fas fa-exclamation-circle"></i>
+          {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+        </div>
+        {% endif %}
+
+        {% if messages %}
+        {% for m in messages %}
+        <div class="sa-error-box" style="{% if 'success' in m.tags %}background:#ecfdf5;border-color:#a7f3d0;color:#065f46;{% endif %}">
+          <i class="fas fa-{% if 'error' in m.tags %}exclamation-circle{% else %}check-circle{% endif %}"></i>{{ m }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="field-group">
+            <label><i class="fas fa-id-badge me-1" style="color:#d97706;"></i>Superadmin Voter ID</label>
+            <input type="text" name="username"
+                   placeholder="e.g. NHEA-2026-AB3XY"
+                   autocomplete="username"
+                   value="{{ form.username.value|default:'' }}"
+                   {% if form.username.errors %}style="border-color:#ef4444;"{% endif %}>
+            {% if form.username.errors %}
+            <ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+
+          <div class="field-group">
+            <label><i class="fas fa-lock me-1" style="color:#d97706;"></i>Password</label>
+            <input type="password" name="password"
+                   placeholder="Your superadmin password"
+                   autocomplete="current-password"
+                   {% if form.password.errors %}style="border-color:#ef4444;"{% endif %}>
+            {% if form.password.errors %}
+            <ul class="errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn-superadmin-login">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In as Superadmin
+          </button>
+        </form>
+
+        <div class="sa-footer-links">
+          <a href="{% url 'admin_login' %}"><i class="fas fa-user-shield me-1"></i>Admin login?</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Security note -->
+    <div style="text-align:center;margin-top:2rem;font-size:0.77rem;color:var(--nhea-muted);" data-aos="fade-up" data-aos-delay="100">
+      <i class="fas fa-lock me-1" style="color:var(--nhea-green);"></i>
+      Encrypted · Monitored · NHEA Voting Platform © {% now "Y" %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

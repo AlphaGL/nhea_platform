@@ -510,16 +510,28 @@
                         <a class="nav-link" href="/reset_password/"><i class="bi bi-key me-1"></i>Reset Password</a>
                     </li>
                 </ul>
-                <div class="ms-lg-3 mt-2 mt-lg-0">
-                    <a href="/Security-Check/" class="nav-link btn-nhea-nav">
-                        <i class="fas fa-user-shield me-1"></i>Staff
+            <div class="ms-lg-3 mt-2 mt-lg-0">
+                {% if user.is_authenticated and user.is_staff and not user.is_superuser %}
+                    <a href="{% url 'admin_dashboard' %}" class="nav-link btn-nhea-nav">
+                        <i class="fas fa-user-shield me-1"></i>Admin Dashboard
                     </a>
-                </div>
-                    <div class="ms-lg-3 mt-2 mt-lg-0">
-                    <a href="/admin/" class="nav-link btn-nhea-nav">
+                {% else %}
+                    <a href="{% url 'admin_login' %}" class="nav-link btn-nhea-nav">
                         <i class="fas fa-user-shield me-1"></i>Admin
                     </a>
-                </div>
+                {% endif %}
+            </div>
+            <div class="ms-lg-3 mt-2 mt-lg-0">
+                {% if user.is_authenticated and user.is_superuser %}
+                    <a href="{% url 'superadmin_dashboard' %}" class="nav-link btn-nhea-nav" style="background:linear-gradient(135deg,#b45309,#f59e0b);">
+                        <i class="fas fa-crown me-1"></i>Superadmin Dashboard
+                    </a>
+                {% else %}
+                    <a href="{% url 'superadmin_login' %}" class="nav-link btn-nhea-nav" style="background:linear-gradient(135deg,#b45309,#f59e0b);">
+                        <i class="fas fa-crown me-1"></i>Super Admin
+                    </a>
+                {% endif %}
+            </div>
             </div>
         </div>
     </nav>
