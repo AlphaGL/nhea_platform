@@ -8,12 +8,18 @@ import string
 def generate_voter_id():
     """Generate a unique NHEA voter ID like NHEA-2026-XXXXX"""
     from django.utils import timezone
+    from django.db import OperationalError, ProgrammingError
     year = timezone.now().year
     suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
     candidate = f"NHEA-{year}-{suffix}"
-    while Voter.objects.filter(voter_id=candidate).exists():
-        suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
-        candidate = f"NHEA-{year}-{suffix}"
+    try:
+        while Voter.objects.filter(voter_id=candidate).exists():
+            suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            candidate = f"NHEA-{year}-{suffix}"
+    except (OperationalError, ProgrammingError):
+        # Table doesn't exist yet (e.g. during initial makemigrations/migrate).
+        # The uniqueness check will happen once the DB is set up.
+        pass
     return candidate
 
 

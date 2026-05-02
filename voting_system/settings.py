@@ -47,20 +47,20 @@ ALLOWED_HOSTS = ["*"]
 # }
 
 # Database
-# DATABASES = {
-#     # neon.tech
-#     ## Email: nextmediahqnet@gmail.com
-#     'default': dj_database_url.parse(
-#         'postgresql://neondb_owner:npg_JG5h2RLkElnX@ep-long-truth-anhddodg-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
-#     ),
-# }
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # neon.tech
+    ## Email: nextmediahqnet@gmail.com
+    'default': dj_database_url.parse(
+        'postgresql://neondb_owner:npg_JG5h2RLkElnX@ep-long-truth-anhddodg-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+    ),
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # Application definition
 
