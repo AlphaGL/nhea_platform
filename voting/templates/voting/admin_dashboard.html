@@ -198,10 +198,10 @@
     {% endif %}
 
     <!-- Activity log available to all admins -->
-    <a href="{% url 'activity_log' %}" class="ad-action-card">
+    <!-- <a href="{% url 'activity_log' %}" class="ad-action-card">
       <div class="ad-action-icon" style="background:linear-gradient(135deg,#065f46,#10b981);"><i class="fas fa-clipboard-list"></i></div>
       <div><div class="ad-action-label">Audit Log</div><div class="ad-action-sub">Platform activity</div></div>
-    </a>
+    </a> -->
 
     {% if admin.can_reset_votes %}
     <a href="{% url 'reset_all' %}" class="ad-action-card" style="border-color:#fca5a5;"
@@ -214,7 +214,7 @@
   </div>
 
   <!-- Recent Activity -->
-  {% if recent_logs %}
+  <!-- {% if recent_logs %}
   <div class="ad-section-title" data-aos="fade-up"><i class="fas fa-history" style="color:var(--nhea-green);"></i>Recent Activity</div>
   <div class="ad-activity-card" data-aos="fade-up">
     <div class="ad-activity-head">
@@ -235,7 +235,7 @@
     </div>
     {% endfor %}
   </div>
-  {% endif %}
+  {% endif %} -->
 
   <div class="text-center mt-4" data-aos="fade-up">
     <a href="{% url 'logout' %}" style="color:var(--nhea-muted);font-size:0.88rem;text-decoration:none;font-weight:600;">
